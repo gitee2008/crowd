@@ -132,11 +132,11 @@ public class DataFileFactory {
 
 	public void checkAndCreateFileDB() {
 		IDatabaseService databaseService = (IDatabaseService) ContextFactory.getBean("databaseService");
-		Database database = databaseService.getDatabaseByMapping("file");
-		if (database == null) {// 不存在文件库，创建默认的文件库
-			Database master = databaseService.getDatabaseByMapping("master");
-			long databaseId = 0;
-			if (master != null && "Y".equals(master.getVerify())) {
+		long databaseId = 0;
+		Database master = databaseService.getDatabaseByMapping("master");
+		if (master != null && "Y".equals(master.getVerify())) {
+			Database database = databaseService.getDatabaseByMapping("file");
+			if (database == null) {// 不存在文件库，创建默认的文件库
 				Database fileDB = master.clone();
 
 				fileDB.setMapping("file");
@@ -148,7 +148,7 @@ public class DataFileFactory {
 				fileDB.setUseType("FILE");
 				fileDB.setRunType("INST");
 				fileDB.setTitle("附件库");
-				fileDB.setDbname(fileDB.getDbname() + "_FILE");
+				fileDB.setDbname(fileDB.getDbname() + "_file");
 				fileDB.setKey(master.getKey());
 				fileDB.setUser(master.getUser());
 				fileDB.setPassword(master.getPassword());
@@ -212,12 +212,13 @@ public class DataFileFactory {
 					JdbcUtils.close(stmt);
 					JdbcUtils.close(conn);
 				}
+			} else {
+				databaseId = database.getId();
+			}
 
-				TableDefinition tableDefinition = DataFileDomainFactory.getTableDefinition();
-				DBUtils.createTable(master.getName(), tableDefinition);
-				
+			if (databaseId > 0) {
 				try {
-					DataFileDomainFactory.createTenantTables(master.getId());
+					DataFileDomainFactory.createTables(databaseId);
 				} catch (Throwable ex) {
 					logger.error(ex);
 				}
@@ -228,6 +229,28 @@ public class DataFileFactory {
 					logger.error(ex);
 				}
 			}
+
+			if (master != null) {
+				try {
+					TableDefinition tableDefinition = DataFileDomainFactory.getTableDefinition();
+					DBUtils.createTable(master.getName(), tableDefinition);
+				} catch (Throwable ex) {
+					logger.error(ex);
+				}
+
+				try {
+					DataFileDomainFactory.createTables(master.getId());
+				} catch (Throwable ex) {
+					logger.error(ex);
+				}
+
+				try {
+					DataFileDomainFactory.createTenantTables(master.getId());
+				} catch (Throwable ex) {
+					logger.error(ex);
+				}
+			}
+
 		}
 	}
 
@@ -412,7 +435,6 @@ public class DataFileFactory {
 				if (fileId != null) {
 					dataFile.setId(fileId);
 				}
-				dataFile.setData(null);// 附件库写入字节流后就不写主控库了
 				getDataFileService().insertDataFile(tenantId, dataFile);
 			}
 		} catch (Exception ex) {
