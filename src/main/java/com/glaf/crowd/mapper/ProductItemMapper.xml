@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.glaf.crowd.mapper.ProductItemMapper">
+
+	<resultMap id="productItemResultMap"
+		type="com.glaf.crowd.domain.ProductItem">
+		<id property="id" column="ID_" jdbcType="VARCHAR" />
+		<result property="tenantId" column="TENANTID_"
+			jdbcType="VARCHAR" />
+		<result property="category" column="CATEGORY_"
+			jdbcType="VARCHAR" />
+		<result property="itemName" column="ITEMNAME_"
+			jdbcType="VARCHAR" />
+		<result property="itemLocation" column="ITEMLOCATION_"
+			jdbcType="VARCHAR" />
+		<result property="smallUrl" column="SMALLURL_"
+			jdbcType="VARCHAR" />
+		<result property="itemUrl" column="ITEMURL_" jdbcType="VARCHAR" />
+		<result property="itemTitle" column="ITEMTITLE_"
+			jdbcType="VARCHAR" />
+		<result property="itemContent" column="ITEMCONTENT_"
+			jdbcType="VARCHAR" />
+		<result property="itemStatus" column="ITEMSTATUS_"
+			jdbcType="INTEGER" />
+		<result property="itemMoney" column="ITEMMONEY_"
+			jdbcType="DOUBLE" />
+		<result property="itemDay" column="ITEMDAY_" jdbcType="INTEGER" />
+		<result property="lastModified" column="LASTMODIFIED_"
+			jdbcType="BIGINT" />
+		<result property="createBy" column="CREATEBY_"
+			jdbcType="VARCHAR" />
+		<result property="createTime" column="CREATETIME_"
+			jdbcType="TIMESTAMP" />
+		<result property="updateBy" column="UPDATEBY_"
+			jdbcType="VARCHAR" />
+		<result property="updateTime" column="UPDATETIME_"
+			jdbcType="TIMESTAMP" />
+	</resultMap>
+
+
+	<insert id="insertProductItem"
+		parameterType="com.glaf.crowd.domain.ProductItem">
+		insert into T_PRODUCT_ITEM
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			ID_
+			<if test="tenantId != null">
+				,TENANTID_
+			</if>
+			<if test="category != null">
+				,CATEGORY_
+			</if>
+			<if test="itemName != null">
+				,ITEMNAME_
+			</if>
+			<if test="itemLocation != null">
+				,ITEMLOCATION_
+			</if>
+			<if test="smallUrl != null">
+				,SMALLURL_
+			</if>
+			<if test="itemUrl != null">
+				,ITEMURL_
+			</if>
+			<if test="itemTitle != null">
+				,ITEMTITLE_
+			</if>
+			<if test="itemContent != null">
+				,ITEMCONTENT_
+			</if>
+			<if test="itemStatus != null">
+				,ITEMSTATUS_
+			</if>
+			<if test="itemMoney != null">
+				,ITEMMONEY_
+			</if>
+			<if test="itemDay != null">
+				,ITEMDAY_
+			</if>
+			<if test="lastModified != null">
+				,LASTMODIFIED_
+			</if>
+			<if test="createBy != null">
+				,CREATEBY_
+			</if>
+			<if test="createTime != null">
+				,CREATETIME_
+			</if>
+			<if test="updateBy != null">
+				,UPDATEBY_
+			</if>
+			<if test="updateTime != null">
+				,UPDATETIME_
+			</if>
+		</trim>
+
+		<trim prefix=" values (" suffix=")" suffixOverrides=",">
+			#{id, jdbcType=VARCHAR}
+
+			<if test="tenantId != null">
+				,#{tenantId, jdbcType=VARCHAR}
+			</if>
+			<if test="category != null">
+				,#{category, jdbcType=VARCHAR}
+			</if>
+			<if test="itemName != null">
+				,#{itemName, jdbcType=VARCHAR}
+			</if>
+			<if test="itemLocation != null">
+				,#{itemLocation, jdbcType=VARCHAR}
+			</if>
+			<if test="smallUrl != null">
+				,#{smallUrl, jdbcType=VARCHAR}
+			</if>
+			<if test="itemUrl != null">
+				,#{itemUrl, jdbcType=VARCHAR}
+			</if>
+			<if test="itemTitle != null">
+				,#{itemTitle, jdbcType=VARCHAR}
+			</if>
+			<if test="itemContent != null">
+				,#{itemContent, jdbcType=VARCHAR}
+			</if>
+			<if test="itemStatus != null">
+				,#{itemStatus, jdbcType=INTEGER}
+			</if>
+			<if test="itemMoney != null">
+				,#{itemMoney, jdbcType=DOUBLE}
+			</if>
+			<if test="itemDay != null">
+				,#{itemDay, jdbcType=INTEGER}
+			</if>
+			<if test="lastModified != null">
+				,#{lastModified, jdbcType=BIGINT}
+			</if>
+			<if test="createBy != null">
+				,#{createBy, jdbcType=VARCHAR}
+			</if>
+			<if test="createTime != null">
+				,#{createTime, jdbcType=TIMESTAMP}
+			</if>
+			<if test="updateBy != null">
+				,#{updateBy, jdbcType=VARCHAR}
+			</if>
+			<if test="updateTime != null">
+				,#{updateTime, jdbcType=TIMESTAMP}
+			</if>
+		</trim>
+	</insert>
+
+
+	<insert id="bulkInsertProductItem"
+		parameterType="java.util.List">
+		insert into T_PRODUCT_ITEM (
+		ID_
+		,TENANTID_
+		,CATEGORY_
+		,ITEMNAME_
+		,ITEMLOCATION_
+		,SMALLURL_
+		,ITEMURL_
+		,ITEMTITLE_
+		,ITEMCONTENT_
+		,ITEMSTATUS_
+		,ITEMMONEY_
+		,ITEMDAY_
+		,LASTMODIFIED_
+		,CREATEBY_
+		,CREATETIME_
+		,UPDATEBY_
+		,UPDATETIME_
+		) values
+		<foreach collection="list" item="productItem" index="index"
+			separator=",">
+			(
+			#{productItem.id, jdbcType=VARCHAR}
+			,#{productItem.tenantId, jdbcType=VARCHAR}
+			,#{productItem.category,
+			jdbcType=VARCHAR}
+			,#{productItem.itemName, jdbcType=VARCHAR}
+			,#{productItem.itemLocation, jdbcType=VARCHAR}
+			,#{productItem.smallUrl, jdbcType=VARCHAR}
+			,#{productItem.itemUrl,
+			jdbcType=VARCHAR}
+			,#{productItem.itemTitle, jdbcType=VARCHAR}
+			,#{productItem.itemContent, jdbcType=VARCHAR}
+			,#{productItem.itemStatus, jdbcType=INTEGER}
+			,#{productItem.itemMoney, jdbcType=DOUBLE}
+			,#{productItem.itemDay,
+			jdbcType=INTEGER}
+			,#{productItem.lastModified, jdbcType=BIGINT}
+			,#{productItem.createBy, jdbcType=VARCHAR}
+			,#{productItem.createTime,
+			jdbcType=TIMESTAMP}
+			,#{productItem.updateBy, jdbcType=VARCHAR}
+			,#{productItem.updateTime, jdbcType=TIMESTAMP}
+			)
+		</foreach>
+	</insert>
+
+
+	<insert id="bulkInsertProductItem_oracle"
+		parameterType="java.util.List">
+		INSERT ALL
+		<foreach collection="list" item="productItem" index="index">
+			insert
+			into T_PRODUCT_ITEM (
+			ID_
+			,TENANTID_
+			,CATEGORY_
+			,ITEMNAME_
+			,ITEMLOCATION_
+			,SMALLURL_
+			,ITEMURL_
+			,ITEMTITLE_
+			,ITEMCONTENT_
+			,ITEMSTATUS_
+			,ITEMMONEY_
+			,ITEMDAY_
+			,LASTMODIFIED_
+			,CREATEBY_
+			,CREATETIME_
+			,UPDATEBY_
+			,UPDATETIME_
+			)
+			values (
+			#{productItem.id, jdbcType=VARCHAR}
+			,#{productItem.tenantId,
+			jdbcType=VARCHAR}
+			,#{productItem.category, jdbcType=VARCHAR}
+			,#{productItem.itemName, jdbcType=VARCHAR}
+			,#{productItem.itemLocation, jdbcType=VARCHAR}
+			,#{productItem.smallUrl, jdbcType=VARCHAR}
+			,#{productItem.itemUrl,
+			jdbcType=VARCHAR}
+			,#{productItem.itemTitle, jdbcType=VARCHAR}
+			,#{productItem.itemContent, jdbcType=VARCHAR}
+			,#{productItem.itemStatus, jdbcType=INTEGER}
+			,#{productItem.itemMoney, jdbcType=DOUBLE}
+			,#{productItem.itemDay,
+			jdbcType=INTEGER}
+			,#{productItem.lastModified, jdbcType=BIGINT}
+			,#{productItem.createBy, jdbcType=VARCHAR}
+			,#{productItem.createTime,
+			jdbcType=TIMESTAMP}
+			,#{productItem.updateBy, jdbcType=VARCHAR}
+			,#{productItem.updateTime, jdbcType=TIMESTAMP}
+			)
+		</foreach>
+		SELECT * FROM dual
+	</insert>
+
+
+	<update id="updateProductItem"
+		parameterType="com.glaf.crowd.domain.ProductItem">
+		update T_PRODUCT_ITEM
+		set
+		<trim prefix="" suffix="" suffixOverrides=",">
+			<if test="category != null">
+				CATEGORY_ = #{category, jdbcType=VARCHAR},
+			</if>
+			<if test="itemName != null">
+				ITEMNAME_ = #{itemName, jdbcType=VARCHAR},
+			</if>
+			<if test="itemLocation != null">
+				ITEMLOCATION_ = #{itemLocation, jdbcType=VARCHAR},
+			</if>
+			<if test="smallUrl != null">
+				SMALLURL_ = #{smallUrl, jdbcType=VARCHAR},
+			</if>
+			<if test="itemUrl != null">
+				ITEMURL_ = #{itemUrl, jdbcType=VARCHAR},
+			</if>
+			<if test="itemTitle != null">
+				ITEMTITLE_ = #{itemTitle, jdbcType=VARCHAR},
+			</if>
+			<if test="itemContent != null">
+				ITEMCONTENT_ = #{itemContent, jdbcType=VARCHAR},
+			</if>
+			<if test="itemStatus != null">
+				ITEMSTATUS_ = #{itemStatus, jdbcType=INTEGER},
+			</if>
+			<if test="itemMoney != null">
+				ITEMMONEY_ = #{itemMoney, jdbcType=DOUBLE},
+			</if>
+			<if test="itemDay != null">
+				ITEMDAY_ = #{itemDay, jdbcType=INTEGER},
+			</if>
+			<if test="lastModified != null">
+				LASTMODIFIED_ = #{lastModified, jdbcType=BIGINT},
+			</if>
+			<if test="updateBy != null">
+				UPDATEBY_ = #{updateBy, jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				UPDATETIME_ = #{updateTime, jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+		where
+		ID_ = #{id, jdbcType=VARCHAR}
+
+	</update>
+
+
+	<delete id="deleteProductItemById" parameterType="string">
+		delete from
+		T_PRODUCT_ITEM
+		where ID_ = #{id}
+	</delete>
+
+
+
+	<select id="getProductItemById" parameterType="string"
+		resultMap="productItemResultMap">
+		select * from T_PRODUCT_ITEM where ID_ = #{id}
+	</select>
+
+
+	<select id="getProductItems"
+		parameterType="com.glaf.crowd.query.ProductItemQuery"
+		resultMap="productItemResultMap">
+		select distinct E.*
+		<include refid="selectProductItemsSql" />
+		<choose>
+			<when test="orderBy != null">
+				order by ${orderBy}
+			</when>
+			<otherwise>
+				order by E.CREATETIME_ desc
+			</otherwise>
+		</choose>
+	</select>
+
+
+	<select id="getProductItemCount"
+		parameterType="com.glaf.crowd.query.ProductItemQuery" resultType="int">
+		select count(*)
+		<include refid="selectProductItemsSql" />
+	</select>
+
+
+	<sql id="selectProductItemsSql">
+
+		from T_PRODUCT_ITEM E
+
+		<where>
+			1 = 1
+
+
+			<if test="category != null and category != '' ">
+				and E.CATEGORY_ = #{category}
+			</if>
+
+			<if test="categoryLike != null and categoryLike != '' ">
+				and E.CATEGORY_ like #{categoryLike}
+			</if>
+
+			<if test="categorys != null and categorys.size() &gt; 0">
+				and E.CATEGORY_ IN
+				<foreach item="x_category" index="index"
+					collection="categorys" open="(" separator="," close=")">
+					#{x_category}
+				</foreach>
+			</if>
+
+			<if test="itemName != null and itemName != '' ">
+				and E.ITEMNAME_ = #{itemName}
+			</if>
+
+			<if test="itemNameLike != null and itemNameLike != '' ">
+				and E.ITEMNAME_ like #{itemNameLike}
+			</if>
+
+			<if test="itemNames != null and itemNames.size() &gt; 0">
+				and E.ITEMNAME_ IN
+				<foreach item="x_itemName" index="index"
+					collection="itemNames" open="(" separator="," close=")">
+					#{x_itemName}
+				</foreach>
+			</if>
+
+			<if test="itemLocation != null and itemLocation != '' ">
+				and E.ITEMLOCATION_ = #{itemLocation}
+			</if>
+
+			<if test="itemLocationLike != null and itemLocationLike != '' ">
+				and E.ITEMLOCATION_ like #{itemLocationLike}
+			</if>
+
+			<if test="itemLocations != null and itemLocations.size() &gt; 0">
+				and E.ITEMLOCATION_ IN
+				<foreach item="x_itemLocation" index="index"
+					collection="itemLocations" open="(" separator="," close=")">
+					#{x_itemLocation}
+				</foreach>
+			</if>
+
+			<if test="smallUrl != null and smallUrl != '' ">
+				and E.SMALLURL_ = #{smallUrl}
+			</if>
+
+			<if test="smallUrlLike != null and smallUrlLike != '' ">
+				and E.SMALLURL_ like #{smallUrlLike}
+			</if>
+
+			<if test="smallUrls != null and smallUrls.size() &gt; 0">
+				and E.SMALLURL_ IN
+				<foreach item="x_smallUrl" index="index"
+					collection="smallUrls" open="(" separator="," close=")">
+					#{x_smallUrl}
+				</foreach>
+			</if>
+
+			<if test="itemUrl != null and itemUrl != '' ">
+				and E.ITEMURL_ = #{itemUrl}
+			</if>
+
+			<if test="itemUrlLike != null and itemUrlLike != '' ">
+				and E.ITEMURL_ like #{itemUrlLike}
+			</if>
+
+			<if test="itemUrls != null and itemUrls.size() &gt; 0">
+				and E.ITEMURL_ IN
+				<foreach item="x_itemUrl" index="index"
+					collection="itemUrls" open="(" separator="," close=")">
+					#{x_itemUrl}
+				</foreach>
+			</if>
+
+			<if test="itemTitle != null and itemTitle != '' ">
+				and E.ITEMTITLE_ = #{itemTitle}
+			</if>
+
+			<if test="itemTitleLike != null and itemTitleLike != '' ">
+				and E.ITEMTITLE_ like #{itemTitleLike}
+			</if>
+
+			<if test="itemTitles != null and itemTitles.size() &gt; 0">
+				and E.ITEMTITLE_ IN
+				<foreach item="x_itemTitle" index="index"
+					collection="itemTitles" open="(" separator="," close=")">
+					#{x_itemTitle}
+				</foreach>
+			</if>
+
+			<if test="itemContent != null and itemContent != '' ">
+				and E.ITEMCONTENT_ = #{itemContent}
+			</if>
+
+			<if test="itemContentLike != null and itemContentLike != '' ">
+				and E.ITEMCONTENT_ like #{itemContentLike}
+			</if>
+
+			<if test="itemContents != null and itemContents.size() &gt; 0">
+				and E.ITEMCONTENT_ IN
+				<foreach item="x_itemContent" index="index"
+					collection="itemContents" open="(" separator="," close=")">
+					#{x_itemContent}
+				</foreach>
+			</if>
+
+			<if test="itemMoneyGreaterThanOrEqual != null">
+				and E.ITEMMONEY_ &gt;= #{itemMoneyGreaterThanOrEqual}
+			</if>
+
+			<if test="itemMoneyLessThanOrEqual != null">
+				and E.ITEMMONEY_ &lt;= #{itemMoneyLessThanOrEqual}
+			</if>
+
+		</where>
+	</sql>
+
+</mapper>
