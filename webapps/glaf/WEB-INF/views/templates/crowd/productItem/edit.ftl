@@ -7,50 +7,7 @@
 <script type="text/javascript">
 
 	function saveData(){
-		var params = jQuery("#iForm").formSerialize();
-		jQuery.ajax({
-				   type: "POST",
-				   url: '${contextPath}/crowd/productItem/saveProductItem',
-				   data: params,
-				   dataType: 'json',
-				   error: function(data){
-					   alert('服务器处理错误！');
-				   },
-				   success: function(data){
-					   if(data != null && data.message != null){
-						   alert(data.message);
-					   } else {
-						   alert('操作成功完成！');
-					   }
-					   if(data.statusCode == 200){
-					       window.parent.location.reload();
-					   } 
-				   }
-			 });
-	}
-
-	function saveAsData(){
-		document.getElementById("id").value="";
-		var params = jQuery("#iForm").formSerialize();
-		jQuery.ajax({
-				   type: "POST",
-				   url: '${contextPath}/crowd/productItem/saveProductItem',
-				   data: params,
-				   dataType:  'json',
-				   error: function(data){
-					   alert('服务器处理错误！');
-				   },
-				   success: function(data){
-					   if(data != null && data.message != null){
-						   alert(data.message);
-					   } else {
-						   alert('操作成功完成！');
-					   }
-					   if(data.statusCode == 200){
-					       window.parent.location.reload();
-					   }
-				   }
-			 });
+         document.iForm.submit();
 	}
 
 </script>
@@ -68,7 +25,7 @@
   </div>
 
   <div data-options="region:'center',border:false,cache:true">
-  <form id="iForm" name="iForm" method="post">
+  <form id="iForm" name="iForm" method="post" enctype="multipart/form-data" action="${contextPath}/crowd/productItem/save">
   <input type="hidden" id="id" name="id" value="${productItem.id}"/>
   <table class="easyui-form" style="width:600px;" align="center">
     <tbody>
@@ -113,17 +70,21 @@
 	<tr>
 		<td width="20%" align="left">小图片地址</td>
 		<td align="left">
-              <input id="smallUrl" name="smallUrl" type="text" 
-			         class="easyui-validatebox x-text" style="width:350px;"
-				     value="${productItem.smallUrl}"/>
+              <input id="smallUrl" name="smallUrl" type="file" 
+			         class="easyui-validatebox x-text" style="width:350px;"/>
+			  <#if productItem.smallUrl?exists && productItem.smallUrl !="" >
+			     <br><br><img src="${contextPath}${productItem.smallUrl}?ts=${ts}" border="0">
+			  </#if>
 		</td>
 	</tr>
 	<tr>
 		<td width="20%" align="left">图片地址</td>
 		<td align="left">
-              <input id="itemUrl" name="itemUrl" type="text" 
-			         class="easyui-validatebox x-text" style="width:350px;"
-				     value="${productItem.itemUrl}"/>
+              <input id="itemUrl" name="itemUrl" type="file" 
+			         class="easyui-validatebox x-text" style="width:350px;"/>
+			  <#if productItem.itemUrl?exists && productItem.itemUrl !="">
+			     <br><br><img src="${contextPath}${productItem.itemUrl}?ts=${ts}" border="0">
+			  </#if>
 		</td>
 	</tr>
 	<tr>

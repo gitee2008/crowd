@@ -266,10 +266,10 @@
 			<if test="itemLocation != null">
 				ITEMLOCATION_ = #{itemLocation, jdbcType=VARCHAR},
 			</if>
-			<if test="smallUrl != null">
+			<if test="smallUrl != null and smallUrl != '' ">
 				SMALLURL_ = #{smallUrl, jdbcType=VARCHAR},
 			</if>
-			<if test="itemUrl != null">
+			<if test="itemUrl != null and itemUrl != ''">
 				ITEMURL_ = #{itemUrl, jdbcType=VARCHAR},
 			</if>
 			<if test="itemTitle != null">

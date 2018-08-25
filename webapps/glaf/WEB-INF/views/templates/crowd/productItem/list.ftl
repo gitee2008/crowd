@@ -10,13 +10,14 @@
     function getLink(){
 	    var link_ = "${contextPath}/crowd/productItem/json?q=1&nodeCode=${nodeCode}";
 		var category = jQuery("#category").val();
-		if(category != ""){
+		if(category != "" && category != "undefined"){
 		    link_ = link_ + "&category="+category;
 		}
-		var itemLocation = jQuery("#itemLocation").val();
-		if(itemLocation != ""){
-		    link_ = link_ + "&itemLocation="+itemLocation;
-		}
+		//var itemLocation = jQuery("#itemLocation").val();
+		//if(itemLocation != "" && itemLocation != "undefined"){
+		//    link_ = link_ + "&itemLocation="+itemLocation;
+		//}
+		//alert(link_);
 		return link_;
     }
 

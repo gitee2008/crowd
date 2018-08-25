@@ -22,7 +22,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -33,6 +35,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSONArray;
@@ -40,13 +45,16 @@ import com.alibaba.fastjson.JSONObject;
 import com.glaf.base.modules.sys.model.Dictory;
 import com.glaf.base.modules.sys.service.DictoryService;
 import com.glaf.base.modules.sys.service.SysTreeService;
+import com.glaf.core.config.SystemProperties;
 import com.glaf.core.config.ViewProperties;
 import com.glaf.core.security.LoginContext;
+import com.glaf.core.util.DateUtils;
+import com.glaf.core.util.FileUtils;
 import com.glaf.core.util.ParamUtils;
 import com.glaf.core.util.RequestUtils;
 import com.glaf.core.util.ResponseUtils;
 import com.glaf.core.util.Tools;
-
+import com.glaf.core.util.UUID32;
 import com.glaf.crowd.domain.ProductItem;
 import com.glaf.crowd.query.ProductItemQuery;
 import com.glaf.crowd.service.ProductItemService;
@@ -114,6 +122,8 @@ public class ProductItemController {
 
 			}
 		}
+		
+		request.setAttribute("ts", System.currentTimeMillis());
 
 		String nodeCode = request.getParameter("nodeCode");
 		if (StringUtils.isEmpty(nodeCode)) {
@@ -256,37 +266,85 @@ public class ProductItemController {
 		return new ModelAndView("/crowd/productItem/list", modelMap);
 	}
 
-	@ResponseBody
-	@RequestMapping("/saveProductItem")
-	public byte[] saveProductItem(HttpServletRequest request) {
+	@RequestMapping("/save")
+	public ModelAndView save(HttpServletRequest request, ModelMap modelMap) {
 		LoginContext loginContext = RequestUtils.getLoginContext(request);
 		String actorId = loginContext.getActorId();
-		Map<String, Object> params = RequestUtils.getParameterMap(request);
-		ProductItem productItem = new ProductItem();
-		try {
-			Tools.populate(productItem, params);
 
-			productItem.setCategory(request.getParameter("category"));
-			productItem.setItemName(request.getParameter("itemName"));
-			productItem.setItemLocation(request.getParameter("itemLocation"));
-			productItem.setSmallUrl(request.getParameter("smallUrl"));
-			productItem.setItemUrl(request.getParameter("itemUrl"));
-			productItem.setItemTitle(request.getParameter("itemTitle"));
-			productItem.setItemContent(request.getParameter("itemContent"));
-			productItem.setItemMoney(RequestUtils.getDouble(request, "itemMoney"));
-			productItem.setItemDay(RequestUtils.getInt(request, "itemDay"));
-			productItem.setCreateBy(actorId);
-			productItem.setUpdateBy(actorId);
-			productItem.setTenantId(loginContext.getTenantId());
+		// 将当前上下文初始化给 CommonsMutipartResolver（多部分解析器）
+		CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(
+				request.getSession().getServletContext());
+		// 检查form中是否有enctype="multipart/form-data"
+		if (multipartResolver.isMultipart(request)) {
+			MultipartHttpServletRequest req = (MultipartHttpServletRequest) request;
+			ProductItem productItem = null;
+			String id = request.getParameter("id");
+			String smallUrl = null;
+			String itemUrl = null;
+			try {
+				if (StringUtils.isNotEmpty(id)) {
+					productItem = productItemService.getProductItem(id);
+					if (!StringUtils.equals(productItem.getTenantId(), loginContext.getTenantId())) {
+						return this.list(request, modelMap);
+					}
+					smallUrl = productItem.getSmallUrl();
+					itemUrl = productItem.getItemUrl();
+				} else {
+					productItem = new ProductItem();
+					productItem.setTenantId(loginContext.getTenantId());
+				}
 
-			this.productItemService.save(productItem);
+				Map<String, MultipartFile> fileMap = req.getFileMap();
+				Set<Entry<String, MultipartFile>> entrySet = fileMap.entrySet();
+				for (Entry<String, MultipartFile> entry : entrySet) {
+					MultipartFile mFile = entry.getValue();
+					if (mFile.getOriginalFilename() != null && mFile.getSize() > 0
+							&& mFile.getSize() <= FileUtils.MB_SIZE * 20) {
+						String name = mFile.getOriginalFilename();
+						String fileExt = FileUtils.getFileExt(name);
+						if (StringUtils.equals(mFile.getName(), "smallUrl")) {
+							if (StringUtils.isNotEmpty(smallUrl)) {
+								FileUtils.save(SystemProperties.getAppPath() + smallUrl, mFile.getBytes());
+							} else {
+								String path = "/upload/" + DateUtils.getNowYearMonthDay() + "/";
+								String filename = path + UUID32.getUUID() + "." + fileExt;
+								FileUtils.mkdirs(SystemProperties.getAppPath() + path);
+								FileUtils.save(SystemProperties.getAppPath() + filename, mFile.getBytes());
+								productItem.setSmallUrl(filename);
+							}
+						}
+						if (StringUtils.equals(mFile.getName(), "itemUrl")) {
+							if (StringUtils.isNotEmpty(itemUrl)) {
+								FileUtils.save(SystemProperties.getAppPath() + itemUrl, mFile.getBytes());
+							} else {
+								String path = "/upload/" + DateUtils.getNowYearMonthDay() + "/";
+								String filename = path + UUID32.getUUID() + "." + fileExt;
+								FileUtils.mkdirs(SystemProperties.getAppPath() + path);
+								FileUtils.save(SystemProperties.getAppPath() + filename, mFile.getBytes());
+								productItem.setItemUrl(filename);
+							}
+						}
+					}
+				}
 
-			return ResponseUtils.responseJsonResult(true);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			logger.error(ex);
+				productItem.setCategory(req.getParameter("category"));
+				productItem.setItemName(req.getParameter("itemName"));
+				productItem.setItemLocation(req.getParameter("itemLocation"));
+				productItem.setItemTitle(req.getParameter("itemTitle"));
+				productItem.setItemContent(req.getParameter("itemContent"));
+				productItem.setItemMoney(RequestUtils.getDouble(req, "itemMoney"));
+				productItem.setItemDay(RequestUtils.getInt(req, "itemDay"));
+				productItem.setCreateBy(actorId);
+				productItem.setUpdateBy(actorId);
+
+				this.productItemService.save(productItem);
+
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				logger.error(ex);
+			}
 		}
-		return ResponseUtils.responseJsonResult(false);
+		return this.list(request, modelMap);
 	}
 
 	@javax.annotation.Resource

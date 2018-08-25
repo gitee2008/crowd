@@ -98,6 +98,8 @@
 		<property name="exposeSpringMacroHelpers" value="true" />
 	</bean>
 
+	<mvc:resources mapping="/upload/**" location="/upload/"
+		cache-period="31556926" />
 	<mvc:resources mapping="/static/**" location="/static/"
 		cache-period="31556926" />
 	<mvc:resources mapping="/html/**" location="/html/"
