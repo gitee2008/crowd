@@ -42,6 +42,7 @@ import com.glaf.core.util.Tools;
 import com.glaf.crowd.domain.ProductItem;
 import com.glaf.crowd.query.ProductItemQuery;
 import com.glaf.crowd.service.ProductItemService;
+import com.glaf.crowd.util.ProductItemJsonFactory;
 
 /**
  * http://127.0.0.1:8080/glaf/website/my/crowd/productItem/json?tenantId=9661a001bcc04ef0955c1408c857164c
@@ -140,7 +141,7 @@ public class MyProductItemController {
 				}
 
 				for (ProductItem productItem : list) {
-					JSONObject rowJSON = productItem.toJsonObject();
+					JSONObject rowJSON = ProductItemJsonFactory.toJsonObject2(productItem);
 					rowJSON.put("id", productItem.getId());
 					rowJSON.put("itemId", productItem.getId());
 					if (nameMap.get(productItem.getCategory()) != null) {

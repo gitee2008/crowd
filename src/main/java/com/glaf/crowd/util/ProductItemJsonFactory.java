@@ -122,6 +122,39 @@ public class ProductItemJsonFactory {
 		}
 		return jsonObject;
 	}
+	
+	public static JSONObject toJsonObject2(ProductItem model) {
+		JSONObject jsonObject = new JSONObject();
+		jsonObject.put("id", model.getId());
+
+		if (model.getCategory() != null) {
+			jsonObject.put("category", model.getCategory());
+		}
+		if (model.getItemName() != null) {
+			jsonObject.put("itemName", model.getItemName());
+		}
+		if (model.getItemLocation() != null) {
+			jsonObject.put("itemLocation", model.getItemLocation());
+		}
+		if (model.getSmallUrl() != null) {
+			jsonObject.put("smallUrl", model.getSmallUrl());
+		}
+		if (model.getItemUrl() != null) {
+			jsonObject.put("itemUrl", model.getItemUrl());
+		}
+		if (model.getItemTitle() != null) {
+			jsonObject.put("itemTitle", model.getItemTitle());
+		}
+		if (model.getItemContent() != null) {
+			jsonObject.put("itemContent", model.getItemContent());
+		}
+		jsonObject.put("itemStatus", model.getItemStatus());
+		jsonObject.put("itemMoney", model.getItemMoney());
+		jsonObject.put("itemDay", model.getItemDay());
+		jsonObject.put("lastModified", model.getLastModified());
+		
+		return jsonObject;
+	}
 
 	public static ObjectNode toObjectNode(ProductItem model) {
 		ObjectNode jsonObject = new ObjectMapper().createObjectNode();
