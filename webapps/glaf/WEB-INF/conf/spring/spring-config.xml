@@ -20,7 +20,6 @@
 	<import resource="spring-ehcache.xml" />
 	<import resource="spring-freemarker.xml" />
 	<import resource="spring-scheduler.xml" />
-	<import resource="spring-flowable.xml" />
 	
 	<!-- <import resource="spring-redis.xml" /> -->
 
