@@ -407,29 +407,25 @@ public class DataFileController {
 
 			} else {
 				databaseId = database.getId();
+
+				try {
+					DataFileDomainFactory.createTenantTables(master.getId());
+				} catch (Throwable ex) {
+					logger.error(ex);
+				}
+
+				try {
+					DataFileDomainFactory.createTenantTables(databaseId);
+				} catch (Throwable ex) {
+					logger.error(ex);
+				}
+
 				try {
 					DataFileDomainFactory.createTables(databaseId);
 				} catch (Throwable ex) {
 					logger.error(ex);
 				}
 
-				try {
-					DataFileDomainFactory.createTables(databaseId, 2018);
-				} catch (Throwable ex) {
-					logger.error(ex);
-				}
-
-				try {
-					DataFileDomainFactory.createTables(databaseId, 2019);
-				} catch (Throwable ex) {
-					logger.error(ex);
-				}
-
-				try {
-					DataFileDomainFactory.createTables(databaseId, 2020);
-				} catch (Throwable ex) {
-					logger.error(ex);
-				}
 			}
 
 			if (master != null) {

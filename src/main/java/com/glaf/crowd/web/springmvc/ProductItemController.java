@@ -316,6 +316,7 @@ public class ProductItemController {
 								dataFile.setPath(smallUrl);
 								dataFile.setServiceKey("ProductItem");
 								dataFile.setId(DigestUtils.md5Hex(smallUrl));
+								dataFile.setTenantId(loginContext.getTenantId());
 								DataFileFactory.getInstance().insertDataFile(loginContext.getTenantId(), dataFile,
 										mFile.getBytes());
 
@@ -331,6 +332,7 @@ public class ProductItemController {
 								dataFile.setPath(filename);
 								dataFile.setServiceKey("ProductItem");
 								dataFile.setId(DigestUtils.md5Hex(filename));
+								dataFile.setTenantId(loginContext.getTenantId());
 								DataFileFactory.getInstance().insertDataFile(loginContext.getTenantId(), dataFile,
 										mFile.getBytes());
 
@@ -349,6 +351,7 @@ public class ProductItemController {
 								dataFile.setPath(itemUrl);
 								dataFile.setServiceKey("ProductItem");
 								dataFile.setId(DigestUtils.md5Hex(itemUrl));
+								dataFile.setTenantId(loginContext.getTenantId());
 								DataFileFactory.getInstance().insertDataFile(loginContext.getTenantId(), dataFile,
 										mFile.getBytes());
 
@@ -364,6 +367,7 @@ public class ProductItemController {
 								dataFile.setPath(filename);
 								dataFile.setServiceKey("ProductItem");
 								dataFile.setId(DigestUtils.md5Hex(filename));
+								dataFile.setTenantId(loginContext.getTenantId());
 								DataFileFactory.getInstance().insertDataFile(loginContext.getTenantId(), dataFile,
 										mFile.getBytes());
 

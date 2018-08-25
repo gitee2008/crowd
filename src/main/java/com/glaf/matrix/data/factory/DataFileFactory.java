@@ -135,6 +135,7 @@ public class DataFileFactory {
 		Database database = databaseService.getDatabaseByMapping("file");
 		if (database == null) {// 不存在文件库，创建默认的文件库
 			Database master = databaseService.getDatabaseByMapping("master");
+			long databaseId = 0;
 			if (master != null && "Y".equals(master.getVerify())) {
 				Database fileDB = master.clone();
 
@@ -190,6 +191,7 @@ public class DataFileFactory {
 
 						fileDB.setActive("1");
 						databaseService.insert(fileDB);
+						databaseId = fileDB.getId();
 
 						conn = cfg.getConnection(fileDB);
 						if (!StringUtils.equals(DBUtils.POSTGRESQL, dbType)) {
@@ -213,6 +215,18 @@ public class DataFileFactory {
 
 				TableDefinition tableDefinition = DataFileDomainFactory.getTableDefinition();
 				DBUtils.createTable(master.getName(), tableDefinition);
+				
+				try {
+					DataFileDomainFactory.createTenantTables(master.getId());
+				} catch (Throwable ex) {
+					logger.error(ex);
+				}
+
+				try {
+					DataFileDomainFactory.createTenantTables(databaseId);
+				} catch (Throwable ex) {
+					logger.error(ex);
+				}
 			}
 		}
 	}
@@ -398,6 +412,7 @@ public class DataFileFactory {
 				if (fileId != null) {
 					dataFile.setId(fileId);
 				}
+				dataFile.setData(null);// 附件库写入字节流后就不写主控库了
 				getDataFileService().insertDataFile(tenantId, dataFile);
 			}
 		} catch (Exception ex) {
