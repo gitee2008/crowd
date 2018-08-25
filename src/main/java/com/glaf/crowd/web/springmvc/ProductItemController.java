@@ -317,7 +317,7 @@ public class ProductItemController {
 								dataFile.setServiceKey("ProductItem");
 								dataFile.setId(DigestUtils.md5Hex(smallUrl));
 								dataFile.setTenantId(loginContext.getTenantId());
-								DataFileFactory.getInstance().insertDataFile(loginContext.getTenantId(), dataFile,
+								DataFileFactory.getInstance().saveDataFile(loginContext.getTenantId(), dataFile,
 										mFile.getBytes());
 
 								FileUtils.save(SystemProperties.getAppPath() + smallUrl, mFile.getBytes());
@@ -333,7 +333,7 @@ public class ProductItemController {
 								dataFile.setServiceKey("ProductItem");
 								dataFile.setId(DigestUtils.md5Hex(filename));
 								dataFile.setTenantId(loginContext.getTenantId());
-								DataFileFactory.getInstance().insertDataFile(loginContext.getTenantId(), dataFile,
+								DataFileFactory.getInstance().saveDataFile(loginContext.getTenantId(), dataFile,
 										mFile.getBytes());
 
 								FileUtils.mkdirs(SystemProperties.getAppPath() + path);
@@ -352,7 +352,7 @@ public class ProductItemController {
 								dataFile.setServiceKey("ProductItem");
 								dataFile.setId(DigestUtils.md5Hex(itemUrl));
 								dataFile.setTenantId(loginContext.getTenantId());
-								DataFileFactory.getInstance().insertDataFile(loginContext.getTenantId(), dataFile,
+								DataFileFactory.getInstance().saveDataFile(loginContext.getTenantId(), dataFile,
 										mFile.getBytes());
 
 								FileUtils.save(SystemProperties.getAppPath() + itemUrl, mFile.getBytes());
@@ -368,7 +368,7 @@ public class ProductItemController {
 								dataFile.setServiceKey("ProductItem");
 								dataFile.setId(DigestUtils.md5Hex(filename));
 								dataFile.setTenantId(loginContext.getTenantId());
-								DataFileFactory.getInstance().insertDataFile(loginContext.getTenantId(), dataFile,
+								DataFileFactory.getInstance().saveDataFile(loginContext.getTenantId(), dataFile,
 										mFile.getBytes());
 
 								FileUtils.mkdirs(SystemProperties.getAppPath() + path);
