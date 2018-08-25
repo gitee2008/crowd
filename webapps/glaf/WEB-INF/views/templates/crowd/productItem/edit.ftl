@@ -27,10 +27,10 @@
   <div data-options="region:'center',border:false,cache:true">
   <form id="iForm" name="iForm" method="post" enctype="multipart/form-data" action="${contextPath}/crowd/productItem/save">
   <input type="hidden" id="id" name="id" value="${productItem.id}"/>
-  <table class="easyui-form" style="width:600px;" align="center">
+  <table class="easyui-form" style="width:98%;" align="center">
     <tbody>
 	<tr>
-		<td width="20%" align="left">分类</td>
+		<td width="15%" align="left">分类</td>
 		<td align="left">
            <select id="category" name="category">
 			    <option value="">----请选择----</option>
@@ -44,7 +44,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td width="20%" align="left">标题</td>
+		<td width="15%" align="left">标题</td>
 		<td align="left">
               <input id="itemTitle" name="itemTitle" type="text" 
 			         class="easyui-validatebox x-text" style="width:350px;"   
@@ -52,7 +52,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td width="20%" align="left">发起人</td>
+		<td width="15%" align="left">发起人</td>
 		<td align="left">
               <input id="itemName" name="itemName" type="text" 
 			         class="easyui-validatebox x-text" style="width:350px;" 
@@ -60,7 +60,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td width="20%" align="left">地址</td>
+		<td width="15%" align="left">地址</td>
 		<td align="left">
               <input id="itemLocation" name="itemLocation" type="text" 
 			         class="easyui-validatebox x-text" style="width:350px;"
@@ -68,7 +68,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td width="20%" align="left">小图片地址</td>
+		<td width="15%" align="left">小图片地址</td>
 		<td align="left">
               <input id="smallUrl" name="smallUrl" type="file" 
 			         class="easyui-validatebox x-text" style="width:350px;"/>
@@ -78,7 +78,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td width="20%" align="left">图片地址</td>
+		<td width="15%" align="left">图片地址</td>
 		<td align="left">
               <input id="itemUrl" name="itemUrl" type="file" 
 			         class="easyui-validatebox x-text" style="width:350px;"/>
@@ -88,20 +88,20 @@
 		</td>
 	</tr>
 	<tr>
-		<td width="20%" align="left">内容描述</td>
+		<td width="15%" align="left">内容描述</td>
 		<td align="left">
 		    <textarea id="itemContent" name="itemContent" rows="6" cols="46" class="x-text" style="height:150px;width:350px;" >${productItem.itemContent}</textarea>
 		</td>
 	</tr>
 	<tr>
-		<td width="20%" align="left">金额</td>
+		<td width="15%" align="left">金额</td>
 		<td align="left">
 			<input id="itemMoney" name="itemMoney" type="text" style="width:90px;" 
 			       class="easyui-numberbox  x-text"  precision="2" value="${productItem.itemMoney}"/>
 		</td>
 	</tr>
 	<tr>
-		<td width="20%" align="left">有效天数</td>
+		<td width="15%" align="left">有效天数</td>
 		<td align="left">
 			<input id="itemDay" name="itemDay" type="text" 
 			       class="easyui-numberbox x-text" style="width:90px;" 
@@ -109,7 +109,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td width="20%" align="left">&nbsp;</td>
+		<td width="15%" align="left">&nbsp;</td>
 		<td align="left">
 			<br><br>
 		</td>
