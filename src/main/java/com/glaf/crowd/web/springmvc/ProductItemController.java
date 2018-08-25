@@ -19,6 +19,7 @@
 package com.glaf.crowd.web.springmvc;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -119,7 +120,7 @@ public class ProductItemController {
 			nodeCode = "ProductCategory";
 		}
 		List<Dictory> dicts = dictoryService.getDictoryList(nodeCode);
-		request.setAttribute("dicts", dicts);
+		request.setAttribute("categories", dicts);
 
 		String view = request.getParameter("view");
 		if (StringUtils.isNotEmpty(view)) {
@@ -147,6 +148,16 @@ public class ProductItemController {
 
 		if (!loginContext.isSystemAdministrator()) {
 			query.tenantId(loginContext.getTenantId());
+		}
+
+		String nameLike = request.getParameter("nameLike_enc");
+		if (StringUtils.isNotEmpty(nameLike)) {
+			query.setItemTitleLike(nameLike);
+		}
+
+		String nameLike_enc = request.getParameter("nameLike_enc");
+		if (StringUtils.isNotEmpty(nameLike_enc)) {
+			query.setItemTitleLike(RequestUtils.decodeString(nameLike));
 		}
 
 		int start = 0;
@@ -191,15 +202,31 @@ public class ProductItemController {
 			if (list != null && !list.isEmpty()) {
 				JSONArray rowsJSON = new JSONArray();
 
-				result.put("rows", rowsJSON);
+				String nodeCode = request.getParameter("nodeCode");
+				if (StringUtils.isEmpty(nodeCode)) {
+					nodeCode = "ProductCategory";
+				}
+				List<Dictory> dicts = dictoryService.getDictoryList(nodeCode);
+
+				Map<String, String> nameMap = new HashMap<String, String>();
+				if (dicts != null && !dicts.isEmpty()) {
+					for (Dictory dict : dicts) {
+						nameMap.put(dict.getCode(), dict.getName());
+					}
+				}
 
 				for (ProductItem productItem : list) {
 					JSONObject rowJSON = productItem.toJsonObject();
 					rowJSON.put("id", productItem.getId());
 					rowJSON.put("productItemId", productItem.getId());
+					if (nameMap.get(productItem.getCategory()) != null) {
+						rowJSON.put("categoryName", nameMap.get(productItem.getCategory()));
+					}
 					rowJSON.put("startIndex", ++start);
 					rowsJSON.add(rowJSON);
 				}
+
+				result.put("rows", rowsJSON);
 
 			}
 		} else {
@@ -213,6 +240,13 @@ public class ProductItemController {
 	@RequestMapping
 	public ModelAndView list(HttpServletRequest request, ModelMap modelMap) {
 		RequestUtils.setRequestParameterToAttribute(request);
+
+		String nodeCode = request.getParameter("nodeCode");
+		if (StringUtils.isEmpty(nodeCode)) {
+			nodeCode = "ProductCategory";
+		}
+		List<Dictory> dicts = dictoryService.getDictoryList(nodeCode);
+		request.setAttribute("categories", dicts);
 
 		String view = request.getParameter("view");
 		if (StringUtils.isNotEmpty(view)) {

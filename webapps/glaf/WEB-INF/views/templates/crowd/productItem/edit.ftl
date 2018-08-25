@@ -62,7 +62,7 @@
 <div class="easyui-layout" data-options="fit:true">  
   <div data-options="region:'north',split:true,border:true" style="height:40px"> 
     <div class="toolbar-backgroud"> 
-	<span class="x_content_title">编辑产品项</span>
+	<span class="x_content_title">&nbsp;编辑产品项</span>&nbsp;
 	<a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-save'" onclick="javascript:saveData();" >保存</a> 
     </div> 
   </div>
@@ -75,7 +75,23 @@
 	<tr>
 		<td width="20%" align="left">分类</td>
 		<td align="left">
-               
+           <select id="category" name="category">
+			    <option value="">----请选择----</option>
+				<#list categories as category>
+				<option value="${category.code}">${category.name}</option>
+				</#list>
+			</select>
+			<script type="text/javascript">
+				 document.getElementById("category").value="${productItem.category}";
+			</script>     
+		</td>
+	</tr>
+	<tr>
+		<td width="20%" align="left">标题</td>
+		<td align="left">
+              <input id="itemTitle" name="itemTitle" type="text" 
+			         class="easyui-validatebox x-text" style="width:350px;"   
+				     value="${productItem.itemTitle}"/>
 		</td>
 	</tr>
 	<tr>
@@ -111,14 +127,6 @@
 		</td>
 	</tr>
 	<tr>
-		<td width="20%" align="left">标题</td>
-		<td align="left">
-              <input id="itemTitle" name="itemTitle" type="text" 
-			         class="easyui-validatebox x-text" style="width:350px;"   
-				     value="${productItem.itemTitle}"/>
-		</td>
-	</tr>
-	<tr>
 		<td width="20%" align="left">内容描述</td>
 		<td align="left">
 		    <textarea id="itemContent" name="itemContent" rows="6" cols="46" class="x-text" style="height:150px;width:350px;" >${productItem.itemContent}</textarea>
@@ -139,7 +147,7 @@
 				   increment="1" value="${productItem.itemDay}"/>
 		</td>
 	</tr>
-    </tbody>
+   </tbody>
   </table>
   </form>
 </div>

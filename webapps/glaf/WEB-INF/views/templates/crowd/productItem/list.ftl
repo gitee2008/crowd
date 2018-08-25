@@ -8,7 +8,7 @@
 
 
     function getLink(){
-	    var link_ = "${contextPath}/crowd/productItem/json";
+	    var link_ = "${contextPath}/crowd/productItem/json?q=1&nodeCode=${nodeCode}";
 		var category = jQuery("#category").val();
 		if(category != ""){
 		    link_ = link_ + "&category="+category;
@@ -90,7 +90,7 @@
           maxmin: true,
 		  shadeClose: true,
 		  title: "新增记录",
-		  area: ['1080px', (jQuery(window).height() - 50) +'px'],
+		  area: ['880px', (jQuery(window).height() - 50) +'px'],
 		  shade: 0.8,
 		  fixed: false, //不固定
 		  shadeClose: true,
@@ -106,7 +106,7 @@
           maxmin: true,
 		  shadeClose: true,
 		  title: "编辑记录",
-		  area: ['1080px', (jQuery(window).height() - 50) +'px'],
+		  area: ['880px', (jQuery(window).height() - 50) +'px'],
 		  shade: 0.8,
 		  fixed: false, //不固定
 		  shadeClose: true,
@@ -121,7 +121,7 @@
           maxmin: true,
 		  shadeClose: true,
 		  title: "编辑记录",
-		  area: ['1080px', (jQuery(window).height() - 50) +'px'],
+		  area: ['880px', (jQuery(window).height() - 50) +'px'],
 		  shade: 0.8,
 		  fixed: false, //不固定
 		  shadeClose: true,
@@ -161,7 +161,7 @@
           maxmin: true,
 		  shadeClose: true,
 		  title: "编辑记录",
-		  area: ['1080px', (jQuery(window).height() - 50) +'px'],
+		  area: ['880px', (jQuery(window).height() - 50) +'px'],
 		  shade: 0.8,
 		  fixed: false, //不固定
 		  shadeClose: true,
@@ -195,7 +195,7 @@
 			  maxmin: true,
 			  shadeClose: true,
 			  title: "编辑记录",
-			  area: ['1080px', (jQuery(window).height() - 50) +'px'],
+			  area: ['880px', (jQuery(window).height() - 50) +'px'],
 			  shade: 0.8,
 			  fixed: false, //不固定
 			  shadeClose: true,
@@ -218,7 +218,7 @@
 			  maxmin: true,
 			  shadeClose: true,
 			  title: "编辑记录",
-			  area: ['1080px', (jQuery(window).height() - 50) +'px'],
+			  area: ['880px', (jQuery(window).height() - 50) +'px'],
 			  shade: 0.8,
 			  fixed: false, //不固定
 			  shadeClose: true,
@@ -315,24 +315,53 @@
 
 	    jQuery('#dlg').dialog('close');
 	}
-		 
+		
+	function doSearch(){
+		var category = document.getElementById("category").value;
+        var nameLike = document.getElementById("nameLike").value;
+        var link = "${contextPath}/crowd/productItem/json?category="+category+"&nameLike="+nameLike;
+		//window.location.href=link;
+		loadGridData(link);
+	}
+	
 </script>
 </head>
 <body style="margin:1px;">  
 <div style="margin:0;"></div>  
 <div class="easyui-layout" data-options="fit:true">  
-   <div data-options="region:'north',split:true,border:true" style="height:40px"> 
+   <div data-options="region:'north',split:true,border:true" style="height:48px"> 
     <div class="toolbar-backgroud"  > 
-	<img src="${contextPath}/static/images/window.png">
-	&nbsp;<span class="x_content_title">产品项列表</span>
-    <a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-add'" 
-	   onclick="javascript:addNew();">新增</a>  
-    <a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-edit'"
-	   onclick="javascript:editSelected();">修改</a>  
-	<a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-remove'"
-	   onclick="javascript:deleteSelections();">删除</a> 
-	<a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-search'"
-	   onclick="javascript:searchWin();">查找</a>
+	<table class="easyui-form" style="width:100%;" align="left">
+    <tbody>
+	<tr>
+	    <td width="40%" align="left">
+		<img src="${contextPath}/static/images/window.png">
+		&nbsp;<span class="x_content_title">产品项列表</span>
+		<a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-add'" 
+		   onclick="javascript:addNew();">新增</a>  
+		<a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-edit'"
+		   onclick="javascript:editSelected();">修改</a>  
+		<a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-remove'"
+		   onclick="javascript:deleteSelections();">删除</a> 
+		</td>
+		<td align="left">
+           分类&nbsp;<select id="category" name="category" onchange="javascript:doSearch();">
+			    <option value="">----请选择----</option>
+				<#list categories as category>
+				<option value="${category.code}">${category.name}</option>
+				</#list>
+			</select>
+			<script type="text/javascript">
+				 document.getElementById("category").value="${productItem.category}";
+			</script> &nbsp;  
+			<input id="nameLike" name="nameLike" type="text" class="x-searchtext"  
+					 style="width:125px;" value="${nameLike}">&nbsp;
+		    <a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-search'"
+	           onclick="javascript:doSearch();">查找</a>
+		</td>
+	</tr>
+	</tbody>
+   </table>
    </div> 
   </div> 
   <div data-options="region:'center',border:true">
