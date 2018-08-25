@@ -127,8 +127,8 @@ public class ProductItemServiceImpl implements ProductItemService {
 
 	@Transactional
 	public void save(ProductItem productItem) {
-		if (StringUtils.isEmpty(productItem.getId())) {
-			productItem.setId(UUID32.getUUID());
+		ProductItem model = this.getProductItem(productItem.getId());
+		if (model == null) {
 			productItem.setCreateTime(new Date());
 			productItemMapper.insertProductItem(productItem);
 		} else {

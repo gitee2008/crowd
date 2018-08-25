@@ -210,6 +210,9 @@ public class DataFileFactory {
 					JdbcUtils.close(stmt);
 					JdbcUtils.close(conn);
 				}
+
+				TableDefinition tableDefinition = DataFileDomainFactory.getTableDefinition();
+				DBUtils.createTable(master.getName(), tableDefinition);
 			}
 		}
 	}

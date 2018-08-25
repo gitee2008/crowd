@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,6 +46,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.glaf.base.modules.sys.model.Dictory;
 import com.glaf.base.modules.sys.service.DictoryService;
 import com.glaf.base.modules.sys.service.SysTreeService;
+import com.glaf.core.base.DataFile;
 import com.glaf.core.config.SystemProperties;
 import com.glaf.core.config.ViewProperties;
 import com.glaf.core.security.LoginContext;
@@ -58,6 +60,8 @@ import com.glaf.core.util.UUID32;
 import com.glaf.crowd.domain.ProductItem;
 import com.glaf.crowd.query.ProductItemQuery;
 import com.glaf.crowd.service.ProductItemService;
+import com.glaf.matrix.data.domain.DataFileEntity;
+import com.glaf.matrix.data.factory.DataFileFactory;
 
 /**
  * 
@@ -122,7 +126,7 @@ public class ProductItemController {
 
 			}
 		}
-		
+
 		request.setAttribute("ts", System.currentTimeMillis());
 
 		String nodeCode = request.getParameter("nodeCode");
@@ -291,6 +295,7 @@ public class ProductItemController {
 					itemUrl = productItem.getItemUrl();
 				} else {
 					productItem = new ProductItem();
+					productItem.setId(UUID32.getUUID());
 					productItem.setTenantId(loginContext.getTenantId());
 				}
 
@@ -304,21 +309,64 @@ public class ProductItemController {
 						String fileExt = FileUtils.getFileExt(name);
 						if (StringUtils.equals(mFile.getName(), "smallUrl")) {
 							if (StringUtils.isNotEmpty(smallUrl)) {
+								DataFile dataFile = new DataFileEntity();
+								dataFile.setBusinessKey(productItem.getId());
+								dataFile.setCreateBy(loginContext.getActorId());
+								dataFile.setFilename(smallUrl);
+								dataFile.setPath(smallUrl);
+								dataFile.setServiceKey("ProductItem");
+								dataFile.setId(DigestUtils.md5Hex(smallUrl));
+								DataFileFactory.getInstance().insertDataFile(loginContext.getTenantId(), dataFile,
+										mFile.getBytes());
+
 								FileUtils.save(SystemProperties.getAppPath() + smallUrl, mFile.getBytes());
 							} else {
 								String path = "/upload/" + DateUtils.getNowYearMonthDay() + "/";
 								String filename = path + UUID32.getUUID() + "." + fileExt;
+
+								DataFile dataFile = new DataFileEntity();
+								dataFile.setBusinessKey(productItem.getId());
+								dataFile.setCreateBy(loginContext.getActorId());
+								dataFile.setFilename(filename);
+								dataFile.setPath(filename);
+								dataFile.setServiceKey("ProductItem");
+								dataFile.setId(DigestUtils.md5Hex(filename));
+								DataFileFactory.getInstance().insertDataFile(loginContext.getTenantId(), dataFile,
+										mFile.getBytes());
+
 								FileUtils.mkdirs(SystemProperties.getAppPath() + path);
 								FileUtils.save(SystemProperties.getAppPath() + filename, mFile.getBytes());
 								productItem.setSmallUrl(filename);
 							}
 						}
+
 						if (StringUtils.equals(mFile.getName(), "itemUrl")) {
 							if (StringUtils.isNotEmpty(itemUrl)) {
+								DataFile dataFile = new DataFileEntity();
+								dataFile.setBusinessKey(productItem.getId());
+								dataFile.setCreateBy(loginContext.getActorId());
+								dataFile.setFilename(itemUrl);
+								dataFile.setPath(itemUrl);
+								dataFile.setServiceKey("ProductItem");
+								dataFile.setId(DigestUtils.md5Hex(itemUrl));
+								DataFileFactory.getInstance().insertDataFile(loginContext.getTenantId(), dataFile,
+										mFile.getBytes());
+
 								FileUtils.save(SystemProperties.getAppPath() + itemUrl, mFile.getBytes());
 							} else {
 								String path = "/upload/" + DateUtils.getNowYearMonthDay() + "/";
 								String filename = path + UUID32.getUUID() + "." + fileExt;
+
+								DataFile dataFile = new DataFileEntity();
+								dataFile.setBusinessKey(productItem.getId());
+								dataFile.setCreateBy(loginContext.getActorId());
+								dataFile.setFilename(filename);
+								dataFile.setPath(filename);
+								dataFile.setServiceKey("ProductItem");
+								dataFile.setId(DigestUtils.md5Hex(filename));
+								DataFileFactory.getInstance().insertDataFile(loginContext.getTenantId(), dataFile,
+										mFile.getBytes());
+
 								FileUtils.mkdirs(SystemProperties.getAppPath() + path);
 								FileUtils.save(SystemProperties.getAppPath() + filename, mFile.getBytes());
 								productItem.setItemUrl(filename);

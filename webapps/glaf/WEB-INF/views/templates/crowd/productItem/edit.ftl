@@ -108,6 +108,12 @@
 				   increment="1" value="${productItem.itemDay}"/>
 		</td>
 	</tr>
+	<tr>
+		<td width="20%" align="left">&nbsp;</td>
+		<td align="left">
+			<br><br>
+		</td>
+	</tr>
    </tbody>
   </table>
   </form>
