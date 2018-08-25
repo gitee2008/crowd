@@ -113,9 +113,20 @@
 	</filter-mapping> 
 
 	<servlet>
-		<servlet-name>dispatcher</servlet-name>
+		<servlet-name>website</servlet-name>
 		<servlet-class>com.glaf.base.servlet.SpringDispatcherServlet</servlet-class>
 		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>website</servlet-name>
+		<url-pattern>/website/*</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<servlet-class>com.glaf.base.servlet.SpringDispatcherServlet</servlet-class>
+		<load-on-startup>2</load-on-startup>
 	</servlet>
 
 	<servlet-mapping>
@@ -123,21 +134,10 @@
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
 
-	<!-- <servlet>
-		<servlet-name>jsp</servlet-name>
-		<servlet-class>com.glaf.base.servlet.SpringDispatcherServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>jsp</servlet-name>
-		<url-pattern>/mx/*</url-pattern>
-	</servlet-mapping> -->
-
 	<servlet>
 		<servlet-name>resteasy</servlet-name>
 		<servlet-class>com.glaf.base.servlet.SpringDispatcherServlet</servlet-class>
-		<load-on-startup>2</load-on-startup>
+		<load-on-startup>3</load-on-startup>
 	</servlet>
 
 	<servlet-mapping>

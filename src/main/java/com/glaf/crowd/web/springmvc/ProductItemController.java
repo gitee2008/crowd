@@ -151,7 +151,7 @@ public class ProductItemController {
 
 	@RequestMapping("/json")
 	@ResponseBody
-	public byte[] json(HttpServletRequest request, ModelMap modelMap) throws IOException {
+	public byte[] json(HttpServletRequest request) throws IOException {
 		LoginContext loginContext = RequestUtils.getLoginContext(request);
 		Map<String, Object> params = RequestUtils.getParameterMap(request);
 		ProductItemQuery query = new ProductItemQuery();
