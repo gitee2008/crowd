@@ -339,6 +339,87 @@ public class TableDataController {
 
 		return new ModelAndView("/tableData/datalist", modelMap);
 	}
+	
+	@RequestMapping("/datalistview")
+	public ModelAndView datalistview(HttpServletRequest request, ModelMap modelMap) {
+		LoginContext loginContext = RequestUtils.getLoginContext(request);
+		RequestUtils.setRequestParameterToAttribute(request);
+		request.setAttribute("canEdit", true);
+		Map<String, Object> params = RequestUtils.getParameterMap(request);
+		logger.debug("params:" + params);
+		String tableId = request.getParameter("tableId");
+		if (StringUtils.isNotEmpty(tableId)) {
+			SysTable sysTable = tableService.getSysTableById(tableId);
+			if (sysTable != null) {
+				List<TableColumn> columns = tableService.getTableColumnsByTableId(tableId);
+				if (columns != null && !columns.isEmpty()) {
+					List<TableColumn> list = new ArrayList<TableColumn>();
+					for (TableColumn column : columns) {
+						if (column.getDisplayType() == 2 || column.getDisplayType() == 4) {
+							list.add(column);
+						}
+					}
+					request.setAttribute("columns", columns);
+					request.setAttribute("table", sysTable);
+					request.setAttribute("sysTable", sysTable);
+					request.setAttribute("tableDefinition", sysTable);
+				}
+
+				List<TableCorrelation> list = tableCorrelationService.getTableCorrelationsByMasterTableId(tableId);
+				if (list != null && !list.isEmpty()) {
+					List<SysTable> correlations = new ArrayList<SysTable>();
+					for (TableCorrelation t : list) {
+						SysTable table = tableService.getSysTableById(t.getSlaveTableId());
+						table.setTableCorrelation(t);
+						correlations.add(table);
+					}
+					request.setAttribute("correlations", correlations);
+				}
+
+				list = tableCorrelationService.getTableCorrelationsBySlaveTableId(tableId);
+				if (list != null && !list.isEmpty()) {
+					TableCorrelation tc = list.get(0);
+					SysTable masterTable = tableService.getSysTableById(tc.getMasterTableId());
+					long topId = RequestUtils.getLong(request, "topId");
+					if (topId > 0) {
+						TableDataBean tableDataBean = new TableDataBean();
+						DataModel dataModel = tableDataBean.getDataModelById(loginContext, masterTable, topId);
+						if (dataModel != null) {
+							LowerLinkedMap dataMap = new LowerLinkedMap();
+							dataMap.putAll(dataModel.getDataMap());
+							int business_status = dataModel.getBusinessStatus();
+							if (business_status == 9) {
+								request.setAttribute("canEdit", false);
+							}
+						}
+					}
+				}
+
+				// SqlCriteriaQuery query2 = new SqlCriteriaQuery();
+				// query2.businessKey(sysTable.getTableName());
+				// query2.moduleId(tableId);
+				List<SqlCriteria> sqlCriterias = sqlCriteriaService.getSqlCriterias(sysTable.getTableName(), tableId);
+				if (sqlCriterias != null && !sqlCriterias.isEmpty()) {
+					for (SqlCriteria col : sqlCriterias) {
+						if (StringUtils.isNotEmpty(request.getParameter(col.getParamName()))) {
+							col.setValue(request.getParameter(col.getParamName()));
+							if (col.getValue() != null) {
+								col.setValueEnc(RequestUtils.encodeString(col.getValue().toString()));
+							}
+						}
+					}
+					request.setAttribute("sqlCriterias", sqlCriterias);
+				}
+			}
+		}
+
+		String view = request.getParameter("view");
+		if (StringUtils.isNotEmpty(view)) {
+			return new ModelAndView(view, modelMap);
+		}
+
+		return new ModelAndView("/tableData/datalistview", modelMap);
+	}
 
 	@RequestMapping("/edit")
 	public ModelAndView edit(HttpServletRequest request, ModelMap modelMap) {

@@ -48,12 +48,12 @@
 
 
    function formatterKeys(val, row){
-		var str = "<a href='javascript:editRow(\""+row.tableId+"\");'><img src='${contextPath}/static/images/edit.gif' border='0'>修改</a>&nbsp;<a href='javascript:deleteRow(\""+row.tableId+"\");'><img src='${contextPath}/static/images/remove.png' border='0'>删除</a>&nbsp;<a href='javascript:tableColumns(\""+row.tableId+"\");'><img src='${contextPath}/static/images/FIX_duplicate_row.png' border='0'>字段列表</a>&nbsp;<a href='javascript:updateSchema(\""+row.tableId+"\");'><img src='${contextPath}/static/images/cfg.png' border='0'>更新表</a>";
+		var str = "<a href='javascript:datalist(\""+row.tableId+"\");'><img src='${contextPath}/static/images/list.gif' border='0'>数据</a>&nbsp;<a href='javascript:editRow(\""+row.tableId+"\");'><img src='${contextPath}/static/images/edit.gif' border='0'>修改</a>&nbsp;<a href='javascript:deleteRow(\""+row.tableId+"\");'><img src='${contextPath}/static/images/remove.png' border='0'>删除</a>&nbsp;<a href='javascript:tableColumns(\""+row.tableId+"\");'><img src='${contextPath}/static/images/FIX_duplicate_row.png' border='0'>字段列表</a>&nbsp;<a href='javascript:updateSchema(\""+row.tableId+"\");'><img src='${contextPath}/static/images/cfg.png' border='0'>更新表</a>";
 	    return str;
 	}
 
 	function datalist(tableId){
-		window.open("${contextPath}/tableData/datalist?tableId="+tableId);
+		window.open("${contextPath}/tableInputData/datalist?tableId="+tableId);
 	}
 
 	function addNew(){
