@@ -185,12 +185,6 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 	@Transient
 	protected TableInputColumn idColumn;
 
-	/**
-	 * 表后缀
-	 */
-	@javax.persistence.Transient
-	protected String tableSuffix;
-
 	@Transient
 	protected List<TableInputColumn> columns = new ArrayList<TableInputColumn>();
 
@@ -263,10 +257,6 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 		return createTime;
 	}
 
-	public int getStartRow() {
-		return startRow;
-	}
-
 	public String getDeleteFetch() {
 		return deleteFetch;
 	}
@@ -329,6 +319,10 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 		return sortOrder;
 	}
 
+	public int getStartRow() {
+		return startRow;
+	}
+
 	public String getSystemFlag() {
 		return systemFlag;
 	}
@@ -339,13 +333,6 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 
 	public String getTableName() {
 		return tableName;
-	}
-
-	public String getTableSuffix() {
-		if (tableSuffix == null) {
-			tableSuffix = "";
-		}
-		return tableSuffix;
 	}
 
 	public String getTemporaryFlag() {
@@ -408,10 +395,6 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 		this.createTime = createTime;
 	}
 
-	public void setStartRow(int startRow) {
-		this.startRow = startRow;
-	}
-
 	public void setDeleteFetch(String deleteFetch) {
 		this.deleteFetch = deleteFetch;
 	}
@@ -472,6 +455,10 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 		this.sortOrder = sortOrder;
 	}
 
+	public void setStartRow(int startRow) {
+		this.startRow = startRow;
+	}
+
 	public void setSystemFlag(String systemFlag) {
 		this.systemFlag = systemFlag;
 	}
@@ -482,10 +469,6 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
-	}
-
-	public void setTableSuffix(String tableSuffix) {
-		this.tableSuffix = tableSuffix;
 	}
 
 	public void setTemporaryFlag(String temporaryFlag) {

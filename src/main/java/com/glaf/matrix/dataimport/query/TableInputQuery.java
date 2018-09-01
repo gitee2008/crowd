@@ -26,7 +26,6 @@ import com.glaf.core.query.BaseQuery;
 public class TableInputQuery extends BaseQuery {
 	private static final long serialVersionUID = 1L;
 	protected List<String> tableIds;
-	protected String tableSuffix;
 	protected Date createTimeGreaterThanOrEqual;
 	protected Date createTimeLessThanOrEqual;
 	protected String descriptionLike;
@@ -161,13 +160,6 @@ public class TableInputQuery extends BaseQuery {
 		return tableIds;
 	}
 
-	public String getTableSuffix() {
-		if (tableSuffix == null) {
-			tableSuffix = "";
-		}
-		return tableSuffix;
-	}
-
 	public String getTitleLike() {
 		if (titleLike != null && titleLike.trim().length() > 0) {
 			if (!titleLike.startsWith("%")) {
@@ -259,10 +251,6 @@ public class TableInputQuery extends BaseQuery {
 
 	public void setTableIds(List<String> tableIds) {
 		this.tableIds = tableIds;
-	}
-
-	public void setTableSuffix(String tableSuffix) {
-		this.tableSuffix = tableSuffix;
 	}
 
 	public void setTitleLike(String titleLike) {

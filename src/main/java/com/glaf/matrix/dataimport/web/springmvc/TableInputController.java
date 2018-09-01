@@ -50,7 +50,6 @@ import com.glaf.core.factory.DataServiceFactory;
 import com.glaf.core.security.LoginContext;
 import com.glaf.core.service.ITablePageService;
 import com.glaf.core.util.DBUtils;
-import com.glaf.core.util.Paging;
 import com.glaf.core.util.ParamUtils;
 import com.glaf.core.util.RequestUtils;
 import com.glaf.core.util.ResponseUtils;
@@ -340,7 +339,7 @@ public class TableInputController {
 		}
 
 		if (limit <= 0) {
-			limit = Paging.DEFAULT_PAGE_SIZE;
+			limit = 50;
 		}
 
 		JSONObject result = new JSONObject();
@@ -419,7 +418,7 @@ public class TableInputController {
 				tableDefinition.setSystemFlag("U");
 				tableDefinition.setLocked(0);
 				tableDefinition.setType("useradd");
-			
+
 				tableInputService.save(tableDefinition);
 
 				return ResponseUtils.responseJsonResult(true);
@@ -465,7 +464,7 @@ public class TableInputController {
 					tableDefinition.setSystemFlag("U");
 					tableDefinition.setLocked(0);
 					tableDefinition.setType("useradd");
-		
+
 					tableInputService.saveAs(tableDefinition, tableDefinition.getColumns());
 
 					return ResponseUtils.responseJsonResult(true);
