@@ -155,6 +155,18 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 	protected int startRow;
 
 	/**
+	 * 结束行
+	 */
+	@Column(name = "STOPROW_")
+	protected int stopRow;
+
+	/**
+	 * 结束词
+	 */
+	@Column(name = "STOPWORD_", length = 100)
+	protected String stopWord;
+
+	/**
 	 * 是否先删除再抓取数据
 	 */
 	@Column(name = "DELETEFETCH_", length = 1)
@@ -229,10 +241,10 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 		if (getClass() != obj.getClass())
 			return false;
 		TableInput other = (TableInput) obj;
-		if (tableName == null) {
-			if (other.tableName != null)
+		if (tableId == null) {
+			if (other.tableId != null)
 				return false;
-		} else if (!tableName.equals(other.tableName))
+		} else if (!tableId.equals(other.tableId))
 			return false;
 		return true;
 	}
@@ -323,6 +335,14 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 		return startRow;
 	}
 
+	public int getStopRow() {
+		return stopRow;
+	}
+
+	public String getStopWord() {
+		return stopWord;
+	}
+
 	public String getSystemFlag() {
 		return systemFlag;
 	}
@@ -359,7 +379,7 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((tableName == null) ? 0 : tableName.hashCode());
+		result = prime * result + ((tableId == null) ? 0 : tableId.hashCode());
 		return result;
 	}
 
@@ -457,6 +477,14 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 
 	public void setStartRow(int startRow) {
 		this.startRow = startRow;
+	}
+
+	public void setStopRow(int stopRow) {
+		this.stopRow = stopRow;
+	}
+
+	public void setStopWord(String stopWord) {
+		this.stopWord = stopWord;
 	}
 
 	public void setSystemFlag(String systemFlag) {

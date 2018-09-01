@@ -90,12 +90,6 @@ public class TableInputJsonFactory {
 		if (jsonObject.containsKey("deleteFetch")) {
 			model.setDeleteFetch(jsonObject.getString("deleteFetch"));
 		}
-		if (jsonObject.containsKey("createTime")) {
-			model.setCreateTime(jsonObject.getDate("createTime"));
-		}
-		if (jsonObject.containsKey("createBy")) {
-			model.setCreateBy(jsonObject.getString("createBy"));
-		}
 		if (jsonObject.containsKey("description")) {
 			model.setDescription(jsonObject.getString("description"));
 		}
@@ -105,11 +99,11 @@ public class TableInputJsonFactory {
 		if (jsonObject.containsKey("startRow")) {
 			model.setStartRow(jsonObject.getInteger("startRow"));
 		}
-		if (jsonObject.containsKey("locked")) {
-			model.setLocked(jsonObject.getInteger("locked"));
+		if (jsonObject.containsKey("stopRow")) {
+			model.setStopRow(jsonObject.getInteger("stopRow"));
 		}
-		if (jsonObject.containsKey("deleteFlag")) {
-			model.setDeleteFlag(jsonObject.getInteger("deleteFlag"));
+		if (jsonObject.containsKey("stopWord")) {
+			model.setStopWord(jsonObject.getString("stopWord"));
 		}
 		if (jsonObject.containsKey("systemFlag")) {
 			model.setSystemFlag(jsonObject.getString("systemFlag"));
@@ -118,6 +112,18 @@ public class TableInputJsonFactory {
 			model.setRevision(jsonObject.getInteger("revision"));
 		}
 
+		if (jsonObject.containsKey("createTime")) {
+			model.setCreateTime(jsonObject.getDate("createTime"));
+		}
+		if (jsonObject.containsKey("createBy")) {
+			model.setCreateBy(jsonObject.getString("createBy"));
+		}
+		if (jsonObject.containsKey("locked")) {
+			model.setLocked(jsonObject.getInteger("locked"));
+		}
+		if (jsonObject.containsKey("deleteFlag")) {
+			model.setDeleteFlag(jsonObject.getInteger("deleteFlag"));
+		}
 		if (jsonObject.containsKey("idColumn")) {
 			TableInputColumn idColumn = TableInputColumnJsonFactory.jsonToObject(jsonObject.getJSONObject("idColumn"));
 			model.setIdColumn(idColumn);
@@ -189,6 +195,24 @@ public class TableInputJsonFactory {
 		if (model.getDeleteFetch() != null) {
 			jsonObject.put("deleteFetch", model.getDeleteFetch());
 		}
+
+		if (model.getDescription() != null) {
+			jsonObject.put("description", model.getDescription());
+		}
+		if (model.getType() != null) {
+			jsonObject.put("type", model.getType());
+		}
+		jsonObject.put("startRow", model.getStartRow());
+		jsonObject.put("stopRow", model.getStopRow());
+		jsonObject.put("stopWord", model.getStopWord());
+
+		jsonObject.put("sortNo", model.getSortNo());
+
+		if (model.getSystemFlag() != null) {
+			jsonObject.put("systemFlag", model.getSystemFlag());
+		}
+		jsonObject.put("revision", model.getRevision());
+
 		if (model.getCreateTime() != null) {
 			jsonObject.put("createTime", DateUtils.getDate(model.getCreateTime()));
 			jsonObject.put("createTime_date", DateUtils.getDate(model.getCreateTime()));
@@ -197,21 +221,9 @@ public class TableInputJsonFactory {
 		if (model.getCreateBy() != null) {
 			jsonObject.put("createBy", model.getCreateBy());
 		}
-		if (model.getDescription() != null) {
-			jsonObject.put("description", model.getDescription());
-		}
-		if (model.getType() != null) {
-			jsonObject.put("type", model.getType());
-		}
-		jsonObject.put("startRow", model.getStartRow());
+
 		jsonObject.put("locked", model.getLocked());
 		jsonObject.put("deleteFlag", model.getDeleteFlag());
-		jsonObject.put("sortNo", model.getSortNo());
-
-		if (model.getSystemFlag() != null) {
-			jsonObject.put("systemFlag", model.getSystemFlag());
-		}
-		jsonObject.put("revision", model.getRevision());
 
 		if (model.getIdColumn() != null) {
 			JSONObject json = TableInputColumnJsonFactory.toJsonObject(model.getIdColumn());
@@ -277,6 +289,17 @@ public class TableInputJsonFactory {
 		if (model.getDeleteFetch() != null) {
 			jsonObject.put("deleteFetch", model.getDeleteFetch());
 		}
+
+		if (model.getDescription() != null) {
+			jsonObject.put("description", model.getDescription());
+		}
+		if (model.getType() != null) {
+			jsonObject.put("type", model.getType());
+		}
+		jsonObject.put("startRow", model.getStartRow());
+		jsonObject.put("stopRow", model.getStopRow());
+		jsonObject.put("stopWord", model.getStopWord());
+
 		if (model.getCreateTime() != null) {
 			jsonObject.put("createTime", DateUtils.getDate(model.getCreateTime()));
 			jsonObject.put("createTime_date", DateUtils.getDate(model.getCreateTime()));
@@ -285,13 +308,7 @@ public class TableInputJsonFactory {
 		if (model.getCreateBy() != null) {
 			jsonObject.put("createBy", model.getCreateBy());
 		}
-		if (model.getDescription() != null) {
-			jsonObject.put("description", model.getDescription());
-		}
-		if (model.getType() != null) {
-			jsonObject.put("type", model.getType());
-		}
-		jsonObject.put("startRow", model.getStartRow());
+
 		jsonObject.put("locked", model.getLocked());
 		jsonObject.put("deleteFlag", model.getDeleteFlag());
 

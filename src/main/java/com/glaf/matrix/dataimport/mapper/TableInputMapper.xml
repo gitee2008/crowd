@@ -41,6 +41,10 @@
 		<result property="type" column="TYPE_" jdbcType="VARCHAR" />
 		<result property="startRow" column="STARTROW_"
 			jdbcType="INTEGER" />
+	    <result property="stopRow" column="STOPROW_"
+			jdbcType="INTEGER" />
+	    <result property="stopWord" column="STOPWORD_"
+			jdbcType="VARCHAR" />
 		<result property="sortNo" column="SORTNO_" jdbcType="INTEGER" />
 		<result property="locked" column="LOCKED_" jdbcType="INTEGER" />
 		<result property="deleteFlag" column="DELETEFLAG_"
@@ -82,6 +86,10 @@
 		<result property="type" column="TYPE_" jdbcType="VARCHAR" />
 		<result property="startRow" column="STARTROW_"
 			jdbcType="INTEGER" />
+		<result property="stopRow" column="STOPROW_"
+			jdbcType="INTEGER" />
+	    <result property="stopWord" column="STOPWORD_"
+			jdbcType="VARCHAR" />
 		<result property="sortNo" column="SORTNO_" jdbcType="INTEGER" />
 		<result property="locked" column="LOCKED_" jdbcType="INTEGER" />
 		<result property="deleteFlag" column="DELETEFLAG_"
@@ -152,6 +160,12 @@
 			</if>
 			<if test="startRow != null">
 				,STARTROW_
+			</if>
+			<if test="stopRow != null">
+				,STOPROW_
+			</if>
+            <if test="stopWord != null">
+				,STOPWORD_
 			</if>
 			<if test="sortNo != null">
 				,SORTNO_
@@ -228,6 +242,12 @@
 			<if test="startRow != null">
 				,#{startRow, jdbcType=INTEGER}
 			</if>
+			<if test="stopRow != null">
+				,#{stopRow, jdbcType=INTEGER}
+			</if>
+			<if test="stopWord != null">
+				,#{stopWord, jdbcType=VARCHAR}
+			</if>
 			<if test="sortNo != null">
 				,#{sortNo, jdbcType=INTEGER}
 			</if>
@@ -299,6 +319,12 @@
 			</if>
 			<if test="startRow != null">
 				STARTROW_ = #{startRow, jdbcType=INTEGER},
+			</if>
+			<if test="stopRow != null">
+				STOPROW_ = #{stopRow, jdbcType=INTEGER},
+			</if>
+			<if test="stopWord != null">
+				STOPWORD_ = #{stopWord, jdbcType=VARCHAR},
 			</if>
 			<if test="sortNo != null">
 				SORTNO_ = #{sortNo, jdbcType=INTEGER},

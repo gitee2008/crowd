@@ -665,7 +665,7 @@ public class TableInputController {
 	@ResponseBody
 	public byte[] updateAllSchema(HttpServletRequest request) {
 		LoginContext loginContext = RequestUtils.getLoginContext(request);
-		if (loginContext.isSystemAdministrator() && StringUtils.equals(loginContext.getActorId(), "admin")) {
+		if (loginContext.isSystemAdministrator()) {
 			TableInput tableInput = null;
 			List<TableInputColumn> extendColumns = null;
 			TableInputQuery query = new TableInputQuery();
@@ -717,11 +717,11 @@ public class TableInputController {
 	@ResponseBody
 	public byte[] updateSchema(HttpServletRequest request) {
 		LoginContext loginContext = RequestUtils.getLoginContext(request);
-		if (loginContext.isSystemAdministrator() && StringUtils.equals(loginContext.getActorId(), "admin")) {
-			try {
-				String tableId = request.getParameter("tableId");
-				TableInput tableInput = null;
-				if (StringUtils.isNotEmpty(tableId)) {
+		if (loginContext.isSystemAdministrator()) {
+			TableInput tableInput = null;
+			String tableId = request.getParameter("tableId");
+			if (StringUtils.isNotEmpty(tableId)) {
+				try {
 					tableInput = tableInputService.getTableInputById(tableId);
 					if (tableInput != null) {
 						List<TableInputColumn> extendColumns = tableInputService.getTableInputColumnsByTableId(tableId);
@@ -739,9 +739,9 @@ public class TableInputController {
 						TableDomainFactory.updateSchema(tableInput.getTableName(), extColumns);
 						return ResponseUtils.responseResult(true);
 					}
+				} catch (Exception ex) {
+					logger.error(ex);
 				}
-			} catch (Exception ex) {
-				logger.error(ex);
 			}
 		}
 		return ResponseUtils.responseResult(false);
