@@ -260,8 +260,8 @@ public class TableInputController {
 
 		String tableId = request.getParameter("tableId");
 		if (StringUtils.isNotEmpty(tableId)) {
-			TableInput tableDefinition = tableInputService.getTableInputById(tableId);
-			request.setAttribute("tableDefinition", tableDefinition);
+			TableInput tableInput = tableInputService.getTableInputById(tableId);
+			request.setAttribute("tableInput", tableInput);
 		}
 
 		String view = request.getParameter("view");
@@ -593,13 +593,13 @@ public class TableInputController {
 	}
 
 	@javax.annotation.Resource
-	public void setTablePageService(ITablePageService tablePageService) {
-		this.tablePageService = tablePageService;
+	public void setTableInputService(TableInputService tableInputService) {
+		this.tableInputService = tableInputService;
 	}
 
 	@javax.annotation.Resource
-	public void setTableService(TableInputService tableInputService) {
-		this.tableInputService = tableInputService;
+	public void setTablePageService(ITablePageService tablePageService) {
+		this.tablePageService = tablePageService;
 	}
 
 	/**
@@ -629,7 +629,7 @@ public class TableInputController {
 		return new ModelAndView("/matrix/tableInput/showSort", modelMap);
 	}
 
-	@RequestMapping("/tables")
+	@RequestMapping
 	public ModelAndView tables(HttpServletRequest request, ModelMap modelMap) {
 		RequestUtils.setRequestParameterToAttribute(request);
 

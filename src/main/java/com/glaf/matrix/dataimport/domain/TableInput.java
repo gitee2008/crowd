@@ -122,10 +122,10 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 	protected String privilegeFlag;
 
 	/**
-	 * 是否临时表
+	 * 输入标识
 	 */
-	@Column(name = "TEMPORARYFLAG_", length = 1)
-	protected String temporaryFlag;
+	@Column(name = "INPUTFLAG_", length = 50)
+	protected String inputFlag;
 
 	/**
 	 * 标题
@@ -299,6 +299,10 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 		return idColumn;
 	}
 
+	public String getInputFlag() {
+		return inputFlag;
+	}
+
 	public int getLocked() {
 		return locked;
 	}
@@ -353,10 +357,6 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 
 	public String getTableName() {
 		return tableName;
-	}
-
-	public String getTemporaryFlag() {
-		return temporaryFlag;
 	}
 
 	public String getTitle() {
@@ -439,6 +439,10 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 		}
 	}
 
+	public void setInputFlag(String inputFlag) {
+		this.inputFlag = inputFlag;
+	}
+
 	public void setInsertOnly(boolean insertOnly) {
 		this.insertOnly = insertOnly;
 	}
@@ -497,10 +501,6 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
-	}
-
-	public void setTemporaryFlag(String temporaryFlag) {
-		this.temporaryFlag = temporaryFlag;
 	}
 
 	public void setTitle(String title) {

@@ -84,8 +84,8 @@ public class TableInputJsonFactory {
 		if (jsonObject.containsKey("treeFlag")) {
 			model.setTreeFlag(jsonObject.getString("treeFlag"));
 		}
-		if (jsonObject.containsKey("temporaryFlag")) {
-			model.setTemporaryFlag(jsonObject.getString("temporaryFlag"));
+		if (jsonObject.containsKey("inputFlag")) {
+			model.setInputFlag(jsonObject.getString("inputFlag"));
 		}
 		if (jsonObject.containsKey("deleteFetch")) {
 			model.setDeleteFetch(jsonObject.getString("deleteFetch"));
@@ -189,8 +189,8 @@ public class TableInputJsonFactory {
 		if (model.getTreeFlag() != null) {
 			jsonObject.put("treeFlag", model.getTreeFlag());
 		}
-		if (model.getTemporaryFlag() != null) {
-			jsonObject.put("temporaryFlag", model.getTemporaryFlag());
+		if (model.getInputFlag() != null) {
+			jsonObject.put("inputFlag", model.getInputFlag());
 		}
 		if (model.getDeleteFetch() != null) {
 			jsonObject.put("deleteFetch", model.getDeleteFetch());
@@ -283,8 +283,8 @@ public class TableInputJsonFactory {
 		if (model.getTreeFlag() != null) {
 			jsonObject.put("treeFlag", model.getTreeFlag());
 		}
-		if (model.getTemporaryFlag() != null) {
-			jsonObject.put("temporaryFlag", model.getTemporaryFlag());
+		if (model.getInputFlag() != null) {
+			jsonObject.put("inputFlag", model.getInputFlag());
 		}
 		if (model.getDeleteFetch() != null) {
 			jsonObject.put("deleteFetch", model.getDeleteFetch());

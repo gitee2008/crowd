@@ -28,7 +28,7 @@
 			jdbcType="VARCHAR" />
 		<result property="treeFlag" column="TREEFLAG_"
 			jdbcType="VARCHAR" />
-		<result property="temporaryFlag" column="TEMPORARYFLAG_"
+		<result property="inputFlag" column="INPUTFLAG_"
 			jdbcType="VARCHAR" />
 		<result property="deleteFetch" column="DELETEFETCH_"
 			jdbcType="VARCHAR" />
@@ -73,7 +73,7 @@
 			jdbcType="VARCHAR" />
 		<result property="treeFlag" column="TREEFLAG_"
 			jdbcType="VARCHAR" />
-		<result property="temporaryFlag" column="TEMPORARYFLAG_"
+		<result property="inputFlag" column="INPUTFLAG_"
 			jdbcType="VARCHAR" />
 		<result property="deleteFetch" column="DELETEFETCH_"
 			jdbcType="VARCHAR" />
@@ -140,8 +140,8 @@
 			<if test="treeFlag != null">
 				,TREEFLAG_
 			</if>
-			<if test="temporaryFlag != null">
-				,TEMPORARYFLAG_
+			<if test="inputFlag != null">
+				,INPUTFLAG_
 			</if>
 			<if test="deleteFetch != null">
 				,DELETEFETCH_
@@ -221,8 +221,8 @@
 			<if test="treeFlag != null">
 				,#{treeFlag, jdbcType=VARCHAR}
 			</if>
-			<if test="temporaryFlag != null">
-				,#{temporaryFlag, jdbcType=VARCHAR}
+			<if test="inputFlag != null">
+				,#{inputFlag, jdbcType=VARCHAR}
 			</if>
 			<if test="deleteFetch != null">
 				,#{deleteFetch, jdbcType=VARCHAR}
@@ -305,8 +305,8 @@
 			<if test="treeFlag != null">
 				TREEFLAG_ = #{treeFlag, jdbcType=VARCHAR},
 			</if>
-			<if test="temporaryFlag != null">
-				TEMPORARYFLAG_ = #{temporaryFlag, jdbcType=VARCHAR},
+			<if test="inputFlag != null">
+				INPUTFLAG_ = #{inputFlag, jdbcType=VARCHAR},
 			</if>
 			<if test="deleteFetch != null">
 				DELETEFETCH_ = #{deleteFetch, jdbcType=VARCHAR},

@@ -317,7 +317,7 @@ public class TableInputColumn implements java.lang.Comparable<TableInputColumn>,
 	protected String width;
 
 	@Column(name = "POSITION_")
-	protected Integer position;
+	protected int position;
 
 	/**
 	 * 是否锁定
@@ -534,7 +534,7 @@ public class TableInputColumn implements java.lang.Comparable<TableInputColumn>,
 		return ordinal;
 	}
 
-	public Integer getPosition() {
+	public int getPosition() {
 		return position;
 	}
 
@@ -910,7 +910,7 @@ public class TableInputColumn implements java.lang.Comparable<TableInputColumn>,
 		this.ordinal = ordinal;
 	}
 
-	public void setPosition(Integer position) {
+	public void setPosition(int position) {
 		this.position = position;
 	}
 
