@@ -202,7 +202,7 @@ public class TableInputDataController {
 						tableDefinition.setColumns(columns);
 
 						if (StringUtils.equals(tableInput.getDeleteFetch(), "Y")) {
-							String sql = " delete from " + tableDefinition.getTableName() + " where CATEGORY_ = '"
+							String sql = " delete from " + tableDefinition.getTableName() + " where TABLEID_ = '"
 									+ tableInput.getTableId() + "' ";
 							DBUtils.executeSchemaResource(conn, sql);
 						}

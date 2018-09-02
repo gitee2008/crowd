@@ -82,7 +82,7 @@
 						   {title:'${field.title}', field:'${field.lowerColumnName}', width:${field.listWidth}, sortable:true},
 					     </#if>
                         </#list>
-					    {field:'functionKey', title:'功能键', width:210, formatter:formatterKeys }
+					    {field:'functionKey', title:'功能键', width:60, formatter:formatterKeys }
 				]],
 				rownumbers: false,
 				pagination: true,

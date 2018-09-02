@@ -69,6 +69,8 @@ public class POIXlsxParser implements DataParser {
 				row = sheet.getRow(i);
 				colCount = row.getPhysicalNumberOfCells();
 				LowerLinkedMap rowMap = new LowerLinkedMap();
+				rowMap.put("tableid", tableInput.getTableId());
+				rowMap.put("tableid_", tableInput.getTableId());
 
 				for (TableInputColumn column : tableInput.getColumns()) {
 					if (column.getPosition() > 0 && column.getPosition() <= colCount) {
