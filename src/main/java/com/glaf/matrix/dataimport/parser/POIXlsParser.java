@@ -34,6 +34,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import com.glaf.core.util.DateUtils;
 import com.glaf.core.util.ExcelUtils;
 import com.glaf.core.util.LowerLinkedMap;
+import com.glaf.core.util.UUID32;
 import com.glaf.matrix.dataimport.domain.TableInput;
 import com.glaf.matrix.dataimport.domain.TableInputColumn;
 
@@ -105,6 +106,7 @@ public class POIXlsParser implements DataParser {
 						dataList.add(rowMap);
 					}
 				} else {
+					rowMap.put("uuid_", UUID32.getUUID());
 					dataList.add(rowMap);
 				}
 			}

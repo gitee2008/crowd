@@ -48,7 +48,7 @@
 
 
    function formatterKeys(val, row){
-		var str = "<a href='javascript:datalist(\""+row.tableId+"\");'><img src='${contextPath}/static/images/list.gif' border='0'>数据</a>&nbsp;<a href='javascript:editRow(\""+row.tableId+"\");'><img src='${contextPath}/static/images/edit.gif' border='0'>修改</a>&nbsp;<a href='javascript:deleteRow(\""+row.tableId+"\");'><img src='${contextPath}/static/images/remove.png' border='0'>删除</a>&nbsp;<a href='javascript:tableColumns(\""+row.tableId+"\");'><img src='${contextPath}/static/images/FIX_duplicate_row.png' border='0'>字段列表</a>&nbsp;<a href='javascript:updateSchema(\""+row.tableId+"\");'><img src='${contextPath}/static/images/cfg.png' border='0'>更新表</a>";
+		var str = "<a href='javascript:datalist(\""+row.tableId+"\");'><img src='${contextPath}/static/images/list.gif' border='0'>数据</a>&nbsp;<a href='javascript:editRow(\""+row.tableId+"\");'><img src='${contextPath}/static/images/edit.gif' border='0'>修改</a>&nbsp;<a href='javascript:deleteRow(\""+row.tableId+"\");'><img src='${contextPath}/static/images/remove.png' border='0'>删除</a>&nbsp;<a href='javascript:dropTable(\""+row.tableId+"\");'><img src='${contextPath}/static/images/drop.png' border='0'>删除表</a>&nbsp;<a href='javascript:tableColumns(\""+row.tableId+"\");'><img src='${contextPath}/static/images/FIX_duplicate_row.png' border='0'>字段列表</a>&nbsp;<a href='javascript:updateSchema(\""+row.tableId+"\");'><img src='${contextPath}/static/images/cfg.png' border='0'>更新表</a>&nbsp;<a href='javascript:showUpload(\""+row.tableId+"\");'><img src='${contextPath}/static/images/upload.gif' border='0'>导入</a>";
 	    return str;
 	}
 
@@ -87,6 +87,23 @@
 			offset: ['20px',''],
 			fadeIn: 100,
 			area: ['1180px', (jQuery(window).height() - 50) +'px'],
+            iframe: {src: link}
+		});
+	}
+
+	function showUpload(tableId){
+		link="${contextPath}/matrix/tableInputData/showUpload?tableId="+tableId;
+		jQuery.layer({
+			type: 2,
+			maxmin: true,
+			shadeClose: true,
+			title: "数据导入",
+			closeBtn: [0, true],
+			shade: [0.8, '#000'],
+			border: [10, 0.3, '#000'],
+			offset: ['20px',''],
+			fadeIn: 100,
+			area: ['880px', (jQuery(window).height() - 50) +'px'],
             iframe: {src: link}
 		});
 	}
@@ -145,6 +162,32 @@
 					   if(data.statusCode == 200){
 						   //window.location.reload();
 						   jQuery('#mydatagrid').datagrid('reload');
+					   }
+				   }
+			 });
+			}
+		}
+	}
+
+	function dropTable(tableId){
+		if(confirm("物理表结构及数据删除后不能恢复，确定删除吗？")){
+			if(confirm("物理表相关的列定义数据都将删除且不能恢复，确实要删除吗？")){
+			  jQuery.ajax({
+				   type: "POST",
+				   url: '${contextPath}/matrix/tableInput/dropTable?tableId='+tableId,
+				   dataType: 'json',
+				   error: function(data){
+					   alert('服务器处理错误！');
+				   },
+				   success: function(data){
+					   if(data != null && data.message != null){
+						   alert(data.message);
+					   } else {
+						   alert('操作成功完成！');
+					   }
+					   if(data.statusCode == 200){
+						   //window.location.reload();
+						   //jQuery('#mydatagrid').datagrid('reload');
 					   }
 				   }
 			 });

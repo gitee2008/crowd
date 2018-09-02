@@ -18,6 +18,7 @@
 package com.glaf.matrix.dataimport.web.springmvc;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -41,15 +42,18 @@ import com.alibaba.fastjson.JSONObject;
 import com.glaf.core.base.ColumnModel;
 import com.glaf.core.base.TableModel;
 import com.glaf.core.config.DatabaseConnectionConfig;
+import com.glaf.core.config.Environment;
 import com.glaf.core.config.ViewProperties;
 import com.glaf.core.domain.ColumnDefinition;
 import com.glaf.core.domain.Database;
 import com.glaf.core.domain.util.TableDomainFactory;
 import com.glaf.core.factory.DataServiceFactory;
+import com.glaf.core.jdbc.DBConnectionFactory;
 import com.glaf.core.security.LoginContext;
 import com.glaf.core.service.IDatabaseService;
 import com.glaf.core.service.ITablePageService;
 import com.glaf.core.util.DBUtils;
+import com.glaf.core.util.JdbcUtils;
 import com.glaf.core.util.ParamUtils;
 import com.glaf.core.util.RequestUtils;
 import com.glaf.core.util.ResponseUtils;
@@ -216,13 +220,19 @@ public class TableInputController {
 	public byte[] deleteTable(HttpServletRequest request) {
 		LoginContext loginContext = RequestUtils.getLoginContext(request);
 		if (loginContext.isSystemAdministrator()) {
+			String systemName = Environment.DEFAULT_SYSTEM_NAME;
 			try {
 				String tableId = request.getParameter("tableId");
-				TableInput tableDefinition = null;
+				TableInput tableInput = null;
 				if (StringUtils.isNotEmpty(tableId)) {
-					tableDefinition = tableInputService.getTableInputById(tableId);
-					if (tableDefinition != null) {
-						if (!DBUtils.tableExists(tableDefinition.getTableName())) {
+					tableInput = tableInputService.getTableInputById(tableId);
+					if (tableInput != null) {
+						if (tableInput.getDatabaseId() > 0) {
+							Database db = databaseService.getDatabaseById(tableInput.getDatabaseId());
+							systemName = db.getName();
+						}
+
+						if (!DBUtils.tableExists(systemName, tableInput.getTableName())) {
 							tableInputService.deleteTable(tableId);
 							return ResponseUtils.responseResult(true);
 						} else {
@@ -233,6 +243,50 @@ public class TableInputController {
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				logger.error(ex);
+			}
+		}
+		return ResponseUtils.responseResult(false);
+	}
+
+	/**
+	 * 删除表
+	 * 
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("/dropTable")
+	@ResponseBody
+	public byte[] dropTable(HttpServletRequest request) {
+		LoginContext loginContext = RequestUtils.getLoginContext(request);
+		if (loginContext.isSystemAdministrator()) {
+			String systemName = Environment.DEFAULT_SYSTEM_NAME;
+			Connection conn = null;
+			try {
+				String tableId = request.getParameter("tableId");
+				TableInput tableInput = null;
+				if (StringUtils.isNotEmpty(tableId)) {
+					tableInput = tableInputService.getTableInputById(tableId);
+					if (tableInput != null) {
+
+						if (tableInput.getDatabaseId() > 0) {
+							Database db = databaseService.getDatabaseById(tableInput.getDatabaseId());
+							systemName = db.getName();
+						}
+
+						conn = DBConnectionFactory.getConnection(systemName);
+						conn.setAutoCommit(false);
+						if (DBUtils.tableExists(conn, tableInput.getTableName())) {
+							DBUtils.executeSchemaResource(conn, "drop table " + tableInput.getTableName());
+							conn.commit();
+							return ResponseUtils.responseResult(true);
+						}
+					}
+				}
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				logger.error(ex);
+			} finally {
+				JdbcUtils.close(conn);
 			}
 		}
 		return ResponseUtils.responseResult(false);

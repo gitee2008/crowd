@@ -19,6 +19,7 @@
 package com.glaf.matrix.dataimport.web.springmvc;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
@@ -173,9 +174,12 @@ public class TableInputDataController {
 		LoginContext loginContext = RequestUtils.getLoginContext(request);
 		String tableId = request.getParameter("tableId");
 		if (StringUtils.isNotEmpty(tableId)) {
+			response.setCharacterEncoding("UTF-8");
+			response.setContentType("text/html; charset=UTF-8");
 			String systemName = Environment.DEFAULT_SYSTEM_NAME;
 			TableInput tableInput = null;
 			Connection conn = null;
+			PrintWriter writer = null;
 			try {
 				tableInput = tableInputService.getTableInputById(tableId);
 				if (tableInput != null) {
@@ -185,19 +189,6 @@ public class TableInputDataController {
 					if (dataList != null && !dataList.isEmpty()) {
 						TableDefinition tableDefinition = new TableDefinition();
 						tableDefinition.setTableName(tableInput.getTableName());
-						List<ColumnDefinition> columns = new ArrayList<ColumnDefinition>();
-						if (tableInput.getIdColumn() != null) {
-							ColumnDefinition idColumn = new ColumnDefinition();
-							idColumn.setColumnName(tableInput.getIdColumn().getColumnName());
-							idColumn.setJavaType(tableInput.getIdColumn().getJavaType());
-							columns.add(idColumn);
-						}
-						for (TableInputColumn col : tableInput.getColumns()) {
-							ColumnDefinition column = new ColumnDefinition();
-							column.setColumnName(col.getColumnName());
-							column.setJavaType(col.getJavaType());
-							columns.add(column);
-						}
 
 						if (tableInput.getDatabaseId() > 0) {
 							Database db = databaseService.getDatabaseById(tableInput.getDatabaseId());
@@ -206,6 +197,10 @@ public class TableInputDataController {
 
 						conn = DBConnectionFactory.getConnection(systemName);
 						conn.setAutoCommit(false);
+
+						List<ColumnDefinition> columns = DBUtils.getColumnDefinitions(conn, tableInput.getTableName());
+						tableDefinition.setColumns(columns);
+
 						if (StringUtils.equals(tableInput.getDeleteFetch(), "Y")) {
 							String sql = " delete from " + tableDefinition.getTableName() + " where CATEGORY_ = '"
 									+ tableInput.getTableId() + "' ";
@@ -214,10 +209,19 @@ public class TableInputDataController {
 						BulkInsertBean bean = new BulkInsertBean();
 						bean.bulkInsert(loginContext, conn, tableDefinition, dataList);
 						conn.commit();
+
+						writer = response.getWriter();
+						writer.write("<br><h3><span style='color:#33cc33'>导入成功！</span></h3>");
+						writer.flush();
+
 					}
 				}
 			} catch (Exception ex) {
+				ex.printStackTrace();
 				logger.error(ex);
+				writer = response.getWriter();
+				writer.write("<br><h3><span style='color:#ff3333'>导入失败！</span></h3>");
+				writer.flush();
 			} finally {
 				JdbcUtils.close(conn);
 			}
