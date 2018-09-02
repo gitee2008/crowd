@@ -46,7 +46,6 @@ import com.glaf.core.util.Constants;
 import com.glaf.core.util.DateUtils;
 import com.glaf.core.util.LowerLinkedMap;
 import com.glaf.core.util.ParamUtils;
-import com.glaf.core.util.QueryUtils;
 import com.glaf.core.util.RequestUtils;
 
 import com.glaf.matrix.data.domain.DataModel;
@@ -347,6 +346,8 @@ public class TableInputDataBean {
 					sqlBuffer.append(" from ").append(tableName).append(" E ");
 					sqlBuffer.append(" where 1=1 ");
 
+					sqlBuffer.append(" and E.TABLEID_ = '").append(tableId).append("' ");
+
 					if (!loginContext.isSystemAdministrator()) {
 						sqlBuffer.append(" and E.TENANTID_ = '").append(loginContext.getTenantId()).append("' ");
 
@@ -358,14 +359,6 @@ public class TableInputDataBean {
 							}
 							subOrganizationIds.add(loginContext.getOrganizationId());
 
-						} else {
-
-							if (loginContext.getGradeIds() != null && !loginContext.getGradeIds().isEmpty()) {
-								sqlBuffer.append(
-										QueryUtils.getSQLCondition(loginContext.getGradeIds(), "E", "GRADEID_"));
-							} else {
-								sqlBuffer.append(" and E.CREATEBY_ = '").append(loginContext.getActorId()).append("' ");
-							}
 						}
 					}
 
