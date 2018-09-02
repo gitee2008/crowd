@@ -224,7 +224,6 @@ public class TableInputDataBean {
 		dataModel.setTitle(ParamUtils.getString(dataMap, "title_"));
 		dataModel.setType(ParamUtils.getString(dataMap, "type_"));
 		dataModel.setTreeId(ParamUtils.getString(dataMap, "treeid_"));
-		dataModel.setGradeId(ParamUtils.getString(dataMap, "gradeid_"));
 		dataModel.setOrganizationId(ParamUtils.getLong(dataMap, "organizationid_"));
 		dataModel.setTenantId(ParamUtils.getString(dataMap, "tenantid_"));
 		dataModel.setIcon(ParamUtils.getString(dataMap, "icon_"));
@@ -271,7 +270,6 @@ public class TableInputDataBean {
 					list.add("sortno_");
 					list.add("locked_");
 					list.add("organizationid_");
-					list.add("gradeid_");
 					list.add("createby_");
 					list.add("createtime_");
 					list.add("business_status_");
