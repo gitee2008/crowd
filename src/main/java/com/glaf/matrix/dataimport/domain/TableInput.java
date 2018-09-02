@@ -56,7 +56,10 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 	protected String tableName;
 
 	@Column(name = "NODEID_")
-	protected Long nodeId;
+	protected long nodeId;
+
+	@Column(name = "DATABASEID_")
+	protected long databaseId;
 
 	/**
 	 * 聚合主键列集
@@ -76,7 +79,7 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 	@Column(name = "ENGLISHTITLE_")
 	protected String englishTitle;
 
-	@Column(name = "PRIMARYKEY_", length = 200)
+	@Column(name = "PRIMARYKEY_", length = 50)
 	protected String primaryKey;
 
 	/**
@@ -132,9 +135,6 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 	 */
 	@Column(name = "TITLE_")
 	protected String title;
-
-	@Column(name = "TOPID_", length = 50)
-	protected String topId;
 
 	/**
 	 * 表类型
@@ -269,6 +269,10 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 		return createTime;
 	}
 
+	public long getDatabaseId() {
+		return databaseId;
+	}
+
 	public String getDeleteFetch() {
 		return deleteFetch;
 	}
@@ -307,7 +311,7 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 		return locked;
 	}
 
-	public Long getNodeId() {
+	public long getNodeId() {
 		return nodeId;
 	}
 
@@ -363,10 +367,6 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 		return title;
 	}
 
-	public String getTopId() {
-		return topId;
-	}
-
 	public String getTreeFlag() {
 		return treeFlag;
 	}
@@ -415,6 +415,10 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 		this.createTime = createTime;
 	}
 
+	public void setDatabaseId(long databaseId) {
+		this.databaseId = databaseId;
+	}
+
 	public void setDeleteFetch(String deleteFetch) {
 		this.deleteFetch = deleteFetch;
 	}
@@ -451,7 +455,7 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 		this.locked = locked;
 	}
 
-	public void setNodeId(Long nodeId) {
+	public void setNodeId(long nodeId) {
 		this.nodeId = nodeId;
 	}
 
@@ -505,10 +509,6 @@ public class TableInput implements java.io.Serializable, java.lang.Comparable<Ta
 
 	public void setTitle(String title) {
 		this.title = title;
-	}
-
-	public void setTopId(String topId) {
-		this.topId = topId;
 	}
 
 	public void setTreeFlag(String treeFlag) {

@@ -53,14 +53,14 @@ public class TableInputJsonFactory {
 		if (jsonObject.containsKey("nodeId")) {
 			model.setNodeId(jsonObject.getLong("nodeId"));
 		}
+		if (jsonObject.containsKey("databaseId")) {
+			model.setDatabaseId(jsonObject.getLong("databaseId"));
+		}
 		if (jsonObject.containsKey("title")) {
 			model.setTitle(jsonObject.getString("title"));
 		}
 		if (jsonObject.containsKey("englishTitle")) {
 			model.setEnglishTitle(jsonObject.getString("englishTitle"));
-		}
-		if (jsonObject.containsKey("topId")) {
-			model.setTopId(jsonObject.getString("topId"));
 		}
 		if (jsonObject.containsKey("aggregationKey")) {
 			model.setAggregationKey(jsonObject.getString("aggregationKey"));
@@ -74,7 +74,6 @@ public class TableInputJsonFactory {
 		if (jsonObject.containsKey("sortOrder")) {
 			model.setSortOrder(jsonObject.getString("sortOrder"));
 		}
-
 		if (jsonObject.containsKey("auditFlag")) {
 			model.setAuditFlag(jsonObject.getString("auditFlag"));
 		}
@@ -111,7 +110,6 @@ public class TableInputJsonFactory {
 		if (jsonObject.containsKey("revision")) {
 			model.setRevision(jsonObject.getInteger("revision"));
 		}
-
 		if (jsonObject.containsKey("createTime")) {
 			model.setCreateTime(jsonObject.getDate("createTime"));
 		}
@@ -124,6 +122,7 @@ public class TableInputJsonFactory {
 		if (jsonObject.containsKey("deleteFlag")) {
 			model.setDeleteFlag(jsonObject.getInteger("deleteFlag"));
 		}
+
 		if (jsonObject.containsKey("idColumn")) {
 			TableInputColumn idColumn = TableInputColumnJsonFactory.jsonToObject(jsonObject.getJSONObject("idColumn"));
 			model.setIdColumn(idColumn);
@@ -156,17 +155,17 @@ public class TableInputJsonFactory {
 		jsonObject.put("_tableName_", model.getTableName());
 		jsonObject.put("tableName_enc", RequestUtils.encodeString(model.getTableName()));
 
-		if (model.getNodeId() != null) {
+		if (model.getNodeId() != 0) {
 			jsonObject.put("nodeId", model.getNodeId());
+		}
+		if (model.getDatabaseId() != 0) {
+			jsonObject.put("databaseId", model.getDatabaseId());
 		}
 		if (model.getTitle() != null) {
 			jsonObject.put("title", model.getTitle());
 		}
 		if (model.getEnglishTitle() != null) {
 			jsonObject.put("englishTitle", model.getEnglishTitle());
-		}
-		if (model.getTopId() != null) {
-			jsonObject.put("topId", model.getTopId());
 		}
 		if (model.getAggregationKey() != null) {
 			jsonObject.put("aggregationKey", model.getAggregationKey());
@@ -195,7 +194,6 @@ public class TableInputJsonFactory {
 		if (model.getDeleteFetch() != null) {
 			jsonObject.put("deleteFetch", model.getDeleteFetch());
 		}
-
 		if (model.getDescription() != null) {
 			jsonObject.put("description", model.getDescription());
 		}
@@ -205,7 +203,6 @@ public class TableInputJsonFactory {
 		jsonObject.put("startRow", model.getStartRow());
 		jsonObject.put("stopRow", model.getStopRow());
 		jsonObject.put("stopWord", model.getStopWord());
-
 		jsonObject.put("sortNo", model.getSortNo());
 
 		if (model.getSystemFlag() != null) {
@@ -248,17 +245,17 @@ public class TableInputJsonFactory {
 		jsonObject.put("tableName", model.getTableName());
 		jsonObject.put("tableName_enc", RequestUtils.encodeString(model.getTableName()));
 
-		if (model.getNodeId() != null) {
+		if (model.getNodeId() != 0) {
 			jsonObject.put("nodeId", model.getNodeId());
+		}
+		if (model.getDatabaseId() != 0) {
+			jsonObject.put("databaseId", model.getDatabaseId());
 		}
 		if (model.getTitle() != null) {
 			jsonObject.put("title", model.getTitle());
 		}
 		if (model.getEnglishTitle() != null) {
 			jsonObject.put("englishTitle", model.getEnglishTitle());
-		}
-		if (model.getTopId() != null) {
-			jsonObject.put("topId", model.getTopId());
 		}
 		if (model.getAggregationKey() != null) {
 			jsonObject.put("aggregationKey", model.getAggregationKey());
@@ -272,11 +269,9 @@ public class TableInputJsonFactory {
 		if (model.getSortOrder() != null) {
 			jsonObject.put("sortOrder", model.getSortOrder());
 		}
-
 		if (model.getAuditFlag() != null) {
 			jsonObject.put("auditFlag", model.getAuditFlag());
 		}
-
 		if (model.getPrivilegeFlag() != null) {
 			jsonObject.put("privilegeFlag", model.getPrivilegeFlag());
 		}
@@ -289,7 +284,6 @@ public class TableInputJsonFactory {
 		if (model.getDeleteFetch() != null) {
 			jsonObject.put("deleteFetch", model.getDeleteFetch());
 		}
-
 		if (model.getDescription() != null) {
 			jsonObject.put("description", model.getDescription());
 		}

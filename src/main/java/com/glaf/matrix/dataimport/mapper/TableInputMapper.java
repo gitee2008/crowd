@@ -34,8 +34,6 @@ public interface TableInputMapper {
 
 	TableInput getTableInputById(String tableId);
 
-	TableInput getTableInputByTableName(String tableName);
-
 	int getTableInputCount(TableInputQuery query);
 
 	List<TableInput> getTableInputs(TableInputQuery query);

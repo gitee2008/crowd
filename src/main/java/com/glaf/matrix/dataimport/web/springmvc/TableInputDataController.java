@@ -19,6 +19,7 @@
 package com.glaf.matrix.dataimport.web.springmvc;
 
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,15 +40,26 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSONObject;
-
+import com.glaf.core.config.Environment;
+import com.glaf.core.domain.ColumnDefinition;
+import com.glaf.core.domain.Database;
+import com.glaf.core.domain.TableDefinition;
+import com.glaf.core.jdbc.BulkInsertBean;
+import com.glaf.core.jdbc.DBConnectionFactory;
+import com.glaf.core.security.LoginContext;
 import com.glaf.core.service.EntityService;
+import com.glaf.core.service.IDatabaseService;
 import com.glaf.core.service.ITableDataService;
 import com.glaf.core.service.ITablePageService;
+import com.glaf.core.util.DBUtils;
+import com.glaf.core.util.FileUtils;
+import com.glaf.core.util.JdbcUtils;
 import com.glaf.core.util.RequestUtils;
 
 import com.glaf.matrix.dataimport.bean.TableInputDataBean;
 import com.glaf.matrix.dataimport.domain.TableInput;
 import com.glaf.matrix.dataimport.domain.TableInputColumn;
+import com.glaf.matrix.dataimport.parser.ParserFactory;
 import com.glaf.matrix.dataimport.service.TableInputService;
 
 @Controller("/matrix/tableInputData")
@@ -57,6 +69,8 @@ public class TableInputDataController {
 	protected static final Log logger = LogFactory.getLog(TableInputDataController.class);
 
 	protected EntityService entityService;
+
+	protected IDatabaseService databaseService;
 
 	protected ITableDataService tableDataService;
 
@@ -106,6 +120,11 @@ public class TableInputDataController {
 	}
 
 	@javax.annotation.Resource
+	public void setDatabaseService(IDatabaseService databaseService) {
+		this.databaseService = databaseService;
+	}
+
+	@javax.annotation.Resource
 	public void setEntityService(EntityService entityService) {
 		this.entityService = entityService;
 	}
@@ -151,11 +170,56 @@ public class TableInputDataController {
 	@RequestMapping(path = "/upload", method = RequestMethod.POST)
 	public void upload(HttpServletRequest request, HttpServletResponse response,
 			@RequestParam("file") MultipartFile mFile) throws IOException {
+		LoginContext loginContext = RequestUtils.getLoginContext(request);
 		String tableId = request.getParameter("tableId");
 		if (StringUtils.isNotEmpty(tableId)) {
-			TableInput tableInput = tableInputService.getTableInputById(tableId);
-			if (tableInput != null) {
+			String systemName = Environment.DEFAULT_SYSTEM_NAME;
+			TableInput tableInput = null;
+			Connection conn = null;
+			try {
+				tableInput = tableInputService.getTableInputById(tableId);
+				if (tableInput != null) {
+					String fileType = FileUtils.getFileExt(mFile.getOriginalFilename());
+					List<Map<String, Object>> dataList = ParserFactory.getInstance().getParser(fileType)
+							.parse(tableInput, mFile.getInputStream());
+					if (dataList != null && !dataList.isEmpty()) {
+						TableDefinition tableDefinition = new TableDefinition();
+						tableDefinition.setTableName(tableInput.getTableName());
+						List<ColumnDefinition> columns = new ArrayList<ColumnDefinition>();
+						if (tableInput.getIdColumn() != null) {
+							ColumnDefinition idColumn = new ColumnDefinition();
+							idColumn.setColumnName(tableInput.getIdColumn().getColumnName());
+							idColumn.setJavaType(tableInput.getIdColumn().getJavaType());
+							columns.add(idColumn);
+						}
+						for (TableInputColumn col : tableInput.getColumns()) {
+							ColumnDefinition column = new ColumnDefinition();
+							column.setColumnName(col.getColumnName());
+							column.setJavaType(col.getJavaType());
+							columns.add(column);
+						}
 
+						if (tableInput.getDatabaseId() > 0) {
+							Database db = databaseService.getDatabaseById(tableInput.getDatabaseId());
+							systemName = db.getName();
+						}
+
+						conn = DBConnectionFactory.getConnection(systemName);
+						conn.setAutoCommit(false);
+						if (StringUtils.equals(tableInput.getDeleteFetch(), "Y")) {
+							String sql = " delete from " + tableDefinition.getTableName() + " where CATEGORY_ = '"
+									+ tableInput.getTableId() + "' ";
+							DBUtils.executeSchemaResource(conn, sql);
+						}
+						BulkInsertBean bean = new BulkInsertBean();
+						bean.bulkInsert(loginContext, conn, tableDefinition, dataList);
+						conn.commit();
+					}
+				}
+			} catch (Exception ex) {
+				logger.error(ex);
+			} finally {
+				JdbcUtils.close(conn);
 			}
 		}
 	}

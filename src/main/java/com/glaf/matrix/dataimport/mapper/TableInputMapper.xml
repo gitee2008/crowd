@@ -13,7 +13,6 @@
 		<result property="title" column="TITLE_" jdbcType="VARCHAR" />
 		<result property="englishTitle" column="ENGLISHTITLE_"
 			jdbcType="VARCHAR" />
-		<result property="topId" column="TOPID_" jdbcType="VARCHAR" />
 		<result property="primaryKey" column="PRIMARYKEY_"
 			jdbcType="VARCHAR" />
 		<result property="sortColumn" column="SORTCOLUMN_"
@@ -41,9 +40,8 @@
 		<result property="type" column="TYPE_" jdbcType="VARCHAR" />
 		<result property="startRow" column="STARTROW_"
 			jdbcType="INTEGER" />
-	    <result property="stopRow" column="STOPROW_"
-			jdbcType="INTEGER" />
-	    <result property="stopWord" column="STOPWORD_"
+		<result property="stopRow" column="STOPROW_" jdbcType="INTEGER" />
+		<result property="stopWord" column="STOPWORD_"
 			jdbcType="VARCHAR" />
 		<result property="sortNo" column="SORTNO_" jdbcType="INTEGER" />
 		<result property="locked" column="LOCKED_" jdbcType="INTEGER" />
@@ -54,6 +52,8 @@
 		<result property="revision" column="REVISION_"
 			jdbcType="INTEGER" />
 		<result property="nodeId" column="NODEID_" jdbcType="BIGINT" />
+		<result property="databaseId" column="DATABASEID_"
+			jdbcType="BIGINT" />
 	</resultMap>
 
 
@@ -64,7 +64,6 @@
 		<result property="title" column="TITLE_" jdbcType="VARCHAR" />
 		<result property="englishTitle" column="ENGLISHTITLE_"
 			jdbcType="VARCHAR" />
-		<result property="topId" column="TOPID_" jdbcType="VARCHAR" />
 		<result property="aggregationKey" column="AGGREGATIONKEY_"
 			jdbcType="VARCHAR" />
 		<result property="auditFlag" column="AUDITFLAG_"
@@ -86,9 +85,8 @@
 		<result property="type" column="TYPE_" jdbcType="VARCHAR" />
 		<result property="startRow" column="STARTROW_"
 			jdbcType="INTEGER" />
-		<result property="stopRow" column="STOPROW_"
-			jdbcType="INTEGER" />
-	    <result property="stopWord" column="STOPWORD_"
+		<result property="stopRow" column="STOPROW_" jdbcType="INTEGER" />
+		<result property="stopWord" column="STOPWORD_"
 			jdbcType="VARCHAR" />
 		<result property="sortNo" column="SORTNO_" jdbcType="INTEGER" />
 		<result property="locked" column="LOCKED_" jdbcType="INTEGER" />
@@ -102,6 +100,8 @@
 			jdbcType="VARCHAR" />
 		<result property="revision" column="REVISION_"
 			jdbcType="INTEGER" />
+		<result property="databaseId" column="DATABASEID_"
+			jdbcType="BIGINT" />
 	</resultMap>
 
 
@@ -115,9 +115,6 @@
 			</if>
 			<if test="englishTitle != null">
 				,ENGLISHTITLE_
-			</if>
-			<if test="topId != null">
-				,TOPID_
 			</if>
 			<if test="aggregationKey != null">
 				,AGGREGATIONKEY_
@@ -164,7 +161,7 @@
 			<if test="stopRow != null">
 				,STOPROW_
 			</if>
-            <if test="stopWord != null">
+			<if test="stopWord != null">
 				,STOPWORD_
 			</if>
 			<if test="sortNo != null">
@@ -185,6 +182,9 @@
 			<if test="nodeId != null">
 				,NODEID_
 			</if>
+			<if test="databaseId != null">
+				,DATABASEID_
+			</if>
 		</trim>
 
 		<trim prefix=" values (" suffix=")" suffixOverrides=",">
@@ -196,9 +196,6 @@
 			</if>
 			<if test="englishTitle != null">
 				,#{englishTitle, jdbcType=VARCHAR}
-			</if>
-			<if test="topId != null">
-				,#{topId, jdbcType=VARCHAR}
 			</if>
 			<if test="aggregationKey != null">
 				,#{aggregationKey, jdbcType=VARCHAR}
@@ -266,6 +263,9 @@
 			<if test="nodeId != null">
 				,#{nodeId, jdbcType=BIGINT}
 			</if>
+			<if test="databaseId != null">
+				,#{databaseId, jdbcType=BIGINT}
+			</if>
 		</trim>
 	</insert>
 
@@ -275,6 +275,9 @@
 		update SYS_INPUT_TABLE
 		set
 		<trim prefix="" suffix="" suffixOverrides=",">
+			<if test="databaseId != null">
+				DATABASEID_ = #{databaseId, jdbcType=BIGINT},
+			</if>
 			<if test="title != null">
 				TITLE_ = #{title, jdbcType=VARCHAR},
 			</if>
@@ -286,9 +289,6 @@
 			</if>
 			<if test="sortOrder != null">
 				SORTORDER_ = #{sortOrder, jdbcType=VARCHAR},
-			</if>
-			<if test="topId != null">
-				TOPID_ = #{topId, jdbcType=VARCHAR},
 			</if>
 			<if test="aggregationKey != null">
 				AGGREGATIONKEY_ = #{aggregationKey, jdbcType=VARCHAR},

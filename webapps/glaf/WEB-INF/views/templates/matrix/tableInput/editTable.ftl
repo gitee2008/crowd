@@ -89,6 +89,20 @@
 		</td>
 	</tr>
 	<tr>
+		<td width="15%" align="left">目标数据库编号</td>
+		<td align="left">
+			<select id="databaseId" name="databaseId">
+			    <option value="">----请选择----</option>
+				<#list  databases as database>
+				<option value="${database.id}">${database.title}[${database.dbname}]</option>
+				</#list>
+            </select> 
+            <script type="text/javascript">
+                 document.getElementById("databaseId").value="${tableInput.databaseId}";
+            </script>
+		</td>
+	</tr>
+	<tr>
 		<td width="20%" align="left">目标表</td>
 		<td align="left">
             <input id="tableName" name="tableName" type="text" 
@@ -99,6 +113,20 @@
 			    （提示：为了保证系统安全，目标表只能以useradd_、etl_、sync_、tree_table_、tmp_开头。）
 			  </span>
 	       </div>
+		</td>
+	</tr>
+	<tr>
+		<td width="15%" align="left">主键列</td>
+		<td align="left">
+			<select id="primaryKey" name="primaryKey">
+			    <option value="">----请选择----</option>
+				<#list  columns as column>
+				<option value="${column.columnName}">${column.title}[${column.columnName}]</option>
+				</#list>
+            </select> 
+            <script type="text/javascript">
+                 document.getElementById("primaryKey").value="${tableInput.primaryKey}";
+            </script>
 		</td>
 	</tr>
 	<tr>

@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -48,6 +47,7 @@ import com.glaf.core.domain.Database;
 import com.glaf.core.domain.util.TableDomainFactory;
 import com.glaf.core.factory.DataServiceFactory;
 import com.glaf.core.security.LoginContext;
+import com.glaf.core.service.IDatabaseService;
 import com.glaf.core.service.ITablePageService;
 import com.glaf.core.util.DBUtils;
 import com.glaf.core.util.ParamUtils;
@@ -65,6 +65,8 @@ import com.glaf.matrix.dataimport.service.TableInputService;
 @RequestMapping("/matrix/tableInput")
 public class TableInputController {
 	protected static final Log logger = LogFactory.getLog(TableInputController.class);
+
+	protected IDatabaseService databaseService;
 
 	protected TableInputService tableInputService;
 
@@ -122,14 +124,14 @@ public class TableInputController {
 	@RequestMapping("/columnsJsonArray")
 	@ResponseBody
 	public byte[] columnsJsonArray(HttpServletRequest request, ModelMap modelMap) throws IOException {
-		String tableName = request.getParameter("tableName");
+		String tableId = request.getParameter("tableId");
 		JSONArray result = new JSONArray();
 		JSONObject idJson = new JSONObject();
 		idJson.put("columnName", "ID_");
 		idJson.put("title", "编号");
 		result.add(idJson);
 
-		List<TableInputColumn> list = tableInputService.getTableInputColumnsByTableName(tableName);
+		List<TableInputColumn> list = tableInputService.getTableInputColumnsByTableId(tableId);
 		if (list != null && !list.isEmpty()) {
 			for (TableInputColumn t : list) {
 				JSONObject rowJSON = t.toJsonObject();
@@ -262,7 +264,14 @@ public class TableInputController {
 		if (StringUtils.isNotEmpty(tableId)) {
 			TableInput tableInput = tableInputService.getTableInputById(tableId);
 			request.setAttribute("tableInput", tableInput);
+
+			List<TableInputColumn> columns = tableInputService.getTableInputColumnsByTableId(tableId);
+			request.setAttribute("columns", columns);
 		}
+
+		DatabaseConnectionConfig cfg = new DatabaseConnectionConfig();
+		List<Database> databases = cfg.getDatabases();
+		request.setAttribute("databases", databases);
 
 		String view = request.getParameter("view");
 		if (StringUtils.isNotEmpty(view)) {
@@ -289,21 +298,6 @@ public class TableInputController {
 		}
 
 		return new ModelAndView("/matrix/tableInput/extColumns", modelMap);
-	}
-
-	@RequestMapping("/importData")
-	@ResponseBody
-	public byte[] importData(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String systemName = request.getParameter("systemName");
-		if (StringUtils.isNotEmpty(systemName)) {
-			try {
-
-				return ResponseUtils.responseResult(true);
-			} catch (Exception ex) {
-				logger.error(ex);
-			}
-		}
-		return ResponseUtils.responseResult(false);
 	}
 
 	@RequestMapping("/json")
@@ -590,6 +584,11 @@ public class TableInputController {
 			}
 		}
 		return ResponseUtils.responseResult(false);
+	}
+
+	@javax.annotation.Resource
+	public void setDatabaseService(IDatabaseService databaseService) {
+		this.databaseService = databaseService;
 	}
 
 	@javax.annotation.Resource

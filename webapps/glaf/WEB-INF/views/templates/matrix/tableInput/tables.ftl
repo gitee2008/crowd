@@ -53,7 +53,7 @@
 	}
 
 	function datalist(tableId){
-		window.open("${contextPath}/tableInputData/datalist?tableId="+tableId);
+		window.open("${contextPath}/matrix/tableInputData/datalist?tableId="+tableId);
 	}
 
 	function addNew(){

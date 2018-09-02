@@ -119,46 +119,12 @@ public class TableInputServiceImpl implements TableInputService {
 			if (columns != null && !columns.isEmpty()) {
 				tableInput.setColumns(columns);
 				for (TableInputColumn column : columns) {
-					if (column.isPrimaryKey()) {
+					if (StringUtils.equalsIgnoreCase(column.getColumnName(), tableInput.getPrimaryKey())) {
 						logger.debug("##PrimaryKey:" + column.toJsonObject().toJSONString());
 						tableInput.setIdColumn(column);
 						columns.remove(column);
 						break;
 					}
-				}
-			}
-			CacheFactory.put("table_input", cacheKey, tableInput.toJsonObject().toJSONString());
-		}
-
-		return tableInput;
-	}
-
-	public TableInput getTableInputByTableName(String tableName) {
-		if (tableName == null) {
-			return null;
-		}
-		String cacheKey = "table_input_" + tableName;
-		if (SystemConfig.getBoolean("use_query_cache")) {
-			String text = CacheFactory.getString("table_input", cacheKey);
-			if (StringUtils.isNotEmpty(text)) {
-				try {
-					com.alibaba.fastjson.JSONObject json = JSON.parseObject(text);
-					TableInput model = TableInputJsonFactory.jsonToObject(json);
-					if (model != null) {
-						return model;
-					}
-				} catch (Exception ex) {
-				}
-			}
-		}
-
-		TableInput tableInput = tableInputMapper.getTableInputByTableName(tableName);
-		if (tableInput != null) {
-			List<TableInputColumn> columns = tableInputColumnMapper
-					.getTableInputColumnsByTableId(tableInput.getTableId());
-			if (columns != null && !columns.isEmpty()) {
-				tableInput.setColumns(columns);
-				for (TableInputColumn column : columns) {
 					if (column.isPrimaryKey()) {
 						logger.debug("##PrimaryKey:" + column.toJsonObject().toJSONString());
 						tableInput.setIdColumn(column);
@@ -193,10 +159,6 @@ public class TableInputServiceImpl implements TableInputService {
 		return null;
 	}
 
-	public List<TableInputColumn> getTableInputColumnsByTableName(String tableName) {
-		return tableInputColumnMapper.getTableInputColumnsByTableName(tableName);
-	}
-
 	public List<TableInputColumn> getTableInputColumnsByTargetId(String targetId) {
 		return tableInputColumnMapper.getTableInputColumnsByTargetId(targetId);
 	}
@@ -228,13 +190,13 @@ public class TableInputServiceImpl implements TableInputService {
 	}
 
 	@Transactional
-	public void insertColumns(String tableName, List<TableInputColumn> columns) {
-		tableName = tableName.toUpperCase();
-		TableInput tableInput = tableInputMapper.getTableInputByTableName(tableName);
+	public void insertColumns(String tableId, List<TableInputColumn> columns) {
+
+		TableInput tableInput = tableInputMapper.getTableInputById(tableId);
 		if (tableInput != null) {
 			String cacheKey = "table_input_" + tableInput.getTableId();
 			CacheFactory.remove("table_input", cacheKey);
-			cacheKey = "table_input_" + tableName;
+			cacheKey = "table_input_" + tableId;
 			CacheFactory.remove("table_input", cacheKey);
 
 			for (TableInputColumn column : columns) {
@@ -242,7 +204,7 @@ public class TableInputServiceImpl implements TableInputService {
 				if (id == null || tableInputColumnMapper.getTableInputColumnById(id) == null) {
 					column.setId(UUID32.getUUID());
 					column.setSystemFlag("1");
-					column.setTableName(tableName);
+					column.setTableName(tableInput.getTableName());
 					column.setTableId(tableInput.getTableId());
 					tableInputColumnMapper.insertTableInputColumn(column);
 				}
@@ -278,7 +240,7 @@ public class TableInputServiceImpl implements TableInputService {
 		String tableName = tableInput.getTableName();
 		tableName = tableName.toUpperCase();
 		tableInput.setTableName(tableName);
-		TableInput table = tableInputMapper.getTableInputByTableName(tableInput.getTableName());
+		TableInput table = tableInputMapper.getTableInputById(tableInput.getTableId());
 		if (table == null) {
 			tableInput.setTableId(UUID32.getUUID());
 			tableInput.setCreateTime(new Date());
@@ -326,21 +288,18 @@ public class TableInputServiceImpl implements TableInputService {
 			column.setSystemFlag("Y");
 			column.setTableName(tableInput.getTableName());
 			column.setTableId(tableInput.getTableId());
-			column.setColumnName(
-					(tableInput.getTableName() + "_user" + idGenerator.getNextId(tableInput.getTableName()))
-							.toLowerCase());
+			column.setColumnName(column.getColumnName());
 			tableInputColumnMapper.insertTableInputColumn(column);
 		}
 	}
 
 	@Transactional
-	public void saveColumn(String tableName, TableInputColumn columnDefinition) {
-		tableName = tableName.toUpperCase();
-		TableInput tableInput = getTableInputByTableName(tableName);
+	public void saveColumn(String tableId, TableInputColumn columnDefinition) {
+		TableInput tableInput = getTableInputById(tableId);
 		if (tableInput != null) {
 			String cacheKey = "table_input_" + tableInput.getTableId();
 			CacheFactory.remove("table_input", cacheKey);
-			cacheKey = "table_input_" + tableName;
+			cacheKey = "table_input_" + tableId;
 			CacheFactory.remove("table_input", cacheKey);
 
 			List<TableInputColumn> columns = tableInput.getColumns();
@@ -380,11 +339,12 @@ public class TableInputServiceImpl implements TableInputService {
 
 			if (!exists) {
 				if (StringUtils.isEmpty(columnDefinition.getColumnName())) {
-					columnDefinition
-							.setColumnName((tableName + "_user" + idGenerator.getNextId(tableName)).toLowerCase());
+					columnDefinition.setColumnName(
+							(tableInput.getTableName() + "_user" + idGenerator.getNextId(tableInput.getTableName()))
+									.toLowerCase());
 				}
 				columnDefinition.setId(UUID32.getUUID());
-				columnDefinition.setTableName(tableName);
+				columnDefinition.setTableName(tableInput.getTableName());
 				columnDefinition.setTableId(tableInput.getTableId());
 				columnDefinition.setOrdinal(++sortNo);
 				tableInputColumnMapper.insertTableInputColumn(columnDefinition);
@@ -408,37 +368,35 @@ public class TableInputServiceImpl implements TableInputService {
 	}
 
 	@Transactional
-	public void saveSystemTable(String tableName, List<TableInputColumn> columns) {
-		tableName = tableName.toUpperCase();
-		TableInput table = tableInputMapper.getTableInputByTableName(tableName);
-		if (table == null) {
-			table = new TableInput();
-			table.setType("SYS");
-			table.setSystemFlag("Y");
-			table.setTableName(tableName.toUpperCase());
-			table.setRevision(1);
-			table.setDeleteFlag(0);
-			table.setLocked(0);
-			table.setEnglishTitle(tableName);
-			table.setCreateBy("system");
-			table.setCreateTime(new Date());
-			table.setTableId(UUID32.getUUID());
-			tableInputMapper.insertTableInput(table);
+	public void saveSystemTable(String tableId, List<TableInputColumn> columns) {
+		TableInput tableInput = tableInputMapper.getTableInputById(tableId);
+		if (tableInput == null) {
+			tableInput = new TableInput();
+			tableInput.setType("SYS");
+			tableInput.setSystemFlag("Y");
+			tableInput.setRevision(1);
+			tableInput.setDeleteFlag(0);
+			tableInput.setLocked(0);
+
+			tableInput.setCreateBy("system");
+			tableInput.setCreateTime(new Date());
+			tableInput.setTableId(UUID32.getUUID());
+			tableInputMapper.insertTableInput(tableInput);
 		} else {
 
-			String cacheKey = "table_input_" + table.getTableId();
+			String cacheKey = "table_input_" + tableInput.getTableId();
 			CacheFactory.remove("table_input", cacheKey);
-			cacheKey = "table_input_" + tableName;
+			cacheKey = "table_input_" + tableId;
 			CacheFactory.remove("table_input", cacheKey);
 
-			tableInputMapper.updateTableInput(table);
+			tableInputMapper.updateTableInput(tableInput);
 		}
-		tableInputColumnMapper.deleteTableInputColumnByTableId(table.getTableId());
+		tableInputColumnMapper.deleteTableInputColumnByTableId(tableInput.getTableId());
 		for (TableInputColumn column : columns) {
 			column.setId(UUID32.getUUID());
 			column.setSystemFlag("Y");
-			column.setTableName(tableName);
-			column.setTableId(table.getTableId());
+			column.setTableName(tableInput.getTableName());
+			column.setTableId(tableInput.getTableId());
 			tableInputColumnMapper.insertTableInputColumn(column);
 		}
 	}

@@ -60,8 +60,6 @@ public interface TableInputService {
 	 */
 	TableInput getTableInputById(String tableId);
 
-	TableInput getTableInputByTableName(String tableName);
-
 	/**
 	 * 
 	 * @param columnId
@@ -74,8 +72,6 @@ public interface TableInputService {
 	List<TableInputColumn> getTableInputColumns(TableInputColumnQuery query);
 
 	List<TableInputColumn> getTableInputColumnsByTableId(String tableId);
-
-	List<TableInputColumn> getTableInputColumnsByTableName(String tableName);
 
 	List<TableInputColumn> getTableInputColumnsByTargetId(String targetId);
 
@@ -94,7 +90,7 @@ public interface TableInputService {
 	List<TableInput> getTableInputsByQueryCriteria(int start, int pageSize, TableInputQuery query);
 
 	@Transactional
-	void insertColumns(String tableName, List<TableInputColumn> columns);
+	void insertColumns(String tableId, List<TableInputColumn> columns);
 
 	/**
 	 * 根据查询参数获取记录列表
@@ -131,11 +127,11 @@ public interface TableInputService {
 	/**
 	 * 保存字段信息
 	 * 
-	 * @param tableName
+	 * @param tableId
 	 * @param column
 	 */
 	@Transactional
-	void saveColumn(String tableName, TableInputColumn column);
+	void saveColumn(String tableId, TableInputColumn column);
 
 	/**
 	 * 保存列定义信息
@@ -149,11 +145,11 @@ public interface TableInputService {
 	/**
 	 * 保存定义
 	 * 
-	 * @param tableName
+	 * @param tableId
 	 * @param rows
 	 */
 	@Transactional
-	void saveSystemTable(String tableName, List<TableInputColumn> rows);
+	void saveSystemTable(String tableId, List<TableInputColumn> rows);
 
 	@Transactional
 	void saveTargetColumn(String targetId, TableInputColumn column);
