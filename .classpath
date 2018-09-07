@@ -17,7 +17,6 @@
 	<classpathentry kind="lib" path="webapps/glaf/WEB-INF/lib/async-http-client.jar"/>
 	<classpathentry kind="lib" path="webapps/glaf/WEB-INF/lib/base64.jar"/>
 	<classpathentry kind="lib" path="webapps/glaf/WEB-INF/lib/bcmail.jar"/>
-	<classpathentry kind="lib" path="webapps/glaf/WEB-INF/lib/bcpg.jar"/>
 	<classpathentry kind="lib" path="webapps/glaf/WEB-INF/lib/bcprov.jar"/>
 	<classpathentry kind="lib" path="webapps/glaf/WEB-INF/lib/bsf.jar"/>
 	<classpathentry kind="lib" path="webapps/glaf/WEB-INF/lib/bsh.jar"/>
