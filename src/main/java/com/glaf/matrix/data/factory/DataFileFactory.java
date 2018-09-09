@@ -421,13 +421,11 @@ public class DataFileFactory {
 				dataFile.setData(data);
 				if (SystemConfig.getBoolean("fs_storage_mongodb")) {
 					MongoFileStorageFactory.getInstance().saveDataFile("fs", fileId, dataFile);
-					dataFile.setData(null);// 附件库写入字节流后就不写主控库了
 				} else {
 					if (systemName != null && !StringUtils.equals(Environment.DEFAULT_SYSTEM_NAME, systemName)) {
 						logger.debug("file save system: " + systemName);
 						Environment.setCurrentSystemName(systemName);
 						fileId = getDataFileService().insertDataFile(tenantId, dataFile);
-						dataFile.setData(null);// 附件库写入字节流后就不写主控库了
 					}
 				}
 
@@ -439,7 +437,7 @@ public class DataFileFactory {
 				getDataFileService().insertDataFile(tenantId, dataFile);
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			// ex.printStackTrace();
 			logger.error(ex);
 			throw new RuntimeException(ex);
 		} finally {
@@ -464,18 +462,18 @@ public class DataFileFactory {
 				dataFile.setData(data);
 				if (SystemConfig.getBoolean("fs_storage_mongodb")) {
 					MongoFileStorageFactory.getInstance().saveDataFile("fs", fileId, dataFile);
-					dataFile.setData(null);// 附件库写入字节流后就不写主控库了
+					dataFile.setData(null);
 				} else {
 					if (systemName != null && !StringUtils.equals(Environment.DEFAULT_SYSTEM_NAME, systemName)) {
 						logger.debug("file save system: " + systemName);
 						Environment.setCurrentSystemName(systemName);
 						getDataFileService().updateDataFileInfo(tenantId, dataFile);
-						dataFile.setData(null);// 附件库写入字节流后就不写主控库了
+						dataFile.setData(null);
 					}
 				}
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			// ex.printStackTrace();
 			logger.error(ex);
 			throw new RuntimeException(ex);
 		} finally {
