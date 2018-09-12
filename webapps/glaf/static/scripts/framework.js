@@ -15,12 +15,10 @@
 	   return result;  
 	};
 
-     //将表单转化为JSON对象
+
     function fromToJson(form) {
         var result = {};
-        //获取表单的数组对象
         var fieldArray = jQuery('#' + form).serializeArray();
-        //将表单转化为JSON对象
         for (var i = 0; i < fieldArray.length; i++) {
             var field = fieldArray[i];
             if (field.name in result) {
