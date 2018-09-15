@@ -18,10 +18,6 @@
 
 package com.glaf.matrix.export.handler;
 
-import java.util.Map;
-
-import org.dom4j.Element;
-
 import com.glaf.matrix.export.domain.XmlExport;
 
 public interface XmlDataHandler {
@@ -32,6 +28,6 @@ public interface XmlDataHandler {
 	 * @param xmlExport
 	 * @param databaseId
 	 */
-	void addChild(XmlExport xmlExport, org.dom4j.Element element, long databaseId, Map<String, Element> elementMap);
+	void addChild(XmlExport xmlExport, org.dom4j.Element element, long databaseId);
 
 }

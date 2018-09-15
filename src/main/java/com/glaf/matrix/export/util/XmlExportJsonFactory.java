@@ -43,6 +43,9 @@ public class XmlExportJsonFactory {
 		if (jsonObject.containsKey("nodeParentId")) {
 			model.setNodeParentId(jsonObject.getLong("nodeParentId"));
 		}
+		if (jsonObject.containsKey("name")) {
+			model.setName(jsonObject.getString("name"));
+		}
 		if (jsonObject.containsKey("title")) {
 			model.setTitle(jsonObject.getString("title"));
 		}
@@ -103,6 +106,9 @@ public class XmlExportJsonFactory {
 		if (model.getNodeParentId() != 0) {
 			jsonObject.put("nodeParentId", model.getNodeParentId());
 		}
+		if (model.getName() != null) {
+			jsonObject.put("name", model.getName());
+		}
 		if (model.getTitle() != null) {
 			jsonObject.put("title", model.getTitle());
 		}
@@ -160,6 +166,9 @@ public class XmlExportJsonFactory {
 
 		if (model.getNodeParentId() != 0) {
 			jsonObject.put("nodeParentId", model.getNodeParentId());
+		}
+		if (model.getName() != null) {
+			jsonObject.put("name", model.getName());
 		}
 		if (model.getTitle() != null) {
 			jsonObject.put("title", model.getTitle());

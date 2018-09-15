@@ -10,6 +10,7 @@
 		<result property="nodeId" column="NODEID_" jdbcType="BIGINT" />
 		<result property="nodeParentId" column="NODEPARENTID_"
 			jdbcType="BIGINT" />
+		<result property="name" column="NAME_" jdbcType="VARCHAR" />
 		<result property="title" column="TITLE_" jdbcType="VARCHAR" />
 		<result property="sql" column="SQL_" jdbcType="VARCHAR" />
 		<result property="resultFlag" column="RESULTFLAG_"
@@ -47,6 +48,9 @@
 			</if>
 			<if test="nodeParentId != null">
 				,NODEPARENTID_
+			</if>
+			<if test="name != null">
+				,NAME_
 			</if>
 			<if test="title != null">
 				,TITLE_
@@ -104,6 +108,9 @@
 			<if test="nodeParentId != null">
 				,#{nodeParentId, jdbcType=BIGINT}
 			</if>
+			<if test="name != null">
+				,#{name, jdbcType=VARCHAR}
+			</if>
 			<if test="title != null">
 				,#{title, jdbcType=VARCHAR}
 			</if>
@@ -160,6 +167,9 @@
 		<trim prefix="" suffix="" suffixOverrides=",">
 			<if test="nodeParentId != null">
 				NODEPARENTID_ = #{nodeParentId, jdbcType=BIGINT},
+			</if>
+			<if test="name != null">
+				NAME_ = #{name, jdbcType=VARCHAR},
 			</if>
 			<if test="title != null">
 				TITLE_ = #{title, jdbcType=VARCHAR},

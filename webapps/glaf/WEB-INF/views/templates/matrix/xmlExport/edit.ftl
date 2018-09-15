@@ -104,6 +104,18 @@
 		</td>
 	</tr>
 	<tr>
+		<td width="12%" align="left">名称</td>
+		<td align="left">
+            <input id="name" name="name" type="text" 
+			       class="easyui-validatebox x-text" style="width:625px;" 
+				   value="${xmlExport.name}"/>
+			<div style="margin-top:5px;">
+		     （提示：可以用于参数名的前缀，以便在子节点中引用。）
+			<br>
+	      </div>
+		</td>
+	</tr>
+	<tr>
 		<td width="12%" align="left">XML Tag</td>
 		<td align="left">
             <input id="xmlTag" name="xmlTag" type="text" 

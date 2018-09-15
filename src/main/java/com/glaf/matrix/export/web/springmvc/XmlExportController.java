@@ -20,7 +20,6 @@ package com.glaf.matrix.export.web.springmvc;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -32,7 +31,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,6 +51,7 @@ import com.glaf.core.identity.User;
 import com.glaf.core.security.LoginContext;
 import com.glaf.core.service.IDatabaseService;
 import com.glaf.core.tree.helper.JacksonTreeHelper;
+import com.glaf.core.util.DateUtils;
 import com.glaf.core.util.Dom4jUtils;
 import com.glaf.core.util.Paging;
 import com.glaf.core.util.ParamUtils;
@@ -199,10 +198,10 @@ public class XmlExportController {
 				org.dom4j.Document document = DocumentHelper.createDocument();
 				org.dom4j.Element root = document.addElement(xmlExport.getXmlTag());
 				xmlExport.setElement(root);
-				Map<String, Element> elementMap = new HashMap<String, Element>();
-				xmlDataHandler.addChild(xmlExport, root, databaseId, elementMap);
+				xmlDataHandler.addChild(xmlExport, root, databaseId);
 				byte[] data = Dom4jUtils.getBytesFromPrettyDocument(document, "UTF-8");
-				ResponseUtils.download(request, response, data, xmlExport.getTitle() + ".xml");
+				ResponseUtils.download(request, response, data,
+						xmlExport.getTitle() + DateUtils.getNowYearMonthDayHHmmss() + ".xml");
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -325,6 +324,7 @@ public class XmlExportController {
 		XmlExport xmlExport = new XmlExport();
 		try {
 			Tools.populate(xmlExport, params);
+			xmlExport.setName(request.getParameter("name"));
 			xmlExport.setTitle(request.getParameter("title"));
 			xmlExport.setSql(request.getParameter("sql"));
 			xmlExport.setResultFlag(request.getParameter("resultFlag"));

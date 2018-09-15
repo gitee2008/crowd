@@ -59,6 +59,12 @@ public class XmlExport implements Serializable, JSONable {
 	protected long nodeParentId;
 
 	/**
+	 * 名称
+	 */
+	@Column(name = "NAME_", length = 50)
+	protected String name;
+
+	/**
 	 * 标题
 	 */
 	@Column(name = "TITLE_", length = 200)
@@ -170,6 +176,9 @@ public class XmlExport implements Serializable, JSONable {
 	protected List<XmlExportItem> items = new ArrayList<XmlExportItem>();
 
 	@javax.persistence.Transient
+	protected Map<String, Object> dataMap = new HashMap<String, Object>();
+
+	@javax.persistence.Transient
 	protected Map<String, Object> parameter = new HashMap<String, Object>();
 
 	public XmlExport() {
@@ -234,6 +243,10 @@ public class XmlExport implements Serializable, JSONable {
 		return "";
 	}
 
+	public Map<String, Object> getDataMap() {
+		return dataMap;
+	}
+
 	public Element getElement() {
 		return element;
 	}
@@ -260,6 +273,10 @@ public class XmlExport implements Serializable, JSONable {
 
 	public int getLevel() {
 		return level;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public long getNodeId() {
@@ -353,6 +370,10 @@ public class XmlExport implements Serializable, JSONable {
 		this.createTime = createTime;
 	}
 
+	public void setDataMap(Map<String, Object> dataMap) {
+		this.dataMap = dataMap;
+	}
+
 	public void setElement(Element element) {
 		this.element = element;
 	}
@@ -379,6 +400,10 @@ public class XmlExport implements Serializable, JSONable {
 
 	public void setLevel(int level) {
 		this.level = level;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public void setNodeId(long nodeId) {
