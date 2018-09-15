@@ -122,6 +122,10 @@
 	background: url('../images/exp.gif') no-repeat;
 }
 
+.icon-xml {
+	background: url('../images/xml.gif') no-repeat;
+}
+
 .icon-submit {
 	background: url('../images/submit.gif') no-repeat;
 }
