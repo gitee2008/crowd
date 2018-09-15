@@ -51,6 +51,7 @@ import com.glaf.core.identity.User;
 import com.glaf.core.security.LoginContext;
 import com.glaf.core.service.IDatabaseService;
 import com.glaf.core.tree.helper.JacksonTreeHelper;
+import com.glaf.core.util.Dom4jUtils;
 import com.glaf.core.util.Paging;
 import com.glaf.core.util.ParamUtils;
 import com.glaf.core.util.RequestUtils;
@@ -196,7 +197,7 @@ public class XmlExportController {
 				org.dom4j.Element root = document.addElement(xmlExport.getXmlTag());
 				XmlDataHandler xmlDataHandler = new XmlExportDataHandler();
 				xmlDataHandler.addChild(xmlExport, root, databaseId);
-				byte[] data = com.glaf.core.util.Dom4jUtils.getBytesFromDocument(document, "UTF-8");
+				byte[] data = Dom4jUtils.getBytesFromPrettyDocument(document, "UTF-8");
 				ResponseUtils.download(request, response, data, xmlExport.getTitle() + ".xml");
 			}
 		} catch (Exception ex) {
