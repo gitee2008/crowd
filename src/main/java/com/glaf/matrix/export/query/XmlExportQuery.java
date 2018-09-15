@@ -27,7 +27,6 @@ public class XmlExportQuery extends DataQuery {
 	protected String nodeParentId;
 	protected List<String> nodeParentIds;
 	protected String titleLike;
-	protected String syncFlag;
 	protected String type;
 	protected String active;
 	protected Date createTimeGreaterThanOrEqual;
@@ -163,10 +162,6 @@ public class XmlExportQuery extends DataQuery {
 		return orderBy;
 	}
 
-	public String getSyncFlag() {
-		return syncFlag;
-	}
-
 	public String getTitleLike() {
 		if (titleLike != null && titleLike.trim().length() > 0) {
 			if (!titleLike.startsWith("%")) {
@@ -245,10 +240,6 @@ public class XmlExportQuery extends DataQuery {
 		this.nodeIds = nodeIds;
 	}
 
-	public void setSyncFlag(String syncFlag) {
-		this.syncFlag = syncFlag;
-	}
-
 	public void setTitleLike(String titleLike) {
 		this.titleLike = titleLike;
 	}
@@ -267,14 +258,6 @@ public class XmlExportQuery extends DataQuery {
 
 	public void setUpdateTimeLessThanOrEqual(Date updateTimeLessThanOrEqual) {
 		this.updateTimeLessThanOrEqual = updateTimeLessThanOrEqual;
-	}
-
-	public XmlExportQuery syncFlag(String syncFlag) {
-		if (syncFlag == null) {
-			throw new RuntimeException("syncFlag is null");
-		}
-		this.syncFlag = syncFlag;
-		return this;
 	}
 
 	public XmlExportQuery titleLike(String titleLike) {

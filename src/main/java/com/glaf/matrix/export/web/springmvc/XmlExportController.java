@@ -20,6 +20,7 @@ package com.glaf.matrix.export.web.springmvc;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -31,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -192,11 +194,13 @@ public class XmlExportController {
 		try {
 			XmlExport xmlExport = xmlExportService.getXmlExport(expId);
 			if (xmlExport != null && StringUtils.equals(xmlExport.getActive(), "Y")) {
-				xmlExport.setParentParameter(params);
+				xmlExport.setParameter(params);
+				XmlDataHandler xmlDataHandler = new XmlExportDataHandler();
 				org.dom4j.Document document = DocumentHelper.createDocument();
 				org.dom4j.Element root = document.addElement(xmlExport.getXmlTag());
-				XmlDataHandler xmlDataHandler = new XmlExportDataHandler();
-				xmlDataHandler.addChild(xmlExport, root, databaseId);
+				xmlExport.setElement(root);
+				Map<String, Element> elementMap = new HashMap<String, Element>();
+				xmlDataHandler.addChild(xmlExport, root, databaseId, elementMap);
 				byte[] data = Dom4jUtils.getBytesFromPrettyDocument(document, "UTF-8");
 				ResponseUtils.download(request, response, data, xmlExport.getTitle() + ".xml");
 			}
@@ -325,7 +329,7 @@ public class XmlExportController {
 			xmlExport.setSql(request.getParameter("sql"));
 			xmlExport.setResultFlag(request.getParameter("resultFlag"));
 			xmlExport.setNodeParentId(RequestUtils.getLong(request, "nodeParentId"));
-			xmlExport.setSyncFlag(request.getParameter("syncFlag"));
+			xmlExport.setLeafFlag(request.getParameter("leafFlag"));
 			xmlExport.setType(request.getParameter("type"));
 			xmlExport.setActive(request.getParameter("active"));
 			xmlExport.setXmlTag(request.getParameter("xmlTag"));

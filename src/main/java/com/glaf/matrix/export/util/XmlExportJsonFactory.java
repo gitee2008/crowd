@@ -52,8 +52,8 @@ public class XmlExportJsonFactory {
 		if (jsonObject.containsKey("resultFlag")) {
 			model.setResultFlag(jsonObject.getString("resultFlag"));
 		}
-		if (jsonObject.containsKey("syncFlag")) {
-			model.setSyncFlag(jsonObject.getString("syncFlag"));
+		if (jsonObject.containsKey("leafFlag")) {
+			model.setLeafFlag(jsonObject.getString("leafFlag"));
 		}
 		if (jsonObject.containsKey("type")) {
 			model.setType(jsonObject.getString("type"));
@@ -112,8 +112,8 @@ public class XmlExportJsonFactory {
 		if (model.getResultFlag() != null) {
 			jsonObject.put("resultFlag", model.getResultFlag());
 		}
-		if (model.getSyncFlag() != null) {
-			jsonObject.put("syncFlag", model.getSyncFlag());
+		if (model.getLeafFlag() != null) {
+			jsonObject.put("leafFlag", model.getLeafFlag());
 		}
 		if (model.getType() != null) {
 			jsonObject.put("type", model.getType());
@@ -170,8 +170,8 @@ public class XmlExportJsonFactory {
 		if (model.getResultFlag() != null) {
 			jsonObject.put("resultFlag", model.getResultFlag());
 		}
-		if (model.getSyncFlag() != null) {
-			jsonObject.put("syncFlag", model.getSyncFlag());
+		if (model.getLeafFlag() != null) {
+			jsonObject.put("leafFlag", model.getLeafFlag());
 		}
 		if (model.getType() != null) {
 			jsonObject.put("type", model.getType());

@@ -25,6 +25,8 @@ import com.alibaba.fastjson.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.dom4j.Element;
+
 import com.glaf.core.base.*;
 import com.glaf.core.util.DateUtils;
 import com.glaf.matrix.export.util.*;
@@ -76,10 +78,10 @@ public class XmlExport implements Serializable, JSONable {
 	protected String resultFlag;
 
 	/**
-	 * 同步标识
+	 * 叶子标识
 	 */
-	@Column(name = "SYNCFLAG_", length = 50)
-	protected String syncFlag;
+	@Column(name = "LEAFFLAG_", length = 50)
+	protected String leafFlag;
 
 	/**
 	 * 类型
@@ -159,13 +161,16 @@ public class XmlExport implements Serializable, JSONable {
 	protected XmlExport parent = null;
 
 	@javax.persistence.Transient
+	protected Element element = null;
+
+	@javax.persistence.Transient
 	protected List<XmlExport> children = new ArrayList<XmlExport>();
 
 	@javax.persistence.Transient
 	protected List<XmlExportItem> items = new ArrayList<XmlExportItem>();
 
 	@javax.persistence.Transient
-	protected Map<String, Object> parentParameter = new HashMap<String, Object>();
+	protected Map<String, Object> parameter = new HashMap<String, Object>();
 
 	public XmlExport() {
 
@@ -229,6 +234,10 @@ public class XmlExport implements Serializable, JSONable {
 		return "";
 	}
 
+	public Element getElement() {
+		return element;
+	}
+
 	public String getExternalAttrsFlag() {
 		return externalAttrsFlag;
 	}
@@ -245,6 +254,10 @@ public class XmlExport implements Serializable, JSONable {
 		return items;
 	}
 
+	public String getLeafFlag() {
+		return this.leafFlag;
+	}
+
 	public int getLevel() {
 		return level;
 	}
@@ -257,12 +270,12 @@ public class XmlExport implements Serializable, JSONable {
 		return this.nodeParentId;
 	}
 
-	public XmlExport getParent() {
-		return parent;
+	public Map<String, Object> getParameter() {
+		return parameter;
 	}
 
-	public Map<String, Object> getParentParameter() {
-		return parentParameter;
+	public XmlExport getParent() {
+		return parent;
 	}
 
 	public String getResultFlag() {
@@ -275,10 +288,6 @@ public class XmlExport implements Serializable, JSONable {
 
 	public String getSql() {
 		return this.sql;
-	}
-
-	public String getSyncFlag() {
-		return this.syncFlag;
 	}
 
 	public String getTemplateId() {
@@ -344,6 +353,10 @@ public class XmlExport implements Serializable, JSONable {
 		this.createTime = createTime;
 	}
 
+	public void setElement(Element element) {
+		this.element = element;
+	}
+
 	public void setExternalAttrsFlag(String externalAttrsFlag) {
 		this.externalAttrsFlag = externalAttrsFlag;
 	}
@@ -360,6 +373,10 @@ public class XmlExport implements Serializable, JSONable {
 		this.items = items;
 	}
 
+	public void setLeafFlag(String leafFlag) {
+		this.leafFlag = leafFlag;
+	}
+
 	public void setLevel(int level) {
 		this.level = level;
 	}
@@ -372,12 +389,12 @@ public class XmlExport implements Serializable, JSONable {
 		this.nodeParentId = nodeParentId;
 	}
 
-	public void setParent(XmlExport parent) {
-		this.parent = parent;
+	public void setParameter(Map<String, Object> parameter) {
+		this.parameter = parameter;
 	}
 
-	public void setParentParameter(Map<String, Object> parentParameter) {
-		this.parentParameter = parentParameter;
+	public void setParent(XmlExport parent) {
+		this.parent = parent;
 	}
 
 	public void setResultFlag(String resultFlag) {
@@ -390,10 +407,6 @@ public class XmlExport implements Serializable, JSONable {
 
 	public void setSql(String sql) {
 		this.sql = sql;
-	}
-
-	public void setSyncFlag(String syncFlag) {
-		this.syncFlag = syncFlag;
 	}
 
 	public void setTemplateId(String templateId) {

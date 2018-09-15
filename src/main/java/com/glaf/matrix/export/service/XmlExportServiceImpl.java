@@ -111,13 +111,13 @@ public class XmlExportServiceImpl implements XmlExportService {
 	 * @return
 	 */
 	public List<XmlExport> getChildrenWithItems(long nodeParentId) {
+		XmlExport parent = this.getXmlExportByNodeId(nodeParentId);
 		List<XmlExport> children = xmlExportMapper.getChildrenXmlExports(nodeParentId);
 		if (children != null && !children.isEmpty()) {
 			for (XmlExport child : children) {
-				XmlExportItemQuery query = new XmlExportItemQuery();
-				query.expId(child.getId());
-				List<XmlExportItem> items = xmlExportItemMapper.getXmlExportItems(query);
+				List<XmlExportItem> items = xmlExportItemMapper.getXmlExportItemsByExpId(child.getId());
 				child.setItems(items);
+				child.setParent(parent);
 			}
 		}
 		return children;

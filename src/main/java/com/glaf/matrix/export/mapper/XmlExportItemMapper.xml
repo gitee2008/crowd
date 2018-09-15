@@ -134,6 +134,15 @@
 	</select>
 
 
+	<select id="getXmlExportItemsByExpId" parameterType="string"
+		resultMap="xmlExportItemResultMap">
+		select * from SYS_XML_EXPORT_ITEM
+		where EXPID_ = #{expId}
+		and LOCKED_ = 0
+		order by SORTNO_ asc
+	</select>
+
+
 	<select id="getXmlExportItems"
 		parameterType="com.glaf.matrix.export.query.XmlExportItemQuery"
 		resultMap="xmlExportItemResultMap">

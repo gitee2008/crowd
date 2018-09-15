@@ -42,6 +42,8 @@ public interface XmlExportItemMapper {
 	int getXmlExportItemCount(XmlExportItemQuery query);
 
 	List<XmlExportItem> getXmlExportItems(XmlExportItemQuery query);
+	
+	List<XmlExportItem> getXmlExportItemsByExpId(String expId);
 
 	void insertXmlExportItem(XmlExportItem model);
 

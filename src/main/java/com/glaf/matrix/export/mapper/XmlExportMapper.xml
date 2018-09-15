@@ -14,7 +14,7 @@
 		<result property="sql" column="SQL_" jdbcType="VARCHAR" />
 		<result property="resultFlag" column="RESULTFLAG_"
 			jdbcType="VARCHAR" />
-		<result property="syncFlag" column="SYNCFLAG_"
+		<result property="leafFlag" column="LEAFFLAG_"
 			jdbcType="VARCHAR" />
 		<result property="type" column="TYPE_" jdbcType="VARCHAR" />
 		<result property="xmlTag" column="XMLTAG_" jdbcType="VARCHAR" />
@@ -57,8 +57,8 @@
 			<if test="resultFlag != null">
 				,RESULTFLAG_
 			</if>
-			<if test="syncFlag != null">
-				,SYNCFLAG_
+			<if test="leafFlag != null">
+				,LEAFFLAG_
 			</if>
 			<if test="type != null">
 				,TYPE_
@@ -113,8 +113,8 @@
 			<if test="resultFlag != null">
 				,#{resultFlag, jdbcType=VARCHAR}
 			</if>
-			<if test="syncFlag != null">
-				,#{syncFlag, jdbcType=VARCHAR}
+			<if test="leafFlag != null">
+				,#{leafFlag, jdbcType=VARCHAR}
 			</if>
 			<if test="type != null">
 				,#{type, jdbcType=VARCHAR}
@@ -170,8 +170,8 @@
 			<if test="resultFlag != null">
 				RESULTFLAG_ = #{resultFlag, jdbcType=VARCHAR},
 			</if>
-			<if test="syncFlag != null">
-				SYNCFLAG_ = #{syncFlag, jdbcType=VARCHAR},
+			<if test="leafFlag != null">
+				LEAFFLAG_ = #{leafFlag, jdbcType=VARCHAR},
 			</if>
 			<if test="type != null">
 				TYPE_ = #{type, jdbcType=VARCHAR},
@@ -229,8 +229,11 @@
 
 	<select id="getChildrenXmlExports" parameterType="long"
 		resultMap="xmlExportResultMap">
-		select * from SYS_XML_EXPORT where NODEPARENTID_ =
-		#{nodeParentId} order by SORTNO_ asc
+		select * from SYS_XML_EXPORT
+		where NODEPARENTID_ =
+		#{nodeParentId}
+		and ACTIVE_ = 'Y'
+		order by SORTNO_ asc
 	</select>
 
 
@@ -287,10 +290,6 @@
 
 			<if test="titleLike != null and titleLike != '' ">
 				and E.TITLE_ like #{titleLike}
-			</if>
-
-			<if test="syncFlag != null and syncFlag != '' ">
-				and E.SYNCFLAG_ = #{syncFlag}
 			</if>
 
 			<if test="type != null and type != '' ">

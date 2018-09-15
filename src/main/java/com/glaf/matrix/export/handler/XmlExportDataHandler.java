@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.glaf.core.context.ContextFactory;
 import com.glaf.core.domain.Database;
@@ -51,21 +51,21 @@ import com.glaf.matrix.export.service.XmlExportService;
 
 public class XmlExportDataHandler implements XmlDataHandler {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+	protected static final Log logger = LogFactory.getLog(XmlExportDataHandler.class);
 
 	/**
 	 * 增加XML节点
 	 * 
 	 * @param xmlExport
-	 * @param element
 	 * @param databaseId
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public void addChild(XmlExport xmlExport, Element element, long databaseId) {
+	public void addChild(XmlExport root, org.dom4j.Element element, long databaseId, Map<String, Element> elementMap) {
 		IDatabaseService databaseService = ContextFactory.getBean("databaseService");
 		XmlExportService xmlExportService = ContextFactory.getBean("com.glaf.matrix.export.service.xmlExportService");
-		Map<String, Object> parentParameter = new HashMap<String, Object>();
+		Map<String, Object> parameter = new HashMap<String, Object>();
+		elementMap.put(root.getId(), element);
 		Database srcDatabase = null;
 		Connection srcConn = null;
 		PreparedStatement srcPsmt = null;
@@ -74,10 +74,11 @@ public class XmlExportDataHandler implements XmlDataHandler {
 		try {
 			srcDatabase = databaseService.getDatabaseById(databaseId);
 
-			String sql = xmlExport.getSql();
+			String sql = root.getSql();
 			if (StringUtils.isNotEmpty(sql) && DBUtils.isLegalQuerySql(sql)) {
-				Map<String, Object> params = xmlExport.getParentParameter();
-				SqlExecutor sqlExecutor = QueryUtils.replaceSQL(sql, params);
+				Map<String, Object> params = root.getParameter();
+				parameter.putAll(params);
+				SqlExecutor sqlExecutor = QueryUtils.replaceSQL(sql, parameter);
 				sql = sqlExecutor.getSql();
 				srcConn = DBConnectionFactory.getConnection(srcDatabase.getName());
 				srcPsmt = srcConn.prepareStatement(sql);
@@ -91,7 +92,7 @@ public class XmlExportDataHandler implements XmlDataHandler {
 				dataMap.putAll(params);
 				List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
 
-				if (StringUtils.equals(xmlExport.getResultFlag(), "S")) {
+				if (StringUtils.equals(root.getResultFlag(), "S")) {
 					if (srcRs.next()) {
 						dataMap.putAll(this.toMap(srcRs));
 					}
@@ -108,9 +109,9 @@ public class XmlExportDataHandler implements XmlDataHandler {
 				/**
 				 * 处理单一记录
 				 */
-				if (StringUtils.equals(xmlExport.getResultFlag(), "S")) {
-					if (xmlExport.getItems() != null && !xmlExport.getItems().isEmpty()) {
-						for (XmlExportItem item : xmlExport.getItems()) {
+				if (StringUtils.equals(root.getResultFlag(), "S")) {
+					if (root.getItems() != null && !root.getItems().isEmpty()) {
+						for (XmlExportItem item : root.getItems()) {
 							/**
 							 * 处理属性
 							 */
@@ -121,10 +122,10 @@ public class XmlExportDataHandler implements XmlDataHandler {
 									value = ParamUtils.getString(dataMap, item.getName().toLowerCase());
 								}
 								if (StringUtils.isNotEmpty(value)) {
-									element.addAttribute(item.getName(), value);
+									root.getElement().addAttribute(item.getName(), value);
 								}
 							} else {
-								element.addElement(item.getName(), value);
+								root.getElement().addElement(item.getName(), value);
 							}
 						}
 					}
@@ -132,10 +133,19 @@ public class XmlExportDataHandler implements XmlDataHandler {
 					/**
 					 * 处理多条记录
 					 */
+					Element elem = null;
+					Element parent = null;
 					for (Map<String, Object> rowMap : resultList) {
-						Element elem = element.addElement(xmlExport.getXmlTag());
-						if (xmlExport.getItems() != null && !xmlExport.getItems().isEmpty()) {
-							for (XmlExportItem item : xmlExport.getItems()) {
+						if (root.getParent() != null) {
+							parent = elementMap.get(root.getParent().getId());
+							if (parent != null) {
+								// 取父节点
+								elem = parent.addElement(root.getXmlTag());
+								logger.debug("------------加到父节点-----------");
+							}
+						}
+						if (elem != null && root.getItems() != null && !root.getItems().isEmpty()) {
+							for (XmlExportItem item : root.getItems()) {
 								/**
 								 * 处理属性
 								 */
@@ -153,15 +163,12 @@ public class XmlExportDataHandler implements XmlDataHandler {
 								}
 							}
 						}
-						List<XmlExport> children = xmlExportService.getChildrenWithItems(xmlExport.getNodeId());
+						/**
+						 * 处理每条记录的子孙节点
+						 */
+						List<XmlExport> children = xmlExportService.getChildrenWithItems(root.getNodeId());
 						if (children != null && !children.isEmpty()) {
-							for (XmlExport child : children) {
-								parentParameter.clear();
-								parentParameter.putAll(params);
-								parentParameter.putAll(rowMap);
-								child.setParentParameter(parentParameter);
-								this.addChild(child, elem, databaseId);
-							}
+							this.processChildren(root, children, parameter, databaseId, elementMap);
 						}
 					}
 				}
@@ -169,27 +176,45 @@ public class XmlExportDataHandler implements XmlDataHandler {
 				/**
 				 * 未定义查询，只是XML节点的情况
 				 */
-				
-				List<XmlExport> children = xmlExportService.getChildrenWithItems(xmlExport.getNodeId());
+				List<XmlExport> children = xmlExportService.getChildrenWithItems(root.getNodeId());
 				if (children != null && !children.isEmpty()) {
-					for (XmlExport child : children) {
-						parentParameter.clear();
-						parentParameter.putAll(xmlExport.getParentParameter());
-						child.setParentParameter(parentParameter);
-						Element elem = element.addElement(child.getXmlTag());
-						this.addChild(child, elem, databaseId);
-					}
+					this.processChildren(root, children, parameter, databaseId, elementMap);
 				}
 			}
 
 		} catch (Exception ex) {
-			// ex.printStackTrace();
+			ex.printStackTrace();
 			logger.error("execute sql error", ex);
 			throw new RuntimeException(ex);
 		} finally {
 			JdbcUtils.close(srcRs);
 			JdbcUtils.close(srcPsmt);
 			JdbcUtils.close(srcConn);
+		}
+	}
+
+	protected void processChildren(XmlExport root, List<XmlExport> children, Map<String, Object> parameter,
+			long databaseId, Map<String, Element> elementMap) {
+		if (children != null && !children.isEmpty()) {
+			Element childElem = null;
+			for (XmlExport child : children) {
+				parameter.clear();
+				parameter.putAll(root.getParameter());
+				child.setParameter(parameter);
+
+				if (child.getParent() != null) {
+					Element parent = elementMap.get(child.getParent().getId());
+					if (parent != null) {
+						childElem = parent.addElement(child.getXmlTag());
+					}
+				}
+				if (childElem != null) {
+					child.setElement(childElem);
+					elementMap.put(child.getId(), childElem);
+				}
+				logger.debug("-------------<" + child.getXmlTag() + ">" + child.getTitle() + "---------------------");
+				this.addChild(child, childElem, databaseId, elementMap);
+			}
 		}
 	}
 
