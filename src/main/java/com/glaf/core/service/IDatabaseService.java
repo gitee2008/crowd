@@ -99,7 +99,7 @@ public interface IDatabaseService {
 	 * 
 	 * @return
 	 */
-	Database getDatabaseById(Long id);
+	Database getDatabaseById(long databaseId);
 
 	/**
 	 * 根据mapping获取一条数据库信息

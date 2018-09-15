@@ -214,8 +214,8 @@ public class DatabaseServiceImpl implements IDatabaseService {
 		return null;
 	}
 
-	public Database getDatabaseById(Long databaseId) {
-		if (databaseId == null || databaseId == 0) {
+	public Database getDatabaseById(long databaseId) {
+		if (databaseId == 0) {
 			return null;
 		}
 		Database database = databaseMapper.getDatabaseById(databaseId);
