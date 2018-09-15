@@ -58,6 +58,8 @@ public interface XmlExportItemService {
 	 */
 	int getXmlExportItemCountByQueryCriteria(XmlExportItemQuery query);
 
+	List<XmlExportItem> getXmlExportItemsByExpId(String expId);
+
 	/**
 	 * 根据查询参数获取一页的数据
 	 * 

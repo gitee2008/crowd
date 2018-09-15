@@ -325,6 +325,7 @@ public class XmlExportController {
 		try {
 			Tools.populate(xmlExport, params);
 			xmlExport.setName(request.getParameter("name"));
+			xmlExport.setMapping(request.getParameter("mapping"));
 			xmlExport.setTitle(request.getParameter("title"));
 			xmlExport.setSql(request.getParameter("sql"));
 			xmlExport.setResultFlag(request.getParameter("resultFlag"));

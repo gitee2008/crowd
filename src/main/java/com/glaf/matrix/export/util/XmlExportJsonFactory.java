@@ -46,6 +46,9 @@ public class XmlExportJsonFactory {
 		if (jsonObject.containsKey("name")) {
 			model.setName(jsonObject.getString("name"));
 		}
+		if (jsonObject.containsKey("mapping")) {
+			model.setMapping(jsonObject.getString("mapping"));
+		}
 		if (jsonObject.containsKey("title")) {
 			model.setTitle(jsonObject.getString("title"));
 		}
@@ -109,6 +112,9 @@ public class XmlExportJsonFactory {
 		if (model.getName() != null) {
 			jsonObject.put("name", model.getName());
 		}
+		if (model.getMapping() != null) {
+			jsonObject.put("mapping", model.getMapping());
+		}
 		if (model.getTitle() != null) {
 			jsonObject.put("title", model.getTitle());
 		}
@@ -169,6 +175,9 @@ public class XmlExportJsonFactory {
 		}
 		if (model.getName() != null) {
 			jsonObject.put("name", model.getName());
+		}
+		if (model.getMapping() != null) {
+			jsonObject.put("mapping", model.getMapping());
 		}
 		if (model.getTitle() != null) {
 			jsonObject.put("title", model.getTitle());

@@ -11,6 +11,7 @@
 		<result property="nodeParentId" column="NODEPARENTID_"
 			jdbcType="BIGINT" />
 		<result property="name" column="NAME_" jdbcType="VARCHAR" />
+		<result property="mapping" column="MAPPING_" jdbcType="VARCHAR" />
 		<result property="title" column="TITLE_" jdbcType="VARCHAR" />
 		<result property="sql" column="SQL_" jdbcType="VARCHAR" />
 		<result property="resultFlag" column="RESULTFLAG_"
@@ -51,6 +52,9 @@
 			</if>
 			<if test="name != null">
 				,NAME_
+			</if>
+			<if test="mapping != null">
+				,MAPPING_
 			</if>
 			<if test="title != null">
 				,TITLE_
@@ -111,6 +115,9 @@
 			<if test="name != null">
 				,#{name, jdbcType=VARCHAR}
 			</if>
+			<if test="mapping != null">
+				,#{mapping, jdbcType=VARCHAR}
+			</if>
 			<if test="title != null">
 				,#{title, jdbcType=VARCHAR}
 			</if>
@@ -170,6 +177,9 @@
 			</if>
 			<if test="name != null">
 				NAME_ = #{name, jdbcType=VARCHAR},
+			</if>
+			<if test="mapping != null">
+				MAPPING_ = #{mapping, jdbcType=VARCHAR},
 			</if>
 			<if test="title != null">
 				TITLE_ = #{title, jdbcType=VARCHAR},

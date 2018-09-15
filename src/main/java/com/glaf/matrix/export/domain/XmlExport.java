@@ -65,6 +65,12 @@ public class XmlExport implements Serializable, JSONable {
 	protected String name;
 
 	/**
+	 * 映射名
+	 */
+	@Column(name = "MAPPING_", length = 50)
+	protected String mapping;
+
+	/**
 	 * 标题
 	 */
 	@Column(name = "TITLE_", length = 200)
@@ -275,6 +281,10 @@ public class XmlExport implements Serializable, JSONable {
 		return level;
 	}
 
+	public String getMapping() {
+		return mapping;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -400,6 +410,10 @@ public class XmlExport implements Serializable, JSONable {
 
 	public void setLevel(int level) {
 		this.level = level;
+	}
+
+	public void setMapping(String mapping) {
+		this.mapping = mapping;
 	}
 
 	public void setName(String name) {

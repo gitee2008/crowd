@@ -111,8 +111,18 @@
 				   value="${xmlExport.name}"/>
 			<div style="margin-top:5px;">
 		     （提示：可以用于参数名的前缀，以便在子节点中引用。）
-			<br>
-	      </div>
+	        </div>
+		</td>
+	</tr>
+	<tr>
+		<td width="12%" align="left">映射名</td>
+		<td align="left">
+            <input id="mapping" name="mapping" type="text" 
+			       class="easyui-validatebox x-text" style="width:625px;" 
+				   value="${xmlExport.mapping}"/>
+			<div style="margin-top:5px;">
+		     （提示：指向上级节点的唯一字段名。）
+	        </div>
 		</td>
 	</tr>
 	<tr>

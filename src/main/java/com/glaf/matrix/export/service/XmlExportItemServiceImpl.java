@@ -92,6 +92,11 @@ public class XmlExportItemServiceImpl implements XmlExportItemService {
 		return xmlExportItemMapper.getXmlExportItemCount(query);
 	}
 
+	@Override
+	public List<XmlExportItem> getXmlExportItemsByExpId(String expId) {
+		return xmlExportItemMapper.getXmlExportItemsByExpId(expId);
+	}
+
 	/**
 	 * 根据查询参数获取一页的数据
 	 * 
