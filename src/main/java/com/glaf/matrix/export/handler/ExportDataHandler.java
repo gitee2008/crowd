@@ -38,14 +38,12 @@ import org.apache.commons.logging.LogFactory;
 
 import com.glaf.core.context.ContextFactory;
 import com.glaf.core.domain.Database;
-import com.glaf.core.el.ExpressionTools;
 import com.glaf.core.entity.SqlExecutor;
 import com.glaf.core.jdbc.DBConnectionFactory;
 import com.glaf.core.service.IDatabaseService;
 import com.glaf.core.util.LowerLinkedMap;
 import com.glaf.core.util.DBUtils;
 import com.glaf.core.util.JdbcUtils;
-import com.glaf.core.util.ParamUtils;
 import com.glaf.core.util.QueryUtils;
 
 import com.glaf.matrix.export.domain.XmlExport;
@@ -68,12 +66,12 @@ public class ExportDataHandler implements DataHandler {
 	}
 
 	/**
-	 * 增加XML节点
+	 * 增加数据节点
 	 * 
 	 * @param xmlExport
 	 *            导出定义
-	 * @param root
-	 *            根节点
+	 * @param dataMap
+	 *            数据集合
 	 * @param databaseId
 	 *            数据库编号
 	 */
@@ -96,12 +94,12 @@ public class ExportDataHandler implements DataHandler {
 		Database srcDatabase = getDatabaseService().getDatabaseById(databaseId);
 
 		if (xmlExport.getNodeParentId() == 0) {// 顶层节点，只能有一个根节点
-			// 根据定义补上根节点的属性
+
 		}
 
 		List<XmlExport> children = getXmlExportService().getChildrenWithItems(xmlExport.getNodeId());
 		if (children != null && !children.isEmpty()) {
-			logger.debug("---------------------------gen child data----------------------------");
+			logger.debug("---------------------------fetch child data----------------------------");
 			for (XmlExport child : children) {
 				child.setParent(xmlExport);
 				int retry = 0;
@@ -135,7 +133,6 @@ public class ExportDataHandler implements DataHandler {
 		Connection srcConn = null;
 		PreparedStatement srcPsmt = null;
 		ResultSet srcRs = null;
-		String value = null;
 		try {
 			if (current.getItems() == null || current.getItems().isEmpty()) {
 				List<XmlExportItem> items = getXmlExportItemService().getXmlExportItemsByExpId(current.getId());
@@ -180,29 +177,29 @@ public class ExportDataHandler implements DataHandler {
 				logger.debug("result size:" + resultList.size());
 				current.setDataList(resultList);
 
+				if (StringUtils.isNotEmpty(current.getName())) {
+					dataMap.put(current.getName() + "_datamodel", current);
+					dataMap.put(current.getName() + "_datalist", resultList);
+				}
+
+				if (StringUtils.isNotEmpty(current.getMapping())) {
+					dataMap.put(current.getMapping() + "_datamodel", current);
+					dataMap.put(current.getMapping() + "_datalist", resultList);
+				}
+
 				/**
 				 * 处理单一记录
 				 */
 				if (StringUtils.equals(current.getResultFlag(), "S")) {
-					if (current.getItems() != null && !current.getItems().isEmpty()) {
-						for (XmlExportItem item : current.getItems()) {
-							/**
-							 * 处理属性
-							 */
-							if (StringUtils.equals(item.getTagFlag(), "A")) {
-								if (StringUtils.isNotEmpty(item.getExpression())) {
-									value = ExpressionTools.evaluate(item.getExpression(), dataMap);
-								} else {
-									value = ParamUtils.getString(dataMap, item.getName().toLowerCase());
-								}
-								if (StringUtils.isNotEmpty(value)) {
-									current.getElement().addAttribute(item.getName(), value);
-								}
-							} else {
-								current.getElement().addElement(item.getName(), value);
-							}
-						}
+
+					if (StringUtils.isNotEmpty(current.getName())) {
+						dataMap.put(current.getName() + "_sx", singleMap);
 					}
+
+					if (StringUtils.isNotEmpty(current.getMapping())) {
+						dataMap.put(current.getMapping() + "_sx", singleMap);
+					}
+
 				} else {
 					/**
 					 * 处理多条记录

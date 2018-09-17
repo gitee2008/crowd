@@ -24,6 +24,16 @@ import com.glaf.matrix.export.domain.XmlExport;
 
 public interface DataHandler {
 
+	/**
+	 * 增加数据节点
+	 * 
+	 * @param xmlExport
+	 *            导出定义
+	 * @param dataMap
+	 *            数据集合
+	 * @param databaseId
+	 *            数据库编号
+	 */
 	void addChild(XmlExport xmlExport, Map<String, Object> dataMap, long databaseId);
 
 }
