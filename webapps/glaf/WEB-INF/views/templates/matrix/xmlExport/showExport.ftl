@@ -27,6 +27,17 @@
 		}
 	}
 
+	function exportXls(){
+		var databaseId = document.getElementById("databaseId").value;
+		var templateId = document.getElementById("templateId").value;
+		if(databaseId != ""){
+            var link = '${request.contextPath}/matrix/xmlExport/exportXls?expId=${xmlExport.id}&databaseId='+databaseId+'&templateId='+templateId;
+		    window.open(link);
+		} else {
+			layer.msg("请选择要导出数据库。");
+		}
+	}
+
 </script>
 </head>
 
@@ -42,6 +53,9 @@
 	&nbsp;
 	<a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-exp'" 
 	   onclick="javascript:exportJson();" >导出JSON</a>
+	&nbsp;
+	<a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-exp'" 
+	   onclick="javascript:exportXls();" >导出Excel</a>
     </div> 
   </div>
 
@@ -61,6 +75,23 @@
 				<option value="${database.id}">${database.title}[${database.dbname}]</option>
 				</#list>
             </select> 
+		</td>
+	</tr> 
+	<tr>
+		<td width="15%" align="left">&nbsp;&nbsp;导出模板</td>
+		<td align="left">
+			<select id="templateId" name="templateId">
+			    <option value="">----请选择----</option>
+				<#list templates as template >
+				<option value="${template.templateId}">${template.title}</option>
+				</#list>
+            </select> 
+            <script type="text/javascript">
+                document.getElementById("templateId").value="${xmlExport.templateId}";
+            </script>
+			<div style="margin-top:5px;">
+		     （提示：需要导出Excel时才选择模板。）
+	        </div>
 		</td>
 	</tr> 
 	<tr><td><br><br><br><br></td></tr>

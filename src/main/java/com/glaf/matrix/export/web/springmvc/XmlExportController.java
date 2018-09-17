@@ -18,19 +18,29 @@
 
 package com.glaf.matrix.export.web.springmvc;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.DocumentHelper;
+import org.jxls.common.Context;
+import org.jxls.transform.poi.PoiTransformer;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,12 +71,14 @@ import com.glaf.core.util.StaxonUtils;
 import com.glaf.core.util.Tools;
 
 import com.glaf.matrix.export.domain.XmlExport;
+import com.glaf.matrix.export.handler.DataHandler;
+import com.glaf.matrix.export.handler.ExportDataHandler;
 import com.glaf.matrix.export.handler.XmlDataHandler;
 import com.glaf.matrix.export.handler.XmlExportDataHandler;
 import com.glaf.matrix.export.query.XmlExportQuery;
 import com.glaf.matrix.export.service.XmlExportService;
 import com.glaf.matrix.util.SysParams;
-
+import com.glaf.template.Template;
 import com.glaf.template.service.ITemplateService;
 
 /**
@@ -171,6 +183,11 @@ public class XmlExportController {
 		}
 		request.setAttribute("databases", activeDatabases);
 
+		Map<String, Template> templateMap = templateService.getAllTemplate();
+		if (templateMap != null && !templateMap.isEmpty()) {
+			request.setAttribute("templates", templateMap.values());
+		}
+
 		String view = request.getParameter("view");
 		if (StringUtils.isNotEmpty(view)) {
 			return new ModelAndView(view, modelMap);
@@ -204,6 +221,70 @@ public class XmlExportController {
 				data = StaxonUtils.xml2json(new String(data, "UTF-8")).getBytes();
 				ResponseUtils.download(request, response, data,
 						xmlExport.getTitle() + DateUtils.getNowYearMonthDayHHmmss() + ".json");
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			logger.error(ex);
+		}
+	}
+
+	@ResponseBody
+	@RequestMapping("/exportXls")
+	public void exportXls(HttpServletRequest request, HttpServletResponse response) {
+		Map<String, Object> params = RequestUtils.getParameterMap(request);
+		SysParams.putInternalParams(params);
+		String expId = RequestUtils.getString(request, "expId");
+		long databaseId = RequestUtils.getLong(request, "databaseId");
+		String templateId = RequestUtils.getString(request, "templateId");
+		InputStream is = null;
+		ByteArrayInputStream bais = null;
+		ByteArrayOutputStream baos = null;
+		BufferedOutputStream bos = null;
+		try {
+			XmlExport xmlExport = xmlExportService.getXmlExport(expId);
+			if (xmlExport != null && StringUtils.equals(xmlExport.getActive(), "Y")) {
+				if (StringUtils.isEmpty(templateId)) {
+					templateId = xmlExport.getTemplateId();
+				}
+				if (StringUtils.isNotEmpty(templateId)) {
+					Template tpl = templateService.getTemplate(templateId);
+					if (tpl != null && tpl.getData() != null) {
+
+						xmlExport.setParameter(params);
+						DataHandler dataHandler = new ExportDataHandler();
+						dataHandler.addChild(xmlExport, params, databaseId);
+
+						bais = new ByteArrayInputStream(tpl.getData());
+						is = new BufferedInputStream(bais);
+						baos = new ByteArrayOutputStream();
+						bos = new BufferedOutputStream(baos);
+
+						Context context2 = PoiTransformer.createInitialContext();
+
+						Set<Entry<String, Object>> entrySet = params.entrySet();
+						for (Entry<String, Object> entry : entrySet) {
+							String key = entry.getKey();
+							Object value = entry.getValue();
+							context2.putVar(key, value);
+						}
+
+						org.jxls.util.JxlsHelper.getInstance().processTemplate(is, bos, context2);
+						IOUtils.closeQuietly(is);
+						IOUtils.closeQuietly(bais);
+
+						bos.flush();
+						baos.flush();
+						byte[] data = baos.toByteArray();
+
+						if (StringUtils.endsWithIgnoreCase(tpl.getDataFile(), ".xlsx")) {
+							ResponseUtils.download(request, response, data,
+									xmlExport.getTitle() + DateUtils.getNowYearMonthDayHHmmss() + ".xlsx");
+						} else {
+							ResponseUtils.download(request, response, data,
+									xmlExport.getTitle() + DateUtils.getNowYearMonthDayHHmmss() + ".xls");
+						}
+					}
+				}
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -464,6 +545,11 @@ public class XmlExportController {
 
 		}
 		request.setAttribute("databases", activeDatabases);
+
+		Map<String, Template> templateMap = templateService.getAllTemplate();
+		if (templateMap != null && !templateMap.isEmpty()) {
+			request.setAttribute("templates", templateMap.values());
+		}
 
 		String view = request.getParameter("view");
 		if (StringUtils.isNotEmpty(view)) {

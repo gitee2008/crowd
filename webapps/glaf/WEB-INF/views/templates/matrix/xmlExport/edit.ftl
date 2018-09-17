@@ -149,6 +149,23 @@
 		</td>
 	</tr>
 
+	<tr>
+		<td width="15%" align="left">导出模板</td>
+		<td align="left">
+			<select id="templateId" name="templateId">
+			    <option value="">----请选择----</option>
+				<#list templates as template >
+				<option value="${template.templateId}">${template.title}</option>
+				</#list>
+            </select> 
+            <script type="text/javascript">
+                document.getElementById("templateId").value="${xmlExport.templateId}";
+            </script>
+			<div style="margin-top:5px;">
+		     （提示：需要导出Excel时可以设置导出的模板。）
+	        </div>
+		</td>
+	</tr>
     <tr>
 		<td width="12%" align="left">是否叶节点</td>
 		<td align="left">
