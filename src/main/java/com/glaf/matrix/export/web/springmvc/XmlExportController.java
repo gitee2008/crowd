@@ -206,6 +206,10 @@ public class XmlExportController {
 	public void exportJson(HttpServletRequest request, HttpServletResponse response) {
 		Map<String, Object> params = RequestUtils.getParameterMap(request);
 		SysParams.putInternalParams(params);
+		LoginContext loginContext = RequestUtils.getLoginContext(request);
+		params.put("login_user", loginContext.getUser());
+		params.put("login_userid", loginContext.getActorId());
+		params.put("login_tenantid", loginContext.getTenantId());
 		long databaseId = RequestUtils.getLong(request, "databaseId");
 		String expId = RequestUtils.getString(request, "expId");
 		try {
@@ -233,6 +237,10 @@ public class XmlExportController {
 	public void exportXls(HttpServletRequest request, HttpServletResponse response) {
 		Map<String, Object> params = RequestUtils.getParameterMap(request);
 		SysParams.putInternalParams(params);
+		LoginContext loginContext = RequestUtils.getLoginContext(request);
+		params.put("login_user", loginContext.getUser());
+		params.put("login_userid", loginContext.getActorId());
+		params.put("login_tenantid", loginContext.getTenantId());
 		String expId = RequestUtils.getString(request, "expId");
 		long databaseId = RequestUtils.getLong(request, "databaseId");
 		String templateId = RequestUtils.getString(request, "templateId");
@@ -297,6 +305,10 @@ public class XmlExportController {
 	public void exportXml(HttpServletRequest request, HttpServletResponse response) {
 		Map<String, Object> params = RequestUtils.getParameterMap(request);
 		SysParams.putInternalParams(params);
+		LoginContext loginContext = RequestUtils.getLoginContext(request);
+		params.put("login_user", loginContext.getUser());
+		params.put("login_userid", loginContext.getActorId());
+		params.put("login_tenantid", loginContext.getTenantId());
 		long databaseId = RequestUtils.getLong(request, "databaseId");
 		String expId = RequestUtils.getString(request, "expId");
 		try {
