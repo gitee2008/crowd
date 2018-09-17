@@ -56,41 +56,57 @@ public class XmlExportDataHandler implements XmlDataHandler {
 
 	protected static final Log logger = LogFactory.getLog(XmlExportDataHandler.class);
 
+	protected IDatabaseService databaseService;
+
+	protected XmlExportService xmlExportService;
+
+	protected XmlExportItemService xmlExportItemService;
+
+	public XmlExportDataHandler() {
+
+	}
+
 	/**
 	 * 增加XML节点
 	 * 
+	 * @param xmlExport
+	 *            导出定义
 	 * @param root
+	 *            根节点
 	 * @param databaseId
+	 *            数据库编号
 	 */
 	@Override
-	public void addChild(XmlExport root, org.dom4j.Element element, long databaseId) {
-		Map<String, Element> elementMap = new HashMap<String, Element>();
-		IDatabaseService databaseService = ContextFactory.getBean("databaseService");
-		XmlExportService xmlExportService = ContextFactory.getBean("com.glaf.matrix.export.service.xmlExportService");
-		XmlExportItemService xmlExportItemService = ContextFactory
-				.getBean("com.glaf.matrix.export.service.xmlExportItemService");
-		List<XmlExport> list = xmlExportService.getAllChildren(root.getNodeId());
+	public void addChild(XmlExport xmlExport, org.dom4j.Element root, long databaseId) {
+		List<XmlExport> list = getXmlExportService().getAllChildren(xmlExport.getNodeId());
 		if (list != null && !list.isEmpty()) {
 			for (XmlExport export : list) {
-				List<XmlExport> children = xmlExportService.getChildrenWithItems(export.getNodeId());
+				List<XmlExport> children = getXmlExportService().getChildrenWithItems(export.getNodeId());
 				export.setChildren(children);
-				if (export.getNodeParentId() == root.getNodeId()) {
-					root.addChild(export);
+				if (export.getNodeParentId() == xmlExport.getNodeId()) {
+					xmlExport.addChild(export);
 				}
 			}
 		}
 
-		// List<XmlExport> children =
-		// xmlExportService.getChildrenWithItems(root.getNodeId());
-		// root.setChildren(children);
+		List<XmlExportItem> items = getXmlExportItemService().getXmlExportItemsByExpId(xmlExport.getId());
+		xmlExport.setItems(items);
 
-		List<XmlExportItem> items = xmlExportItemService.getXmlExportItemsByExpId(root.getId());
-		root.setItems(items);
+		Database srcDatabase = getDatabaseService().getDatabaseById(databaseId);
 
-		Database srcDatabase = databaseService.getDatabaseById(databaseId);
-		elementMap.put(root.getId(), element);
-		logger.debug("---------------------------gen xml----------------------------");
-		this.addChild(root, element, srcDatabase, elementMap);
+		if (xmlExport.getNodeParentId() == 0) {// 顶层节点，只能有一个根节点
+			// 根据定义补上根节点的属性
+		}
+
+		List<XmlExport> children = getXmlExportService().getChildrenWithItems(xmlExport.getNodeId());
+		if (children != null && !children.isEmpty()) {
+			xmlExport.setElement(root);
+			logger.debug("---------------------------gen child xml----------------------------");
+			for (XmlExport child : children) {
+				child.setParent(xmlExport);
+				this.addChild(child, srcDatabase);
+			}
+		}
 	}
 
 	/**
@@ -100,19 +116,15 @@ public class XmlExportDataHandler implements XmlDataHandler {
 	 * @param databaseId
 	 */
 	@SuppressWarnings("unchecked")
-	public void addChild(XmlExport current, org.dom4j.Element element, Database srcDatabase,
-			Map<String, Element> elementMap) {
-		XmlExportItemService xmlExportItemService = ContextFactory
-				.getBean("com.glaf.matrix.export.service.xmlExportItemService");
+	public void addChild(XmlExport current, Database srcDatabase) {
 		Map<String, Object> parameter = new HashMap<String, Object>();
-		elementMap.put(current.getId(), element);
 		Connection srcConn = null;
 		PreparedStatement srcPsmt = null;
 		ResultSet srcRs = null;
 		String value = null;
 		try {
 			if (current.getItems() == null || current.getItems().isEmpty()) {
-				List<XmlExportItem> items = xmlExportItemService.getXmlExportItemsByExpId(current.getId());
+				List<XmlExportItem> items = getXmlExportItemService().getXmlExportItemsByExpId(current.getId());
 				current.setItems(items);
 			}
 			String sql = current.getSql();
@@ -180,29 +192,15 @@ public class XmlExportDataHandler implements XmlDataHandler {
 					 * 处理多条记录
 					 */
 					Element elem = null;
-					Element parent = null;
 					for (Map<String, Object> rowMap : resultList) {
-						if (current.getParent() != null) {
-							if (StringUtils.isNotEmpty(current.getMapping())) {
-								if (rowMap.get(current.getMapping().trim().toLowerCase()) != null) {
-									parent = elementMap
-											.get(rowMap.get(current.getMapping().trim().toLowerCase()).toString());
-									if (parent != null) {
-										logger.debug("##当前节点:" + current.getXmlTag() + " 父节点名称:" + parent.getName());
-									}
-								}
-							}
-							if (parent == null) {
-								parent = elementMap.get(current.getParent().getId());
-								if (parent != null) {
-									logger.debug("当前节点:" + current.getXmlTag() + " 父节点名称:" + parent.getName());
-									// 取父节点
-									elem = parent.addElement(current.getXmlTag());
-									// logger.debug("------------加到父节点-----------");
-								}
-							}
-						}
-
+						/**
+						 * 在这个节点的父节点上添加下级节点
+						 */
+						elem = current.getParent().getElement().addElement(current.getXmlTag());
+						// logger.debug("----<" + current.getXmlTag() + ">" + current.getTitle() +
+						// "----");
+						// logger.debug("elem:" + elem);
+						// logger.debug("current.getItems():" + current.getItems());
 						if (elem != null && current.getItems() != null && !current.getItems().isEmpty()) {
 							for (XmlExportItem item : current.getItems()) {
 								/**
@@ -215,9 +213,6 @@ public class XmlExportDataHandler implements XmlDataHandler {
 										value = ParamUtils.getString(rowMap, item.getName().trim().toLowerCase());
 									}
 									if (StringUtils.isNotEmpty(value)) {
-										// if ("GCXM".equals(current.getXmlTag())) {
-										// logger.debug(item.getName()+"-->" + value);
-										// }
 										elem.addAttribute(item.getName(), value);
 									}
 								} else {
@@ -226,13 +221,47 @@ public class XmlExportDataHandler implements XmlDataHandler {
 							}
 						}
 
+						// logger.debug("elem:" + elem);
+
 						/**
 						 * 处理每条记录的子孙节点
 						 */
 						List<XmlExport> children = current.getChildren();
+						if (children == null || children.isEmpty()) {
+							if (!StringUtils.equals(current.getLeafFlag(), "Y")) {
+								children = getXmlExportService().getChildrenWithItems(current.getNodeId());
+							}
+						}
+						// logger.debug("->children:" + children);
 						if (children != null && !children.isEmpty()) {
 							current.setDataMap(rowMap);
-							this.processChildren(current, children, parameter, srcDatabase, elementMap);
+							current.setElement(elem);
+
+							if (StringUtils.isNotEmpty(current.getName())) {
+								Set<Entry<String, Object>> entrySet = current.getParameter().entrySet();
+								for (Entry<String, Object> entry : entrySet) {
+									String key = entry.getKey();
+									Object val = entry.getValue();
+									parameter.put(current.getName() + "_" + key, val);
+								}
+							}
+
+							for (XmlExport child : children) {
+
+								if (StringUtils.isNotEmpty(current.getName())) {
+									Set<Entry<String, Object>> entrySet = rowMap.entrySet();
+									for (Entry<String, Object> entry : entrySet) {
+										String key = entry.getKey();
+										Object val = entry.getValue();
+										parameter.put(current.getName() + "_" + key, val);
+									}
+								}
+
+								child.setParent(current);
+								child.setParameter(parameter);
+
+								this.addChild(child, srcDatabase);
+							}
 						}
 					}
 				}
@@ -241,8 +270,29 @@ public class XmlExportDataHandler implements XmlDataHandler {
 				 * 未定义查询，只是XML节点的情况
 				 */
 				List<XmlExport> children = current.getChildren();
+				if (children == null || children.isEmpty()) {
+					if (!StringUtils.equals(current.getLeafFlag(), "Y")) {
+						children = getXmlExportService().getChildrenWithItems(current.getNodeId());
+					}
+				}
+				// logger.debug("->children:" + children);
 				if (children != null && !children.isEmpty()) {
-					this.processChildren(current, children, parameter, srcDatabase, elementMap);
+					for (XmlExport child : children) {
+						child.setParent(current);
+						if (current.getElement() == null) {
+							Element elem = current.getParent().getElement().addElement(child.getXmlTag());
+							current.setElement(elem);
+						}
+						/**
+						 * 在子节点的父节点上添加下级节点
+						 */
+						if (current.getElement() != null) {
+							Element childElem = current.getElement().addElement(child.getXmlTag());
+							child.setElement(childElem);
+							logger.debug("---------<" + child.getXmlTag() + ">" + child.getTitle() + "------------");
+							this.addChild(child, srcDatabase);
+						}
+					}
 				}
 			}
 
@@ -257,55 +307,37 @@ public class XmlExportDataHandler implements XmlDataHandler {
 		}
 	}
 
-	protected void processChildren(XmlExport current, List<XmlExport> children, Map<String, Object> parameter,
-			Database srcDatabase, Map<String, Element> elementMap) {
-		if (children != null && !children.isEmpty()) {
-			Element childElem = null;
-			for (XmlExport child : children) {
-				parameter.clear();
-				parameter.putAll(current.getParameter());
-				if (StringUtils.isNotEmpty(current.getName())) {
-					Set<Entry<String, Object>> entrySet = current.getParameter().entrySet();
-					for (Entry<String, Object> entry : entrySet) {
-						String key = entry.getKey();
-						Object value = entry.getValue();
-						parameter.put(current.getName() + "_" + key, value);
-					}
-				}
-
-				if (StringUtils.isNotEmpty(current.getName())) {
-					Set<Entry<String, Object>> entrySet = current.getDataMap().entrySet();
-					for (Entry<String, Object> entry : entrySet) {
-						String key = entry.getKey();
-						Object value = entry.getValue();
-						parameter.put(current.getName() + "_" + key, value);
-					}
-				}
-
-				child.setParameter(parameter);
-
-				// logger.debug("parameter:" + parameter);
-
-				if (child.getParent() != null) {
-					Element parent = elementMap.get(child.getParent().getId());
-					if (parent != null) {
-						childElem = parent.addElement(child.getXmlTag());
-					}
-				}
-				if (childElem != null) {
-					child.setElement(childElem);
-					if (current.getDataMap() != null && StringUtils.isNotEmpty(child.getMapping())) {
-						if (current.getDataMap().get(child.getMapping().trim().toLowerCase()) != null) {
-							elementMap.put(current.getDataMap().get(child.getMapping().trim().toLowerCase()).toString(),
-									childElem);
-						}
-					}
-					elementMap.put(child.getId(), childElem);
-				}
-				logger.debug("-------------<" + child.getXmlTag() + ">" + child.getTitle() + "------------");
-				this.addChild(child, childElem, srcDatabase, elementMap);
-			}
+	public IDatabaseService getDatabaseService() {
+		if (databaseService == null) {
+			databaseService = ContextFactory.getBean("databaseService");
 		}
+		return databaseService;
+	}
+
+	public XmlExportItemService getXmlExportItemService() {
+		if (xmlExportItemService == null) {
+			xmlExportItemService = ContextFactory.getBean("com.glaf.matrix.export.service.xmlExportItemService");
+		}
+		return xmlExportItemService;
+	}
+
+	public XmlExportService getXmlExportService() {
+		if (xmlExportService == null) {
+			xmlExportService = ContextFactory.getBean("com.glaf.matrix.export.service.xmlExportService");
+		}
+		return xmlExportService;
+	}
+
+	public void setDatabaseService(IDatabaseService databaseService) {
+		this.databaseService = databaseService;
+	}
+
+	public void setXmlExportItemService(XmlExportItemService xmlExportItemService) {
+		this.xmlExportItemService = xmlExportItemService;
+	}
+
+	public void setXmlExportService(XmlExportService xmlExportService) {
+		this.xmlExportService = xmlExportService;
 	}
 
 	public Map<String, Object> toMap(ResultSet rs) throws SQLException {

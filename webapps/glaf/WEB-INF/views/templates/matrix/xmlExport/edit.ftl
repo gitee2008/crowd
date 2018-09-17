@@ -150,6 +150,19 @@
 	</tr>
 
     <tr>
+		<td width="12%" align="left">是否叶节点</td>
+		<td align="left">
+		    <select id="leafFlag" name="leafFlag">
+			    <option value="N">有下级</option>
+			    <option value="Y">无下级</option>
+             </select>
+             <script type="text/javascript">
+                 document.getElementById("leafFlag").value="${xmlExport.leafFlag}";
+             </script>
+		</td>
+    </tr>
+
+    <tr>
 		<td width="12%" align="left">结果类型</td>
 		<td align="left">
 		    <select id="resultFlag" name="resultFlag">
