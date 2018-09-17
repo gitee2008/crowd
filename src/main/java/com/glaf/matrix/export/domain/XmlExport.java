@@ -182,10 +182,10 @@ public class XmlExport implements Serializable, JSONable {
 	protected List<XmlExportItem> items = new ArrayList<XmlExportItem>();
 
 	@javax.persistence.Transient
-	protected Map<String, Object> dataMap = new HashMap<String, Object>();
+	protected Map<String, Object> parameter = new HashMap<String, Object>();
 
 	@javax.persistence.Transient
-	protected Map<String, Object> parameter = new HashMap<String, Object>();
+	protected List<Map<String, Object>> dataList = new ArrayList<Map<String, Object>>();
 
 	public XmlExport() {
 
@@ -249,8 +249,8 @@ public class XmlExport implements Serializable, JSONable {
 		return "";
 	}
 
-	public Map<String, Object> getDataMap() {
-		return dataMap;
+	public List<Map<String, Object>> getDataList() {
+		return dataList;
 	}
 
 	public Element getElement() {
@@ -380,8 +380,8 @@ public class XmlExport implements Serializable, JSONable {
 		this.createTime = createTime;
 	}
 
-	public void setDataMap(Map<String, Object> dataMap) {
-		this.dataMap = dataMap;
+	public void setDataList(List<Map<String, Object>> dataList) {
+		this.dataList = dataList;
 	}
 
 	public void setElement(Element element) {

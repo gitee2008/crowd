@@ -27,8 +27,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -104,7 +106,21 @@ public class XmlExportDataHandler implements XmlDataHandler {
 			logger.debug("---------------------------gen child xml----------------------------");
 			for (XmlExport child : children) {
 				child.setParent(xmlExport);
-				this.addChild(child, srcDatabase);
+				int retry = 0;
+				boolean success = false;
+				while (retry < 3 && !success) {
+					try {
+						retry++;
+						this.addChild(child, srcDatabase);
+						success = true;
+					} catch (Exception ex) {
+						logger.error(ex);
+						try {
+							TimeUnit.MILLISECONDS.sleep(20 + new Random().nextInt(50));
+						} catch (InterruptedException e) {
+						}
+					}
+				}
 			}
 		}
 	}
@@ -139,7 +155,8 @@ public class XmlExportDataHandler implements XmlDataHandler {
 				srcPsmt = srcConn.prepareStatement(sql);
 
 				if (sqlExecutor.getParameter() != null) {
-					// logger.debug("parameter:" + sqlExecutor.getParameter());
+					// logger.debug("params:" + parameter);
+					logger.debug("parameter:" + sqlExecutor.getParameter());
 					List<Object> values = (List<Object>) sqlExecutor.getParameter();
 					JdbcUtils.fillStatement(srcPsmt, values);
 				}
@@ -163,6 +180,7 @@ public class XmlExportDataHandler implements XmlDataHandler {
 				JdbcUtils.close(srcConn);
 
 				logger.debug("result size:" + resultList.size());
+				current.setDataList(resultList);
 
 				/**
 				 * 处理单一记录
@@ -192,6 +210,7 @@ public class XmlExportDataHandler implements XmlDataHandler {
 					 * 处理多条记录
 					 */
 					Element elem = null;
+
 					for (Map<String, Object> rowMap : resultList) {
 						/**
 						 * 在这个节点的父节点上添加下级节点
@@ -234,7 +253,7 @@ public class XmlExportDataHandler implements XmlDataHandler {
 						}
 						// logger.debug("->children:" + children);
 						if (children != null && !children.isEmpty()) {
-							current.setDataMap(rowMap);
+							// current.setDataMap(rowMap);
 							current.setElement(elem);
 
 							if (StringUtils.isNotEmpty(current.getName())) {
@@ -243,6 +262,15 @@ public class XmlExportDataHandler implements XmlDataHandler {
 									String key = entry.getKey();
 									Object val = entry.getValue();
 									parameter.put(current.getName() + "_" + key, val);
+								}
+							}
+
+							if (StringUtils.isNotEmpty(current.getMapping())) {
+								Set<Entry<String, Object>> entrySet = current.getParameter().entrySet();
+								for (Entry<String, Object> entry : entrySet) {
+									String key = entry.getKey();
+									Object val = entry.getValue();
+									parameter.put(current.getMapping() + "_" + key, val);
 								}
 							}
 
@@ -257,10 +285,33 @@ public class XmlExportDataHandler implements XmlDataHandler {
 									}
 								}
 
+								if (StringUtils.isNotEmpty(current.getMapping())) {
+									Set<Entry<String, Object>> entrySet = rowMap.entrySet();
+									for (Entry<String, Object> entry : entrySet) {
+										String key = entry.getKey();
+										Object val = entry.getValue();
+										parameter.put(current.getMapping() + "_" + key, val);
+									}
+								}
+
 								child.setParent(current);
 								child.setParameter(parameter);
 
-								this.addChild(child, srcDatabase);
+								int retry = 0;
+								boolean success = false;
+								while (retry < 3 && !success) {
+									try {
+										retry++;
+										this.addChild(child, srcDatabase);
+										success = true;
+									} catch (Exception ex) {
+										logger.error(ex);
+										try {
+											TimeUnit.MILLISECONDS.sleep(20 + new Random().nextInt(50));
+										} catch (InterruptedException e) {
+										}
+									}
+								}
 							}
 						}
 					}
@@ -290,12 +341,25 @@ public class XmlExportDataHandler implements XmlDataHandler {
 							Element childElem = current.getElement().addElement(child.getXmlTag());
 							child.setElement(childElem);
 							logger.debug("---------<" + child.getXmlTag() + ">" + child.getTitle() + "------------");
-							this.addChild(child, srcDatabase);
+							int retry = 0;
+							boolean success = false;
+							while (retry < 3 && !success) {
+								try {
+									retry++;
+									this.addChild(child, srcDatabase);
+									success = true;
+								} catch (Exception ex) {
+									logger.error(ex);
+									try {
+										TimeUnit.MILLISECONDS.sleep(20 + new Random().nextInt(50));
+									} catch (InterruptedException e) {
+									}
+								}
+							}
 						}
 					}
 				}
 			}
-
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			logger.error("execute sql query error", ex);

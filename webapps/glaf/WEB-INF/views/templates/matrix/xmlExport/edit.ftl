@@ -121,7 +121,7 @@
 			       class="easyui-validatebox x-text" style="width:625px;" 
 				   value="${xmlExport.mapping}"/>
 			<div style="margin-top:5px;">
-		     （提示：指向上级节点的唯一字段名。）
+		     （提示：用作参数的别名。）
 	        </div>
 		</td>
 	</tr>

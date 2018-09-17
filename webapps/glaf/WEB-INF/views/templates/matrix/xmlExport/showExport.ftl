@@ -17,6 +17,16 @@
 		}
 	}
 
+	function exportJson(){
+		var databaseId = document.getElementById("databaseId").value;
+		if(databaseId != ""){
+            var link = '${request.contextPath}/matrix/xmlExport/exportJson?expId=${xmlExport.id}&databaseId='+databaseId;
+		    window.open(link);
+		} else {
+			layer.msg("请选择要导出数据库。");
+		}
+	}
+
 </script>
 </head>
 
@@ -28,7 +38,10 @@
     <div class="toolbar-backgroud"> 
 	<span class="x_content_title"><img src="${request.contextPath}/static/images/window.png">&nbsp;编辑导出节点定义</span>
 	<a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-exp'" 
-	   onclick="javascript:exportXml();" >导出</a> 
+	   onclick="javascript:exportXml();" >导出XML</a> 
+	&nbsp;
+	<a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-exp'" 
+	   onclick="javascript:exportJson();" >导出JSON</a>
     </div> 
   </div>
 

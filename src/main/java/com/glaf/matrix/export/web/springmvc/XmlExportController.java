@@ -57,6 +57,7 @@ import com.glaf.core.util.Paging;
 import com.glaf.core.util.ParamUtils;
 import com.glaf.core.util.RequestUtils;
 import com.glaf.core.util.ResponseUtils;
+import com.glaf.core.util.StaxonUtils;
 import com.glaf.core.util.Tools;
 
 import com.glaf.matrix.export.domain.XmlExport;
@@ -181,6 +182,33 @@ public class XmlExportController {
 		}
 
 		return new ModelAndView("/matrix/xmlExport/edit", modelMap);
+	}
+
+	@ResponseBody
+	@RequestMapping("/exportJson")
+	public void exportJson(HttpServletRequest request, HttpServletResponse response) {
+		Map<String, Object> params = RequestUtils.getParameterMap(request);
+		SysParams.putInternalParams(params);
+		long databaseId = RequestUtils.getLong(request, "databaseId");
+		String expId = RequestUtils.getString(request, "expId");
+		try {
+			XmlExport xmlExport = xmlExportService.getXmlExport(expId);
+			if (xmlExport != null && StringUtils.equals(xmlExport.getActive(), "Y")) {
+				xmlExport.setParameter(params);
+				XmlDataHandler xmlDataHandler = new XmlExportDataHandler();
+				org.dom4j.Document document = DocumentHelper.createDocument();
+				org.dom4j.Element root = document.addElement(xmlExport.getXmlTag());
+				xmlExport.setElement(root);
+				xmlDataHandler.addChild(xmlExport, root, databaseId);
+				byte[] data = Dom4jUtils.getBytesFromPrettyDocument(document, "UTF-8");
+				data = StaxonUtils.xml2json(new String(data, "UTF-8")).getBytes();
+				ResponseUtils.download(request, response, data,
+						xmlExport.getTitle() + DateUtils.getNowYearMonthDayHHmmss() + ".json");
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			logger.error(ex);
+		}
 	}
 
 	@ResponseBody
