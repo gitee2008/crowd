@@ -138,8 +138,16 @@ public class XmlExportController {
 	public ModelAndView edit(HttpServletRequest request, ModelMap modelMap) {
 		RequestUtils.setRequestParameterToAttribute(request);
 
+		long nodeId = RequestUtils.getLong(request, "nodeId");
 		long nodeParentId = RequestUtils.getLong(request, "nodeParentId");
-		XmlExport xmlExport = xmlExportService.getXmlExport(RequestUtils.getString(request, "id"));
+
+		XmlExport xmlExport = null;
+		if (StringUtils.isNotEmpty(RequestUtils.getString(request, "id"))) {
+			xmlExport = xmlExportService.getXmlExport(RequestUtils.getString(request, "id"));
+		} else if (nodeId > 0) {
+			xmlExport = xmlExportService.getXmlExportByNodeId(nodeId);
+		}
+
 		if (xmlExport != null) {
 			request.setAttribute("xmlExport", xmlExport);
 			XmlExport parent = xmlExportService.getXmlExportByNodeId(xmlExport.getNodeParentId());

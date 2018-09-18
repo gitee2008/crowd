@@ -45,7 +45,7 @@ import com.glaf.core.jdbc.DBConnectionFactory;
 import com.glaf.core.service.IDatabaseService;
 import com.glaf.core.tree.component.TreeComponent;
 import com.glaf.core.tree.component.TreeRepository;
-import com.glaf.core.tree.helper.TreeRepositoryBuilder;
+import com.glaf.core.tree.helper.JacksonTreeHelper;
 import com.glaf.core.util.LowerLinkedMap;
 import com.glaf.core.util.DBUtils;
 import com.glaf.core.util.JdbcUtils;
@@ -395,7 +395,7 @@ public class XmlExportDataHandler implements XmlDataHandler {
 	}
 
 	protected void processTreeNode(XmlExport current, List<TreeComponent> trees) {
-		TreeRepositoryBuilder builder = new TreeRepositoryBuilder();
+		JacksonTreeHelper builder = new JacksonTreeHelper();
 		TreeRepository treeRepository = builder.buildTree(trees);
 		if (treeRepository != null) {
 			String value = null;
