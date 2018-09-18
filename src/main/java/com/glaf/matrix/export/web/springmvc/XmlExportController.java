@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +48,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -229,6 +231,58 @@ public class XmlExportController {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			logger.error(ex);
+		}
+	}
+
+	@ResponseBody
+	@RequestMapping("/exportVar")
+	public void exportVar(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("text/html; charset=UTF-8");
+		Map<String, Object> params = RequestUtils.getParameterMap(request);
+		SysParams.putInternalParams(params);
+		LoginContext loginContext = RequestUtils.getLoginContext(request);
+		params.put("login_user", loginContext.getUser());
+		params.put("login_userid", loginContext.getActorId());
+		params.put("login_tenantid", loginContext.getTenantId());
+		String expId = RequestUtils.getString(request, "expId");
+		long databaseId = RequestUtils.getLong(request, "databaseId");
+		PrintWriter writer = null;
+		try {
+			XmlExport xmlExport = xmlExportService.getXmlExport(expId);
+			if (xmlExport != null && StringUtils.equals(xmlExport.getActive(), "Y")) {
+				xmlExport.setParameter(params);
+				DataHandler dataHandler = new ExportDataHandler();
+				dataHandler.addChild(xmlExport, params, databaseId);
+				// JSONObject json = new JSONObject();
+				StringBuilder buff = new StringBuilder();
+				Set<Entry<String, Object>> entrySet = params.entrySet();
+				for (Entry<String, Object> entry : entrySet) {
+					String key = entry.getKey();
+					Object value = entry.getValue();
+					// json.put(key, value);
+					if (value != null) {
+						buff.append("<div><span style='font:bold 14px 宋体;color:#FF6666;'>").append(key)
+								.append("</span>=");
+						buff.append("<span style='font:bold 14px 宋体;color:#3399CC;'>");
+						if (value instanceof java.util.Date) {
+							buff.append(DateUtils.getDateTime((java.util.Date) value));
+						} else {
+							buff.append(JSON.toJSONString(value));
+						}
+						buff.append("</span></div>");
+					}
+				}
+				writer = response.getWriter();
+				writer.println(buff.toString());
+				writer.flush();
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			logger.error(ex);
+		} finally {
+			IOUtils.closeQuietly(writer);
 		}
 	}
 
@@ -452,6 +506,7 @@ public class XmlExportController {
 			xmlExport.setResultFlag(request.getParameter("resultFlag"));
 			xmlExport.setNodeParentId(RequestUtils.getLong(request, "nodeParentId"));
 			xmlExport.setLeafFlag(request.getParameter("leafFlag"));
+			xmlExport.setTreeFlag(request.getParameter("treeFlag"));
 			xmlExport.setType(request.getParameter("type"));
 			xmlExport.setActive(request.getParameter("active"));
 			xmlExport.setXmlTag(request.getParameter("xmlTag"));

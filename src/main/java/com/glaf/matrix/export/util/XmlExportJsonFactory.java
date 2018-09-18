@@ -58,6 +58,9 @@ public class XmlExportJsonFactory {
 		if (jsonObject.containsKey("leafFlag")) {
 			model.setLeafFlag(jsonObject.getString("leafFlag"));
 		}
+		if (jsonObject.containsKey("treeFlag")) {
+			model.setTreeFlag(jsonObject.getString("treeFlag"));
+		}
 		if (jsonObject.containsKey("type")) {
 			model.setType(jsonObject.getString("type"));
 		}
@@ -120,6 +123,9 @@ public class XmlExportJsonFactory {
 		}
 		if (model.getLeafFlag() != null) {
 			jsonObject.put("leafFlag", model.getLeafFlag());
+		}
+		if (model.getTreeFlag() != null) {
+			jsonObject.put("treeFlag", model.getTreeFlag());
 		}
 		if (model.getType() != null) {
 			jsonObject.put("type", model.getType());
@@ -184,6 +190,9 @@ public class XmlExportJsonFactory {
 		}
 		if (model.getLeafFlag() != null) {
 			jsonObject.put("leafFlag", model.getLeafFlag());
+		}
+		if (model.getTreeFlag() != null) {
+			jsonObject.put("treeFlag", model.getTreeFlag());
 		}
 		if (model.getType() != null) {
 			jsonObject.put("type", model.getType());

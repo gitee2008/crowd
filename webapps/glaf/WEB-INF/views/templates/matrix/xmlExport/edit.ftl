@@ -99,7 +99,7 @@
 		<td width="12%" align="left">标题</td>
 		<td align="left">
             <input id="title" name="title" type="text" 
-			       class="easyui-validatebox x-text" style="width:625px;" 
+			       class="easyui-validatebox x-text" style="width:685px;" 
 				   value="${xmlExport.title}"/>
 		</td>
 	</tr>
@@ -107,7 +107,7 @@
 		<td width="12%" align="left">名称</td>
 		<td align="left">
             <input id="name" name="name" type="text" 
-			       class="easyui-validatebox x-text" style="width:625px;" 
+			       class="easyui-validatebox x-text" style="width:685px;" 
 				   value="${xmlExport.name}"/>
 			<div style="margin-top:5px;">
 		     （提示：可以用于参数名的前缀，以便在子节点中引用。）
@@ -118,7 +118,7 @@
 		<td width="12%" align="left">映射名</td>
 		<td align="left">
             <input id="mapping" name="mapping" type="text" 
-			       class="easyui-validatebox x-text" style="width:625px;" 
+			       class="easyui-validatebox x-text" style="width:685px;" 
 				   value="${xmlExport.mapping}"/>
 			<div style="margin-top:5px;">
 		     （提示：用作参数的别名。）
@@ -129,7 +129,7 @@
 		<td width="12%" align="left">XML Tag</td>
 		<td align="left">
             <input id="xmlTag" name="xmlTag" type="text" 
-			       class="easyui-validatebox x-text" style="width:625px;" 
+			       class="easyui-validatebox x-text" style="width:685px;" 
 				   value="${xmlExport.xmlTag}"/>
 		</td>
 	</tr>
@@ -137,7 +137,7 @@
 	<tr>
 		<td width="90" align="left">SQL取数语句</td>
 		<td align="left">
-		    <textarea id="sql" name="sql" rows="6" cols="46" class="x-textarea" style="width:625px;height:320px;" >${xmlExport.sql}</textarea>
+		    <textarea id="sql" name="sql" rows="6" cols="46" class="x-textarea" style="width:685px;height:320px;" >${xmlExport.sql}</textarea>
 		   <div style="margin-top:5px;">
 		     （提示：可以使用union语句组合结果。）
 			<br>
@@ -148,25 +148,25 @@
 	      </div>
 		</td>
 	</tr>
+    
+	<tr>
+		<td width="12%" align="left">是否树形结构</td>
+		<td align="left">
+		    <select id="treeFlag" name="treeFlag">
+			    <option value="N">否</option>
+			    <option value="Y">是</option>
+             </select>
+             <script type="text/javascript">
+                 document.getElementById("treeFlag").value="${xmlExport.treeFlag}";
+             </script> &nbsp;
+			 <span style="color:red;">（ 提示：如果该节点按树形结构导出，请在查询中指定树的编号ext_tree_id及树的父节点编号ext_tree_parentid。）</span>
+             <div style="margin-top:5px;">
+		      （例如：select ID as ext_tree_id, PARENTID as ext_tree_parentid, NAME as name from SYS_TREE ）
+	         </div>
+		</td>
+    </tr>
 
 	<tr>
-		<td width="15%" align="left">导出模板</td>
-		<td align="left">
-			<select id="templateId" name="templateId">
-			    <option value="">----请选择----</option>
-				<#list templates as template >
-				<option value="${template.templateId}">${template.title}</option>
-				</#list>
-            </select> 
-            <script type="text/javascript">
-                document.getElementById("templateId").value="${xmlExport.templateId}";
-            </script>
-			<div style="margin-top:5px;">
-		     （提示：需要导出Excel时可以设置导出的模板。）
-	        </div>
-		</td>
-	</tr>
-    <tr>
 		<td width="12%" align="left">是否叶节点</td>
 		<td align="left">
 		    <select id="leafFlag" name="leafFlag">
@@ -192,6 +192,24 @@
 		</td>
     </tr>
   
+  	<tr>
+		<td width="15%" align="left">导出模板</td>
+		<td align="left">
+			<select id="templateId" name="templateId">
+			    <option value="">----请选择----</option>
+				<#list templates as template >
+				<option value="${template.templateId}">${template.title}</option>
+				</#list>
+            </select> 
+            <script type="text/javascript">
+                document.getElementById("templateId").value="${xmlExport.templateId}";
+            </script>
+			<div style="margin-top:5px;">
+		     （提示：需要导出Excel时可以设置导出的模板。）
+	        </div>
+		</td>
+	</tr>
+
 	<tr>
 		<td width="12%" align="left">顺序编号</td>
 		<td align="left">

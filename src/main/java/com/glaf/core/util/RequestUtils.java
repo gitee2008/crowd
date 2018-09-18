@@ -840,7 +840,7 @@ public class RequestUtils {
 	 * @return
 	 */
 	public static Map<String, Object> getParameterMap(HttpServletRequest request) {
-		Map<String, Object> dataMap = new java.util.HashMap<String, Object>();
+		Map<String, Object> dataMap = new java.util.TreeMap<String, Object>();
 		Enumeration<?> enumeration = request.getParameterNames();
 		while (enumeration.hasMoreElements()) {
 			String paramName = (String) enumeration.nextElement();
@@ -878,7 +878,7 @@ public class RequestUtils {
 	 * @return
 	 */
 	public static Map<String, Object> getParameterMap(HttpServletRequest request, String prefix) {
-		Map<String, Object> dataMap = new java.util.HashMap<String, Object>();
+		Map<String, Object> dataMap = new java.util.TreeMap<String, Object>();
 		Enumeration<?> enumeration = request.getParameterNames();
 		while (enumeration.hasMoreElements()) {
 			String paramName = (String) enumeration.nextElement();
@@ -903,7 +903,7 @@ public class RequestUtils {
 	 * @return
 	 */
 	public static Map<String, Object> getParameterMap(MultipartHttpServletRequest request) {
-		Map<String, Object> dataMap = new java.util.HashMap<String, Object>();
+		Map<String, Object> dataMap = new java.util.TreeMap<String, Object>();
 		dataMap.put("contextPath", request.getContextPath());
 		Enumeration<?> enumeration = request.getParameterNames();
 		while (enumeration.hasMoreElements()) {
@@ -937,7 +937,7 @@ public class RequestUtils {
 	 * @return
 	 */
 	public static Map<String, Object> getQueryParams(HttpServletRequest request) {
-		Map<String, Object> params = new java.util.HashMap<String, Object>();
+		Map<String, Object> params = new java.util.TreeMap<String, Object>();
 
 		String complex_query = request.getParameter("xyz_complex_query");
 		if (StringUtils.isNotEmpty(complex_query)) {
@@ -1011,7 +1011,7 @@ public class RequestUtils {
 	 * @return
 	 */
 	public static Map<String, Object> getQueryParams(HttpServletRequest request, String prefix) {
-		Map<String, Object> params = new java.util.HashMap<String, Object>();
+		Map<String, Object> params = new java.util.TreeMap<String, Object>();
 
 		String complex_query = request.getParameter("xyz_complex_query");
 		if (StringUtils.isNotEmpty(complex_query)) {

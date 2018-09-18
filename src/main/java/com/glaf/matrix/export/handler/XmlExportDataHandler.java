@@ -43,6 +43,9 @@ import com.glaf.core.el.ExpressionTools;
 import com.glaf.core.entity.SqlExecutor;
 import com.glaf.core.jdbc.DBConnectionFactory;
 import com.glaf.core.service.IDatabaseService;
+import com.glaf.core.tree.component.TreeComponent;
+import com.glaf.core.tree.component.TreeRepository;
+import com.glaf.core.tree.helper.TreeRepositoryBuilder;
 import com.glaf.core.util.LowerLinkedMap;
 import com.glaf.core.util.DBUtils;
 import com.glaf.core.util.JdbcUtils;
@@ -211,73 +214,72 @@ public class XmlExportDataHandler implements XmlDataHandler {
 					 */
 					Element elem = null;
 
-					for (Map<String, Object> rowMap : resultList) {
-						/**
-						 * 在这个节点的父节点上添加下级节点
-						 */
-						elem = current.getParent().getElement().addElement(current.getXmlTag());
-						// logger.debug("----<" + current.getXmlTag() + ">" + current.getTitle() +
-						// "----");
-						// logger.debug("elem:" + elem);
-						// logger.debug("current.getItems():" + current.getItems());
-						if (elem != null && current.getItems() != null && !current.getItems().isEmpty()) {
-							for (XmlExportItem item : current.getItems()) {
-								/**
-								 * 处理属性
-								 */
-								if (StringUtils.equals(item.getTagFlag(), "A")) {
-									if (StringUtils.isNotEmpty(item.getExpression())) {
-										value = ExpressionTools.evaluate(item.getExpression(), rowMap);
+					/**
+					 * 处理树形结构的叶子节点
+					 */
+					if (StringUtils.equals(current.getTreeFlag(), "Y")
+							&& StringUtils.equals(current.getLeafFlag(), "Y")) {
+						List<TreeComponent> trees = new ArrayList<TreeComponent>();
+						for (Map<String, Object> rowMap : resultList) {
+							TreeComponent tree = new TreeComponent();
+							tree.setId(ParamUtils.getString(rowMap, "ext_tree_id"));
+							tree.setParentId(ParamUtils.getString(rowMap, "ext_tree_parentid"));
+							tree.setDataMap(rowMap);
+							if (StringUtils.equals(tree.getParentId(), "0")
+									|| StringUtils.equals(tree.getParentId(), "-1")) {
+								tree.setParentId(null);
+							}
+							trees.add(tree);
+						}
+						this.processTreeNode(current, trees);
+					} else {
+						for (Map<String, Object> rowMap : resultList) {
+							/**
+							 * 在这个节点的父节点上添加下级节点
+							 */
+							elem = current.getParent().getElement().addElement(current.getXmlTag());
+							// logger.debug("----<" + current.getXmlTag() + ">" + current.getTitle() +
+							// "----");
+							// logger.debug("elem:" + elem);
+							// logger.debug("current.getItems():" + current.getItems());
+							if (elem != null && current.getItems() != null && !current.getItems().isEmpty()) {
+								for (XmlExportItem item : current.getItems()) {
+									/**
+									 * 处理属性
+									 */
+									if (StringUtils.equals(item.getTagFlag(), "A")) {
+										if (StringUtils.isNotEmpty(item.getExpression())) {
+											value = ExpressionTools.evaluate(item.getExpression(), rowMap);
+										} else {
+											value = ParamUtils.getString(rowMap, item.getName().trim().toLowerCase());
+										}
+										if (StringUtils.isNotEmpty(value)) {
+											elem.addAttribute(item.getName(), value);
+										}
 									} else {
-										value = ParamUtils.getString(rowMap, item.getName().trim().toLowerCase());
+										elem.addElement(item.getName(), value);
 									}
-									if (StringUtils.isNotEmpty(value)) {
-										elem.addAttribute(item.getName(), value);
-									}
-								} else {
-									elem.addElement(item.getName(), value);
-								}
-							}
-						}
-
-						// logger.debug("elem:" + elem);
-
-						/**
-						 * 处理每条记录的子孙节点
-						 */
-						List<XmlExport> children = current.getChildren();
-						if (children == null || children.isEmpty()) {
-							if (!StringUtils.equals(current.getLeafFlag(), "Y")) {
-								children = getXmlExportService().getChildrenWithItems(current.getNodeId());
-							}
-						}
-						// logger.debug("->children:" + children);
-						if (children != null && !children.isEmpty()) {
-							// current.setDataMap(rowMap);
-							current.setElement(elem);
-
-							if (StringUtils.isNotEmpty(current.getName())) {
-								Set<Entry<String, Object>> entrySet = current.getParameter().entrySet();
-								for (Entry<String, Object> entry : entrySet) {
-									String key = entry.getKey();
-									Object val = entry.getValue();
-									parameter.put(current.getName() + "_" + key, val);
 								}
 							}
 
-							if (StringUtils.isNotEmpty(current.getMapping())) {
-								Set<Entry<String, Object>> entrySet = current.getParameter().entrySet();
-								for (Entry<String, Object> entry : entrySet) {
-									String key = entry.getKey();
-									Object val = entry.getValue();
-									parameter.put(current.getMapping() + "_" + key, val);
+							// logger.debug("elem:" + elem);
+
+							/**
+							 * 处理每条记录的子孙节点
+							 */
+							List<XmlExport> children = current.getChildren();
+							if (children == null || children.isEmpty()) {
+								if (!StringUtils.equals(current.getLeafFlag(), "Y")) {
+									children = getXmlExportService().getChildrenWithItems(current.getNodeId());
 								}
 							}
-
-							for (XmlExport child : children) {
+							// logger.debug("->children:" + children);
+							if (children != null && !children.isEmpty()) {
+								// current.setDataMap(rowMap);
+								current.setElement(elem);
 
 								if (StringUtils.isNotEmpty(current.getName())) {
-									Set<Entry<String, Object>> entrySet = rowMap.entrySet();
+									Set<Entry<String, Object>> entrySet = current.getParameter().entrySet();
 									for (Entry<String, Object> entry : entrySet) {
 										String key = entry.getKey();
 										Object val = entry.getValue();
@@ -286,7 +288,7 @@ public class XmlExportDataHandler implements XmlDataHandler {
 								}
 
 								if (StringUtils.isNotEmpty(current.getMapping())) {
-									Set<Entry<String, Object>> entrySet = rowMap.entrySet();
+									Set<Entry<String, Object>> entrySet = current.getParameter().entrySet();
 									for (Entry<String, Object> entry : entrySet) {
 										String key = entry.getKey();
 										Object val = entry.getValue();
@@ -294,21 +296,42 @@ public class XmlExportDataHandler implements XmlDataHandler {
 									}
 								}
 
-								child.setParent(current);
-								child.setParameter(parameter);
+								for (XmlExport child : children) {
 
-								int retry = 0;
-								boolean success = false;
-								while (retry < 3 && !success) {
-									try {
-										retry++;
-										this.addChild(child, srcDatabase);
-										success = true;
-									} catch (Exception ex) {
-										logger.error(ex);
+									if (StringUtils.isNotEmpty(current.getName())) {
+										Set<Entry<String, Object>> entrySet = rowMap.entrySet();
+										for (Entry<String, Object> entry : entrySet) {
+											String key = entry.getKey();
+											Object val = entry.getValue();
+											parameter.put(current.getName() + "_" + key, val);
+										}
+									}
+
+									if (StringUtils.isNotEmpty(current.getMapping())) {
+										Set<Entry<String, Object>> entrySet = rowMap.entrySet();
+										for (Entry<String, Object> entry : entrySet) {
+											String key = entry.getKey();
+											Object val = entry.getValue();
+											parameter.put(current.getMapping() + "_" + key, val);
+										}
+									}
+
+									child.setParent(current);
+									child.setParameter(parameter);
+
+									int retry = 0;
+									boolean success = false;
+									while (retry < 3 && !success) {
 										try {
-											TimeUnit.MILLISECONDS.sleep(20 + new Random().nextInt(50));
-										} catch (InterruptedException e) {
+											retry++;
+											this.addChild(child, srcDatabase);
+											success = true;
+										} catch (Exception ex) {
+											logger.error(ex);
+											try {
+												TimeUnit.MILLISECONDS.sleep(20 + new Random().nextInt(50));
+											} catch (InterruptedException e) {
+											}
 										}
 									}
 								}
@@ -368,6 +391,67 @@ public class XmlExportDataHandler implements XmlDataHandler {
 			JdbcUtils.close(srcRs);
 			JdbcUtils.close(srcPsmt);
 			JdbcUtils.close(srcConn);
+		}
+	}
+
+	protected void processTreeNode(XmlExport current, List<TreeComponent> trees) {
+		TreeRepositoryBuilder builder = new TreeRepositoryBuilder();
+		TreeRepository treeRepository = builder.buildTree(trees);
+		if (treeRepository != null) {
+			String value = null;
+			List<TreeComponent> components = treeRepository.getTopTrees();
+			if (components != null && !components.isEmpty()) {
+				for (TreeComponent component : components) {
+					Element element = current.getParent().getElement().addElement(current.getXmlTag());
+					for (XmlExportItem item : current.getItems()) {
+						/**
+						 * 处理属性
+						 */
+						if (StringUtils.equals(item.getTagFlag(), "A")) {
+							if (StringUtils.isNotEmpty(item.getExpression())) {
+								value = ExpressionTools.evaluate(item.getExpression(), component.getDataMap());
+							} else {
+								value = ParamUtils.getString(component.getDataMap(),
+										item.getName().trim().toLowerCase());
+							}
+							if (StringUtils.isNotEmpty(value)) {
+								element.addAttribute(item.getName(), value);
+							}
+						} else {
+							element.addElement(item.getName(), value);
+						}
+					}
+					this.processChildTreeNode(current, element, component);
+				}
+			}
+		}
+	}
+
+	protected void processChildTreeNode(XmlExport current, Element element, TreeComponent treeComponent) {
+		List<TreeComponent> components = treeComponent.getComponents();
+		if (components != null && !components.isEmpty()) {
+			String value = null;
+			Element elem = element.addElement(current.getXmlTag());
+			for (TreeComponent child : components) {
+				for (XmlExportItem item : current.getItems()) {
+					/**
+					 * 处理属性
+					 */
+					if (StringUtils.equals(item.getTagFlag(), "A")) {
+						if (StringUtils.isNotEmpty(item.getExpression())) {
+							value = ExpressionTools.evaluate(item.getExpression(), child.getDataMap());
+						} else {
+							value = ParamUtils.getString(child.getDataMap(), item.getName().trim().toLowerCase());
+						}
+						if (StringUtils.isNotEmpty(value)) {
+							elem.addAttribute(item.getName(), value);
+						}
+					} else {
+						elem.addElement(item.getName(), value);
+					}
+				}
+				this.processChildTreeNode(current, elem, child);
+			}
 		}
 	}
 

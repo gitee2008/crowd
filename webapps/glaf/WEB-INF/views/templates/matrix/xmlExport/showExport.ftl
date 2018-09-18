@@ -38,6 +38,16 @@
 		}
 	}
 
+	function exportVar(){
+		var databaseId = document.getElementById("databaseId").value;
+		if(databaseId != ""){
+            var link = '${request.contextPath}/matrix/xmlExport/exportVar?expId=${xmlExport.id}&databaseId='+databaseId;
+		    window.open(link);
+		} else {
+			layer.msg("请选择要导出数据库。");
+		}
+	}
+
 </script>
 </head>
 
@@ -56,6 +66,9 @@
 	&nbsp;
 	<a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-exp'" 
 	   onclick="javascript:exportXls();" >导出Excel</a>
+	&nbsp;
+	<a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-exp'" 
+	   onclick="javascript:exportVar();" >查看变量输出</a>
     </div> 
   </div>
 

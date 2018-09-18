@@ -96,6 +96,12 @@ public class XmlExport implements Serializable, JSONable {
 	protected String leafFlag;
 
 	/**
+	 * 树形结构标识
+	 */
+	@Column(name = "TREEFLAG_", length = 50)
+	protected String treeFlag;
+
+	/**
 	 * 类型
 	 */
 	@Column(name = "TYPE_", length = 50)
@@ -325,6 +331,10 @@ public class XmlExport implements Serializable, JSONable {
 		return this.title;
 	}
 
+	public String getTreeFlag() {
+		return treeFlag;
+	}
+
 	public String getType() {
 		return this.type;
 	}
@@ -454,6 +464,10 @@ public class XmlExport implements Serializable, JSONable {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public void setTreeFlag(String treeFlag) {
+		this.treeFlag = treeFlag;
 	}
 
 	public void setType(String type) {

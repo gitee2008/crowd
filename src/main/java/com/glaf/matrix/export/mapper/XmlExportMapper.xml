@@ -18,6 +18,8 @@
 			jdbcType="VARCHAR" />
 		<result property="leafFlag" column="LEAFFLAG_"
 			jdbcType="VARCHAR" />
+		<result property="treeFlag" column="TREEFLAG_"
+			jdbcType="VARCHAR" />
 		<result property="type" column="TYPE_" jdbcType="VARCHAR" />
 		<result property="xmlTag" column="XMLTAG_" jdbcType="VARCHAR" />
 		<result property="templateId" column="TEMPLATEID_"
@@ -67,6 +69,9 @@
 			</if>
 			<if test="leafFlag != null">
 				,LEAFFLAG_
+			</if>
+			<if test="treeFlag != null">
+				,TREEFLAG_
 			</if>
 			<if test="type != null">
 				,TYPE_
@@ -130,6 +135,9 @@
 			<if test="leafFlag != null">
 				,#{leafFlag, jdbcType=VARCHAR}
 			</if>
+			<if test="treeFlag != null">
+				,#{treeFlag, jdbcType=VARCHAR}
+			</if>
 			<if test="type != null">
 				,#{type, jdbcType=VARCHAR}
 			</if>
@@ -192,6 +200,9 @@
 			</if>
 			<if test="leafFlag != null">
 				LEAFFLAG_ = #{leafFlag, jdbcType=VARCHAR},
+			</if>
+			<if test="treeFlag != null">
+				TREEFLAG_ = #{treeFlag, jdbcType=VARCHAR},
 			</if>
 			<if test="type != null">
 				TYPE_ = #{type, jdbcType=VARCHAR},

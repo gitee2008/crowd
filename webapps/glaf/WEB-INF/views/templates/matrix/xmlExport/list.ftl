@@ -100,7 +100,7 @@
 			border: [10, 0.3, '#000'],
 			offset: ['20px',''],
 			fadeIn: 100,
-			area: ['980px', (jQuery(window).height() - 50) +'px'],
+			area: ['1080px', (jQuery(window).height() - 50) +'px'],
             iframe: {src: link}
 		}); 
 	}
@@ -118,7 +118,7 @@
 			border: [10, 0.3, '#000'],
 			offset: ['20px',''],
 			fadeIn: 100,
-			area: ['980px', (jQuery(window).height() - 50) +'px'],
+			area: ['1080px', (jQuery(window).height() - 50) +'px'],
             iframe: {src: link}
 		});
 	}
@@ -136,7 +136,7 @@
 			border: [10, 0.3, '#000'],
 			offset: ['20px',''],
 			fadeIn: 100,
-			area: ['980px', (jQuery(window).height() - 50) +'px'],
+			area: ['1080px', (jQuery(window).height() - 50) +'px'],
             iframe: {src: link}
 		});
 	}
@@ -153,7 +153,7 @@
 			border: [10, 0.3, '#000'],
 			offset: ['20px',''],
 			fadeIn: 100,
-			area: ['980px', (jQuery(window).height() - 50) +'px'],
+			area: ['1080px', (jQuery(window).height() - 50) +'px'],
             iframe: {src: link}
 		}); 
 	}
@@ -189,7 +189,7 @@
 			border: [10, 0.3, '#000'],
 			offset: ['20px',''],
 			fadeIn: 100,
-			area: ['980px', (jQuery(window).height() - 50) +'px'],
+			area: ['1080px', (jQuery(window).height() - 50) +'px'],
             iframe: {src: link}
 		  });
 	    }
@@ -214,7 +214,7 @@
 				border: [10, 0.3, '#000'],
 				offset: ['20px',''],
 				fadeIn: 100,
-				area: ['980px', (jQuery(window).height() - 50) +'px'],
+				area: ['1080px', (jQuery(window).height() - 50) +'px'],
 				iframe: {src: link}
 			  });
 		}
