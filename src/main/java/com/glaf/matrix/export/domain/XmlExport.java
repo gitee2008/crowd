@@ -197,11 +197,33 @@ public class XmlExport implements Serializable, JSONable {
 
 	}
 
+	public void addAttr(String name, String title) {
+		if (items == null) {
+			items = new ArrayList<XmlExportItem>();
+		}
+		XmlExportItem item = new XmlExportItem();
+		item.setTagFlag("A");
+		item.setName(name);
+		item.setTitle(title);
+		items.add(item);
+	}
+
 	public void addChild(XmlExport child) {
 		if (children == null) {
 			children = new ArrayList<XmlExport>();
 		}
 		children.add(child);
+	}
+
+	public void addElement(String name, String title) {
+		if (items == null) {
+			items = new ArrayList<XmlExportItem>();
+		}
+		XmlExportItem item = new XmlExportItem();
+		item.setTagFlag("E");
+		item.setName(name);
+		item.setTitle(title);
+		items.add(item);
 	}
 
 	public void addItem(XmlExportItem item) {

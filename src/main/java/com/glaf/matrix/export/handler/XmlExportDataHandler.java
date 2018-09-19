@@ -46,6 +46,7 @@ import com.glaf.core.service.IDatabaseService;
 import com.glaf.core.tree.component.TreeComponent;
 import com.glaf.core.tree.component.TreeRepository;
 import com.glaf.core.tree.helper.JacksonTreeHelper;
+import com.glaf.core.tree.helper.XmlTreeHelper;
 import com.glaf.core.util.LowerLinkedMap;
 import com.glaf.core.util.DBUtils;
 import com.glaf.core.util.JdbcUtils;
@@ -231,7 +232,13 @@ public class XmlExportDataHandler implements XmlDataHandler {
 							}
 							trees.add(tree);
 						}
-						this.processTreeNode(current, trees);
+						// this.processTreeNode(current, trees);
+						Map<String, String> elemMap = new HashMap<String, String>();
+						for (XmlExportItem item : current.getItems()) {
+							elemMap.put(item.getName(), item.getTagFlag());
+						}
+						XmlTreeHelper xmlTreeHelper = new XmlTreeHelper();
+						xmlTreeHelper.appendChild(current.getElement(), current.getXmlTag(), elemMap, trees);
 					} else {
 						for (Map<String, Object> rowMap : resultList) {
 							/**
