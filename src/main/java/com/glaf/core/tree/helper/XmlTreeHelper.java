@@ -33,7 +33,35 @@ import com.glaf.core.util.DateUtils;
 
 public class XmlTreeHelper {
 
-	protected Element addData(TreeComponent component, Element element, String xmlTag, Map<String, String> elemMap) {
+	/**
+	 * 附加XML数据节点
+	 * 
+	 * @param element
+	 *            XML节点元素
+	 * @param xmlTag
+	 *            XML标记
+	 * @param elemMap
+	 *            元素或属性集合
+	 * @param treeModels
+	 *            树节点
+	 */
+	public void appendChild(Element element, String xmlTag, Map<String, String> elemMap,
+			List<TreeComponent> treeModels) {
+		if (treeModels != null && treeModels.size() > 0) {
+			TreeRepositoryBuilder builder = new TreeRepositoryBuilder();
+			TreeRepository menuRepository = builder.buildTree(treeModels);
+			List<TreeComponent> topTrees = menuRepository.getTopTrees();
+			if (topTrees != null && topTrees.size() > 0) {
+				for (int i = 0, len = topTrees.size(); i < len; i++) {
+					TreeComponent component = (TreeComponent) topTrees.get(i);
+					Element elem = this.appendData(component, element, xmlTag, elemMap);
+					this.processTreeNode(elem, component, xmlTag, elemMap);
+				}
+			}
+		}
+	}
+
+	protected Element appendData(TreeComponent component, Element element, String xmlTag, Map<String, String> elemMap) {
 		Element elem = element.addElement(xmlTag);
 		if (component.getDataMap() != null) {
 			String text = null;
@@ -42,7 +70,6 @@ public class XmlTreeHelper {
 			for (Entry<String, String> entry : entrySet) {
 				String name = entry.getKey();
 				String type = entry.getValue();
-
 				Object value = dataMap.get(name.toLowerCase());
 				if (value != null) {
 					if (value instanceof Date) {
@@ -51,7 +78,6 @@ public class XmlTreeHelper {
 					} else {
 						text = value.toString();
 					}
-
 					if (StringUtils.equals(type, "A")) {
 						elem.addAttribute(name, text);
 					} else {
@@ -63,27 +89,11 @@ public class XmlTreeHelper {
 		return elem;
 	}
 
-	public void appendChild(Element element, String xmlTag, Map<String, String> elemMap,
-			List<TreeComponent> treeModels) {
-		if (treeModels != null && treeModels.size() > 0) {
-			TreeRepositoryBuilder builder = new TreeRepositoryBuilder();
-			TreeRepository menuRepository = builder.buildTree(treeModels);
-			List<TreeComponent> topTrees = menuRepository.getTopTrees();
-			if (topTrees != null && topTrees.size() > 0) {
-				for (int i = 0, len = topTrees.size(); i < len; i++) {
-					TreeComponent component = (TreeComponent) topTrees.get(i);
-					Element elem = this.addData(component, element, xmlTag, elemMap);
-					this.processTreeNode(elem, component, xmlTag, elemMap);
-				}
-			}
-		}
-	}
-
 	protected void processTreeNode(Element element, TreeComponent component, String xmlTag,
 			Map<String, String> elemMap) {
 		if (component.getComponents() != null && component.getComponents().size() > 0) {
 			for (TreeComponent child : component.getComponents()) {
-				Element elem = this.addData(child, element, xmlTag, elemMap);
+				Element elem = this.appendData(child, element, xmlTag, elemMap);
 				this.processTreeNode(elem, child, xmlTag, elemMap);
 			}
 		}
