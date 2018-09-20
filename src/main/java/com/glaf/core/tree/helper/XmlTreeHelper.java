@@ -72,7 +72,8 @@ public class XmlTreeHelper {
 			if (topTrees != null && topTrees.size() > 0) {
 				for (int i = 0, len = topTrees.size(); i < len; i++) {
 					TreeComponent component = (TreeComponent) topTrees.get(i);
-					this.processTreeNode(element, component, xmlTag, elemMap);
+					Element elem = this.addData(component, element, xmlTag, elemMap);
+					this.processTreeNode(elem, component, xmlTag, elemMap);
 				}
 			}
 		}
