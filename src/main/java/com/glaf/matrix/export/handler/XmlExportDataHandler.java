@@ -82,6 +82,7 @@ public class XmlExportDataHandler implements XmlDataHandler {
 	 * @param databaseId
 	 *            数据库编号
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void addChild(XmlExport xmlExport, org.dom4j.Element root, long databaseId) {
 		List<XmlExport> list = getXmlExportService().getAllChildren(xmlExport.getNodeId());
@@ -102,6 +103,74 @@ public class XmlExportDataHandler implements XmlDataHandler {
 
 		if (xmlExport.getNodeParentId() == 0) {// 顶层节点，只能有一个根节点
 			// 根据定义补上根节点的属性
+			if (StringUtils.equals(xmlExport.getResultFlag(), "S")) {
+				Map<String, Object> parameter = new HashMap<String, Object>();
+				if (xmlExport.getItems() != null && !xmlExport.getItems().isEmpty()) {
+					String value = null;
+					Connection srcConn = null;
+					PreparedStatement srcPsmt = null;
+					ResultSet srcRs = null;
+					try {
+						String sql = xmlExport.getSql();
+						if (StringUtils.isNotEmpty(sql) && DBUtils.isLegalQuerySql(sql)) {
+							Map<String, Object> params = xmlExport.getParameter();
+							parameter.putAll(params);
+							SqlExecutor sqlExecutor = QueryUtils.replaceSQL(sql, parameter);
+							sql = sqlExecutor.getSql();
+							logger.debug("sql:" + sql);
+							// logger.debug("params:" + parameter);
+							srcConn = DBConnectionFactory.getConnection(srcDatabase.getName());
+							srcPsmt = srcConn.prepareStatement(sql);
+
+							if (sqlExecutor.getParameter() != null) {
+								// logger.debug("params:" + parameter);
+								logger.debug("parameter:" + sqlExecutor.getParameter());
+								List<Object> values = (List<Object>) sqlExecutor.getParameter();
+								JdbcUtils.fillStatement(srcPsmt, values);
+							}
+							srcRs = srcPsmt.executeQuery();
+							Map<String, Object> dataMap = new HashMap<String, Object>();
+							dataMap.putAll(params);
+
+							if (StringUtils.equals(xmlExport.getResultFlag(), "S")) {
+								if (srcRs.next()) {
+									dataMap.putAll(this.toMap(srcRs));
+								}
+							}
+
+							JdbcUtils.close(srcRs);
+							JdbcUtils.close(srcPsmt);
+							JdbcUtils.close(srcConn);
+
+							for (XmlExportItem item : xmlExport.getItems()) {
+								/**
+								 * 处理属性
+								 */
+								if (StringUtils.equals(item.getTagFlag(), "A")) {
+									if (StringUtils.isNotEmpty(item.getExpression())) {
+										value = ExpressionTools.evaluate(item.getExpression(), dataMap);
+									} else {
+										value = ParamUtils.getString(dataMap, item.getName().toLowerCase());
+									}
+									if (StringUtils.isNotEmpty(value)) {
+										root.addAttribute(item.getName(), value);
+									}
+								} else {
+									root.addElement(item.getName(), value);
+								}
+							}
+						}
+					} catch (Exception ex) {
+						ex.printStackTrace();
+						logger.error("execute sql query error", ex);
+						throw new RuntimeException(ex);
+					} finally {
+						JdbcUtils.close(srcRs);
+						JdbcUtils.close(srcPsmt);
+						JdbcUtils.close(srcConn);
+					}
+				}
+			}
 		}
 
 		List<XmlExport> children = getXmlExportService().getChildrenWithItems(xmlExport.getNodeId());
