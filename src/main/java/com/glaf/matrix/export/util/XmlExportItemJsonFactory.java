@@ -55,6 +55,18 @@ public class XmlExportItemJsonFactory {
 			model.setExpression(jsonObject.getString("expression"));
 		}
 
+		if (jsonObject.containsKey("defaultValue")) {
+			model.setDefaultValue(jsonObject.getString("defaultValue"));
+		}
+
+		if (jsonObject.containsKey("dataType")) {
+			model.setDataType(jsonObject.getString("dataType"));
+		}
+
+		if (jsonObject.containsKey("required")) {
+			model.setRequired(jsonObject.getString("required"));
+		}
+
 		if (jsonObject.containsKey("sortNo")) {
 			model.setSortNo(jsonObject.getInteger("sortNo"));
 		}
@@ -94,6 +106,18 @@ public class XmlExportItemJsonFactory {
 			jsonObject.put("expression", model.getExpression());
 		}
 
+		if (model.getDefaultValue() != null) {
+			jsonObject.put("defaultValue", model.getDefaultValue());
+		}
+
+		if (model.getDataType() != null) {
+			jsonObject.put("dataType", model.getDataType());
+		}
+
+		if (model.getRequired() != null) {
+			jsonObject.put("required", model.getRequired());
+		}
+
 		if (model.getCreateBy() != null) {
 			jsonObject.put("createBy", model.getCreateBy());
 		}
@@ -125,6 +149,15 @@ public class XmlExportItemJsonFactory {
 		}
 		if (model.getExpression() != null) {
 			jsonObject.put("expression", model.getExpression());
+		}
+		if (model.getDefaultValue() != null) {
+			jsonObject.put("defaultValue", model.getDefaultValue());
+		}
+		if (model.getDataType() != null) {
+			jsonObject.put("dataType", model.getDataType());
+		}
+		if (model.getRequired() != null) {
+			jsonObject.put("required", model.getRequired());
 		}
 		if (model.getCreateBy() != null) {
 			jsonObject.put("createBy", model.getCreateBy());

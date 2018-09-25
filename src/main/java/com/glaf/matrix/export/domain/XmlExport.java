@@ -38,7 +38,7 @@ import com.glaf.matrix.export.util.*;
  */
 
 @Entity
-@Table(name = "SYS_XML_EXPORT")
+@Table(name = "SYS_XML_EXPORT", uniqueConstraints = { @UniqueConstraint(columnNames = { "NODEID_" }) })
 public class XmlExport implements Serializable, JSONable {
 	private static final long serialVersionUID = 1L;
 
@@ -188,6 +188,9 @@ public class XmlExport implements Serializable, JSONable {
 	protected List<XmlExportItem> items = new ArrayList<XmlExportItem>();
 
 	@javax.persistence.Transient
+	protected Map<String, XmlExportItem> itemMap = new HashMap<String, XmlExportItem>();
+
+	@javax.persistence.Transient
 	protected Map<String, Object> parameter = new HashMap<String, Object>();
 
 	@javax.persistence.Transient
@@ -208,13 +211,6 @@ public class XmlExport implements Serializable, JSONable {
 		items.add(item);
 	}
 
-	public void addChild(XmlExport child) {
-		if (children == null) {
-			children = new ArrayList<XmlExport>();
-		}
-		children.add(child);
-	}
-
 	public void addElement(String name, String title) {
 		if (items == null) {
 			items = new ArrayList<XmlExportItem>();
@@ -224,6 +220,13 @@ public class XmlExport implements Serializable, JSONable {
 		item.setName(name);
 		item.setTitle(title);
 		items.add(item);
+	}
+
+	public void addChild(XmlExport child) {
+		if (children == null) {
+			children = new ArrayList<XmlExport>();
+		}
+		children.add(child);
 	}
 
 	public void addItem(XmlExportItem item) {
@@ -297,6 +300,15 @@ public class XmlExport implements Serializable, JSONable {
 		return this.interval;
 	}
 
+	public Map<String, XmlExportItem> getItemMap() {
+		if (items != null && !items.isEmpty()) {
+			for (XmlExportItem item : items) {
+				itemMap.put(item.getName().toLowerCase(), item);
+			}
+		}
+		return itemMap;
+	}
+
 	public List<XmlExportItem> getItems() {
 		return items;
 	}
@@ -310,10 +322,16 @@ public class XmlExport implements Serializable, JSONable {
 	}
 
 	public String getMapping() {
+		if (mapping != null) {
+			mapping = mapping.trim().toLowerCase();
+		}
 		return mapping;
 	}
 
 	public String getName() {
+		if (name != null) {
+			name = name.trim().toLowerCase();
+		}
 		return name;
 	}
 

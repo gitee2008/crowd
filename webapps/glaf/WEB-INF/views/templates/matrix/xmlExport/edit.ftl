@@ -84,7 +84,7 @@
             <select id="nodeParentId" name="nodeParentId">
 				<option value="0">&nbsp;&nbsp;/&nbsp;&nbsp;</option>
 				<#list children as child>
-				<option value="${child.nodeId}">${child.blank}&nbsp;+&lt;${child.xmlTag}&gt;&nbsp;${child.title}[${child.level}]</option>
+				<option value="${child.nodeId}">${child.blank}&nbsp;+&lt;${child.xmlTag}&gt;&nbsp;${child.title}[第${child.level}级]</option>
 				</#list>
             </select>
 			<script type="text/javascript">
@@ -143,6 +143,10 @@
 			<br>
 			<span>
 			 （可以使用动态参数,也可以使用父节点的输出变量当输入参数,例如: column1 = <script>document.write("#");</script>{param1}）
+			</span>
+			<br>
+			<span style="font: bold 13px 宋体; color:#ff3366">
+			 （参数名请全部转成小写字母，支持小写字母、数字0-9及下划线。）
 			</span>
 			<br>
 	      </div>

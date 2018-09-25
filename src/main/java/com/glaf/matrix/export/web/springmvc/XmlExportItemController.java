@@ -105,7 +105,7 @@ public class XmlExportItemController {
 		if (xmlExportItem != null) {
 			request.setAttribute("xmlExportItem", xmlExportItem);
 		}
-		
+
 		List<Integer> sortNoList = new ArrayList<Integer>();
 		for (int i = 1; i < 50; i++) {
 			sortNoList.add(i);
@@ -240,6 +240,9 @@ public class XmlExportItemController {
 			xmlExportItem.setName(request.getParameter("name"));
 			xmlExportItem.setTitle(request.getParameter("title"));
 			xmlExportItem.setExpression(request.getParameter("expression"));
+			xmlExportItem.setDefaultValue(request.getParameter("defaultValue"));
+			xmlExportItem.setDataType(request.getParameter("dataType"));
+			xmlExportItem.setRequired(request.getParameter("required"));
 			xmlExportItem.setTagFlag(request.getParameter("tagFlag"));
 			xmlExportItem.setSortNo(RequestUtils.getInt(request, "sortNo"));
 			xmlExportItem.setLocked(RequestUtils.getInt(request, "locked"));

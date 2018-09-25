@@ -75,6 +75,21 @@ public class XmlExportItem implements Serializable, JSONable {
 	protected String expression;
 
 	/**
+	 * 默认值
+	 */
+	@Column(name = "DEFAULTVALUE_", length = 500)
+	protected String defaultValue;
+
+	@Column(name = "DATATYPE_", length = 20)
+	protected String dataType;
+
+	/**
+	 * 是否必须
+	 */
+	@Column(name = "REQUIRED_", length = 1)
+	protected String required;
+
+	/**
 	 * 顺序号
 	 */
 	@Column(name = "SORTNO_")
@@ -142,6 +157,14 @@ public class XmlExportItem implements Serializable, JSONable {
 		return dataList;
 	}
 
+	public String getDataType() {
+		return dataType;
+	}
+
+	public String getDefaultValue() {
+		return defaultValue;
+	}
+
 	public String getExpId() {
 		return this.expId;
 	}
@@ -159,7 +182,14 @@ public class XmlExportItem implements Serializable, JSONable {
 	}
 
 	public String getName() {
+		if (name != null) {
+			name = name.trim();
+		}
 		return name;
+	}
+
+	public String getRequired() {
+		return required;
 	}
 
 	public int getSortNo() {
@@ -198,6 +228,14 @@ public class XmlExportItem implements Serializable, JSONable {
 		this.dataList = dataList;
 	}
 
+	public void setDataType(String dataType) {
+		this.dataType = dataType;
+	}
+
+	public void setDefaultValue(String defaultValue) {
+		this.defaultValue = defaultValue;
+	}
+
 	public void setExpId(String expId) {
 		this.expId = expId;
 	}
@@ -216,6 +254,10 @@ public class XmlExportItem implements Serializable, JSONable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public void setRequired(String required) {
+		this.required = required;
 	}
 
 	public void setSortNo(int sortNo) {

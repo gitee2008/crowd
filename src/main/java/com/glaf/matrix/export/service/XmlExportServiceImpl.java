@@ -30,14 +30,18 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.glaf.core.dao.EntityDAO;
 import com.glaf.core.id.IdGenerator;
+import com.glaf.core.security.Authentication;
 import com.glaf.core.util.UUID32;
 import com.glaf.matrix.export.domain.XmlExport;
 import com.glaf.matrix.export.domain.XmlExportItem;
 import com.glaf.matrix.export.mapper.XmlExportMapper;
 import com.glaf.matrix.export.mapper.XmlExportItemMapper;
 import com.glaf.matrix.export.query.XmlExportQuery;
+import com.glaf.matrix.export.util.XmlExportJsonFactory;
 import com.glaf.matrix.export.query.XmlExportItemQuery;
 
 @Service("com.glaf.matrix.export.service.xmlExportService")
@@ -79,6 +83,32 @@ public class XmlExportServiceImpl implements XmlExportService {
 				xmlExportMapper.deleteXmlExportById(id);
 			}
 		}
+	}
+
+	public JSONObject exportJson(String expId) {
+		XmlExport root = this.getXmlExport(expId);
+		JSONObject jsonObject = root.toJsonObject();
+
+		List<XmlExport> children = xmlExportMapper.getChildrenXmlExports(root.getNodeId());
+		if (children != null && !children.isEmpty()) {
+			JSONArray array = new JSONArray();
+			for (XmlExport child : children) {
+				if (!"Y".equals(child.getActive())) {
+					continue;
+				}
+				List<XmlExportItem> items = xmlExportItemMapper.getXmlExportItemsByExpId(child.getId());
+				child.setItems(items);
+				JSONObject json = child.toJsonObject();
+				// json.remove("id");
+				// json.remove("nodeId");
+				// json.remove("nodeParentId");
+				this.loadChild(json, child);
+				array.add(json);
+			}
+			jsonObject.put("children", array);
+		}
+
+		return jsonObject;
 	}
 
 	/**
@@ -161,6 +191,41 @@ public class XmlExportServiceImpl implements XmlExportService {
 		return rows;
 	}
 
+	@Transactional
+	public void importAll(String expId, JSONObject jsonObject) {
+		XmlExport model = this.getXmlExport(expId);
+		if (model != null) {
+			XmlExport child = XmlExportJsonFactory.jsonToObject(jsonObject);
+			child.setId(UUID32.getUUID());
+			child.setNodeId(idGenerator.nextId("SYS_XML_EXPORT"));
+			child.setNodeParentId(model.getNodeId());
+			child.setCreateTime(new Date());
+			child.setCreateBy(Authentication.getAuthenticatedActorId());
+			child.setActive("Y");
+
+			xmlExportMapper.insertXmlExport(child);
+
+			if (child.getItems() != null && !child.getItems().isEmpty()) {
+				for (XmlExportItem item : child.getItems()) {
+					item.setId(UUID32.getUUID());
+					item.setCreateTime(new Date());
+					item.setCreateBy(Authentication.getAuthenticatedActorId());
+					item.setExpId(child.getId());
+					item.setLocked(0);
+					xmlExportItemMapper.insertXmlExportItem(item);
+				}
+			}
+			if (jsonObject.containsKey("children")) {
+				JSONArray array = jsonObject.getJSONArray("children");
+				int len = array.size();
+				for (int i = 0; i < len; i++) {
+					JSONObject json = array.getJSONObject(i);
+					this.importAll(child.getId(), json);
+				}
+			}
+		}
+	}
+
 	public List<XmlExport> list(XmlExportQuery query) {
 		List<XmlExport> list = xmlExportMapper.getXmlExports(query);
 		return list;
@@ -195,14 +260,32 @@ public class XmlExportServiceImpl implements XmlExportService {
 				child.setBlank(buff2.toString());
 				root.addChild(child);
 				logger.debug("-------------------level" + child.getLevel() + "----------------");
-
 				if (!list.contains(child)) {
 					list.add(child);
 				}
-
 				this.load(list, child);
-
 			}
+		}
+	}
+
+	protected void loadChild(JSONObject jsonObject, XmlExport xmlExport) {
+		List<XmlExport> children = xmlExportMapper.getChildrenXmlExports(xmlExport.getNodeId());
+		if (children != null && !children.isEmpty()) {
+			JSONArray array = new JSONArray();
+			for (XmlExport child : children) {
+				if (!"Y".equals(child.getActive())) {
+					continue;
+				}
+				List<XmlExportItem> items = xmlExportItemMapper.getXmlExportItemsByExpId(child.getId());
+				child.setItems(items);
+				JSONObject json = child.toJsonObject();
+				// json.remove("id");
+				// json.remove("nodeId");
+				// json.remove("nodeParentId");
+				this.loadChild(json, child);
+				array.add(json);
+			}
+			jsonObject.put("children", array);
 		}
 	}
 

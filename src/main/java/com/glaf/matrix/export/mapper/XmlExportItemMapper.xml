@@ -13,6 +13,12 @@
 		<result property="title" column="TITLE_" jdbcType="VARCHAR" />
 		<result property="expression" column="EXPRESSION_"
 			jdbcType="VARCHAR" />
+		<result property="defaultValue" column="DEFAULTVALUE_"
+			jdbcType="VARCHAR" />
+		<result property="dataType" column="DATATYPE_"
+			jdbcType="VARCHAR" />
+		<result property="required" column="REQUIRED_"
+			jdbcType="VARCHAR" />
 		<result property="tagFlag" column="TAGFLAG_" jdbcType="VARCHAR" />
 		<result property="sortNo" column="SORTNO_" jdbcType="INTEGER" />
 		<result property="locked" column="LOCKED_" jdbcType="INTEGER" />
@@ -39,6 +45,15 @@
 			</if>
 			<if test="expression != null">
 				,EXPRESSION_
+			</if>
+			<if test="defaultValue != null">
+				,DEFAULTVALUE_
+			</if>
+			<if test="dataType != null">
+				,DATATYPE_
+			</if>
+			<if test="required != null">
+				,REQUIRED_
 			</if>
 			<if test="tagFlag != null">
 				,TAGFLAG_
@@ -71,6 +86,15 @@
 			</if>
 			<if test="expression != null">
 				,#{expression, jdbcType=VARCHAR}
+			</if>
+			<if test="defaultValue != null">
+				,#{defaultValue, jdbcType=VARCHAR}
+			</if>
+			<if test="dataType != null">
+				,#{dataType, jdbcType=VARCHAR}
+			</if>
+			<if test="required != null">
+				,#{required, jdbcType=VARCHAR}
 			</if>
 			<if test="tagFlag != null">
 				,#{tagFlag, jdbcType=VARCHAR}
@@ -105,6 +129,15 @@
 			<if test="expression != null">
 				EXPRESSION_ = #{expression, jdbcType=VARCHAR},
 			</if>
+			<if test="defaultValue != null">
+				DEFAULTVALUE_ = #{defaultValue, jdbcType=VARCHAR},
+			</if>
+			<if test="dataType != null">
+				DATATYPE_ = #{dataType, jdbcType=VARCHAR},
+			</if>
+			<if test="required != null">
+				REQUIRED_ = #{required, jdbcType=VARCHAR},
+			</if>
 			<if test="tagFlag != null">
 				TAGFLAG_ = #{tagFlag, jdbcType=VARCHAR},
 			</if>
@@ -138,7 +171,8 @@
 		resultMap="xmlExportItemResultMap">
 		select * from SYS_XML_EXPORT_ITEM
 		where EXPID_ = #{expId}
-		and LOCKED_ = 0
+		and
+		LOCKED_ = 0
 		order by SORTNO_ asc
 	</select>
 

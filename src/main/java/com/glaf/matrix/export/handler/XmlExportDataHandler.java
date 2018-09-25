@@ -23,14 +23,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -44,12 +44,11 @@ import com.glaf.core.entity.SqlExecutor;
 import com.glaf.core.jdbc.DBConnectionFactory;
 import com.glaf.core.service.IDatabaseService;
 import com.glaf.core.tree.component.TreeComponent;
-import com.glaf.core.tree.component.TreeRepository;
-import com.glaf.core.tree.helper.JacksonTreeHelper;
 import com.glaf.core.tree.helper.XmlTreeHelper;
-import com.glaf.core.util.LowerLinkedMap;
 import com.glaf.core.util.DBUtils;
+import com.glaf.core.util.DateUtils;
 import com.glaf.core.util.JdbcUtils;
+import com.glaf.core.util.LowerLinkedMap;
 import com.glaf.core.util.ParamUtils;
 import com.glaf.core.util.QueryUtils;
 
@@ -96,6 +95,8 @@ public class XmlExportDataHandler implements XmlDataHandler {
 			}
 		}
 
+		Map<String, Object> parameter = new HashMap<String, Object>();
+
 		List<XmlExportItem> items = getXmlExportItemService().getXmlExportItemsByExpId(xmlExport.getId());
 		xmlExport.setItems(items);
 
@@ -104,7 +105,6 @@ public class XmlExportDataHandler implements XmlDataHandler {
 		if (xmlExport.getNodeParentId() == 0) {// 顶层节点，只能有一个根节点
 			// 根据定义补上根节点的属性
 			if (StringUtils.equals(xmlExport.getResultFlag(), "S")) {
-				Map<String, Object> parameter = new HashMap<String, Object>();
 				if (xmlExport.getItems() != null && !xmlExport.getItems().isEmpty()) {
 					String value = null;
 					Connection srcConn = null;
@@ -134,7 +134,7 @@ public class XmlExportDataHandler implements XmlDataHandler {
 
 							if (StringUtils.equals(xmlExport.getResultFlag(), "S")) {
 								if (srcRs.next()) {
-									dataMap.putAll(this.toMap(srcRs));
+									dataMap.putAll(this.toMap(srcRs, xmlExport.getItemMap()));
 								}
 							}
 
@@ -179,21 +179,7 @@ public class XmlExportDataHandler implements XmlDataHandler {
 			logger.debug("---------------------------gen child xml----------------------------");
 			for (XmlExport child : children) {
 				child.setParent(xmlExport);
-				int retry = 0;
-				boolean success = false;
-				while (retry < 3 && !success) {
-					try {
-						retry++;
-						this.addChild(child, srcDatabase);
-						success = true;
-					} catch (Exception ex) {
-						logger.error(ex);
-						try {
-							TimeUnit.MILLISECONDS.sleep(20 + new Random().nextInt(50));
-						} catch (InterruptedException e) {
-						}
-					}
-				}
+				this.addChild(child, srcDatabase);
 			}
 		}
 	}
@@ -240,11 +226,12 @@ public class XmlExportDataHandler implements XmlDataHandler {
 
 				if (StringUtils.equals(current.getResultFlag(), "S")) {
 					if (srcRs.next()) {
-						dataMap.putAll(this.toMap(srcRs));
+						dataMap.putAll(this.toMap(srcRs, current.getItemMap()));
 					}
 				} else {
+					Map<String, XmlExportItem> itemMap = current.getItemMap();
 					while (srcRs.next()) {
-						resultList.add(this.toMap(srcRs));
+						resultList.add(this.toMap(srcRs, itemMap));
 					}
 				}
 
@@ -302,16 +289,22 @@ public class XmlExportDataHandler implements XmlDataHandler {
 							trees.add(tree);
 						}
 						// this.processTreeNode(current, trees);
-						Map<String, String> elemMap = new HashMap<String, String>();
-						for (XmlExportItem item : current.getItems()) {
-							elemMap.put(item.getName(), item.getTagFlag());
+						if (current.getItems() != null && !current.getItems().isEmpty()) {
+							/**
+							 * 有序HashMap
+							 */
+							Map<String, String> elemMap = new LinkedHashMap<String, String>();
+							for (XmlExportItem item : current.getItems()) {
+								elemMap.put(item.getName(), item.getTagFlag());
+							}
+							XmlTreeHelper xmlTreeHelper = new XmlTreeHelper();
+							xmlTreeHelper.appendChild(current.getParent().getElement(), current.getXmlTag(), elemMap,
+									trees);
 						}
-						XmlTreeHelper xmlTreeHelper = new XmlTreeHelper();
-						xmlTreeHelper.appendChild(current.getElement(), current.getXmlTag(), elemMap, trees);
 					} else {
 						for (Map<String, Object> rowMap : resultList) {
 							/**
-							 * 在这个节点的父节点上添加下级节点
+							 * 在当前节点的父节点上添加下级节点
 							 */
 							elem = current.getParent().getElement().addElement(current.getXmlTag());
 							// logger.debug("----<" + current.getXmlTag() + ">" + current.getTitle() +
@@ -351,8 +344,14 @@ public class XmlExportDataHandler implements XmlDataHandler {
 							}
 							// logger.debug("->children:" + children);
 							if (children != null && !children.isEmpty()) {
-								// current.setDataMap(rowMap);
 								current.setElement(elem);
+
+								Set<Entry<String, Object>> entrySet0 = rowMap.entrySet();
+								for (Entry<String, Object> entry : entrySet0) {
+									String key = entry.getKey();
+									Object val = entry.getValue();
+									parameter.put(key, val);
+								}
 
 								if (StringUtils.isNotEmpty(current.getName())) {
 									Set<Entry<String, Object>> entrySet = current.getParameter().entrySet();
@@ -372,44 +371,28 @@ public class XmlExportDataHandler implements XmlDataHandler {
 									}
 								}
 
+								if (StringUtils.isNotEmpty(current.getName())) {
+									Set<Entry<String, Object>> entrySet = rowMap.entrySet();
+									for (Entry<String, Object> entry : entrySet) {
+										String key = entry.getKey();
+										Object val = entry.getValue();
+										parameter.put(current.getName() + "_" + key, val);
+									}
+								}
+
+								if (StringUtils.isNotEmpty(current.getMapping())) {
+									Set<Entry<String, Object>> entrySet = rowMap.entrySet();
+									for (Entry<String, Object> entry : entrySet) {
+										String key = entry.getKey();
+										Object val = entry.getValue();
+										parameter.put(current.getMapping() + "_" + key, val);
+									}
+								}
+
 								for (XmlExport child : children) {
-
-									if (StringUtils.isNotEmpty(current.getName())) {
-										Set<Entry<String, Object>> entrySet = rowMap.entrySet();
-										for (Entry<String, Object> entry : entrySet) {
-											String key = entry.getKey();
-											Object val = entry.getValue();
-											parameter.put(current.getName() + "_" + key, val);
-										}
-									}
-
-									if (StringUtils.isNotEmpty(current.getMapping())) {
-										Set<Entry<String, Object>> entrySet = rowMap.entrySet();
-										for (Entry<String, Object> entry : entrySet) {
-											String key = entry.getKey();
-											Object val = entry.getValue();
-											parameter.put(current.getMapping() + "_" + key, val);
-										}
-									}
-
 									child.setParent(current);
 									child.setParameter(parameter);
-
-									int retry = 0;
-									boolean success = false;
-									while (retry < 3 && !success) {
-										try {
-											retry++;
-											this.addChild(child, srcDatabase);
-											success = true;
-										} catch (Exception ex) {
-											logger.error(ex);
-											try {
-												TimeUnit.MILLISECONDS.sleep(20 + new Random().nextInt(50));
-											} catch (InterruptedException e) {
-											}
-										}
-									}
+									this.addChild(child, srcDatabase);
 								}
 							}
 						}
@@ -434,27 +417,13 @@ public class XmlExportDataHandler implements XmlDataHandler {
 							current.setElement(elem);
 						}
 						/**
-						 * 在子节点的父节点上添加下级节点
+						 * 在当前节点的父节点上添加下级节点
 						 */
 						if (current.getElement() != null) {
 							Element childElem = current.getElement().addElement(child.getXmlTag());
 							child.setElement(childElem);
 							logger.debug("---------<" + child.getXmlTag() + ">" + child.getTitle() + "------------");
-							int retry = 0;
-							boolean success = false;
-							while (retry < 3 && !success) {
-								try {
-									retry++;
-									this.addChild(child, srcDatabase);
-									success = true;
-								} catch (Exception ex) {
-									logger.error(ex);
-									try {
-										TimeUnit.MILLISECONDS.sleep(20 + new Random().nextInt(50));
-									} catch (InterruptedException e) {
-									}
-								}
-							}
+							this.addChild(child, srcDatabase);
 						}
 					}
 				}
@@ -467,67 +436,6 @@ public class XmlExportDataHandler implements XmlDataHandler {
 			JdbcUtils.close(srcRs);
 			JdbcUtils.close(srcPsmt);
 			JdbcUtils.close(srcConn);
-		}
-	}
-
-	protected void processTreeNode(XmlExport current, List<TreeComponent> trees) {
-		JacksonTreeHelper builder = new JacksonTreeHelper();
-		TreeRepository treeRepository = builder.buildTree(trees);
-		if (treeRepository != null) {
-			String value = null;
-			List<TreeComponent> components = treeRepository.getTopTrees();
-			if (components != null && !components.isEmpty()) {
-				for (TreeComponent component : components) {
-					Element element = current.getParent().getElement().addElement(current.getXmlTag());
-					for (XmlExportItem item : current.getItems()) {
-						/**
-						 * 处理属性
-						 */
-						if (StringUtils.equals(item.getTagFlag(), "A")) {
-							if (StringUtils.isNotEmpty(item.getExpression())) {
-								value = ExpressionTools.evaluate(item.getExpression(), component.getDataMap());
-							} else {
-								value = ParamUtils.getString(component.getDataMap(),
-										item.getName().trim().toLowerCase());
-							}
-							if (StringUtils.isNotEmpty(value)) {
-								element.addAttribute(item.getName(), value);
-							}
-						} else {
-							element.addElement(item.getName(), value);
-						}
-					}
-					this.processChildTreeNode(current, element, component);
-				}
-			}
-		}
-	}
-
-	protected void processChildTreeNode(XmlExport current, Element element, TreeComponent treeComponent) {
-		List<TreeComponent> components = treeComponent.getComponents();
-		if (components != null && !components.isEmpty()) {
-			String value = null;
-			Element elem = element.addElement(current.getXmlTag());
-			for (TreeComponent child : components) {
-				for (XmlExportItem item : current.getItems()) {
-					/**
-					 * 处理属性
-					 */
-					if (StringUtils.equals(item.getTagFlag(), "A")) {
-						if (StringUtils.isNotEmpty(item.getExpression())) {
-							value = ExpressionTools.evaluate(item.getExpression(), child.getDataMap());
-						} else {
-							value = ParamUtils.getString(child.getDataMap(), item.getName().trim().toLowerCase());
-						}
-						if (StringUtils.isNotEmpty(value)) {
-							elem.addAttribute(item.getName(), value);
-						}
-					} else {
-						elem.addElement(item.getName(), value);
-					}
-				}
-				this.processChildTreeNode(current, elem, child);
-			}
 		}
 	}
 
@@ -564,20 +472,62 @@ public class XmlExportDataHandler implements XmlDataHandler {
 		this.xmlExportService = xmlExportService;
 	}
 
-	public Map<String, Object> toMap(ResultSet rs) throws SQLException {
-		Map<String, Object> result = new LowerLinkedMap();
+	public Map<String, Object> toMap(ResultSet rs, Map<String, XmlExportItem> itemMap) throws SQLException {
+		Map<String, Object> resultMap = new LowerLinkedMap();
 		ResultSetMetaData rsmd = rs.getMetaData();
+		DecimalFormat formater1 = new DecimalFormat("###");
+		DecimalFormat formater2 = new DecimalFormat("###.##");
 		int count = rsmd.getColumnCount();
 		for (int i = 1; i <= count; i++) {
 			String columnName = rsmd.getColumnLabel(i);
 			if (StringUtils.isEmpty(columnName)) {
 				columnName = rsmd.getColumnName(i);
 			}
-			Object object = rs.getObject(i);
 			columnName = columnName.toLowerCase();
-			result.put(columnName, object);
+			Object object = rs.getObject(i);
+			if (object != null) {
+				if (object instanceof java.util.Date) {
+					java.util.Date date = (java.util.Date) object;
+					resultMap.put(columnName, DateUtils.getDate(date));
+				} else if (object instanceof Integer) {
+					int val = (int) object;
+					resultMap.put(columnName, formater1.format(val));
+				} else if (object instanceof Long) {
+					long val = (long) object;
+					resultMap.put(columnName, formater1.format(val));
+				} else if (object instanceof Double) {
+					double val = (double) object;
+					resultMap.put(columnName, formater2.format(val));
+				} else if (object instanceof java.math.BigInteger) {
+					java.math.BigInteger val = (java.math.BigInteger) object;
+					resultMap.put(columnName, formater1.format(val.longValue()));
+				} else if (object instanceof java.math.BigDecimal) {
+					java.math.BigDecimal val = (java.math.BigDecimal) object;
+					resultMap.put(columnName, formater2.format(val.doubleValue()));
+				} else {
+					resultMap.put(columnName, object);
+				}
+			} else {
+				XmlExportItem item = itemMap.get(columnName);
+				if (item != null && StringUtils.isNotEmpty(item.getDefaultValue())) {
+					resultMap.put(columnName, item.getDefaultValue());
+				}
+			}
 		}
-		return result;
+
+		Set<Entry<String, XmlExportItem>> entrySet = itemMap.entrySet();
+		for (Entry<String, XmlExportItem> entry : entrySet) {
+			String key = entry.getKey();
+			XmlExportItem item = entry.getValue();
+			if (resultMap.get(key) == null && StringUtils.isNotEmpty(item.getExpression())) {
+				String value = ExpressionTools.evaluate(item.getExpression(), resultMap);
+				if (value != null) {
+					resultMap.put(key, value);
+				}
+			}
+		}
+
+		return resultMap;
 	}
 
 }

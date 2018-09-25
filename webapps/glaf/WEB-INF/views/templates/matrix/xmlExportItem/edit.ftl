@@ -94,6 +94,44 @@
 		</td>
 	</tr>
 	<tr>
+		<td width="15%" align="left">是否必须</td>
+		<td align="left">
+		    <select id="required" name="required">
+			    <option value="N">否</option>
+			    <option value="Y">是</option>
+             </select>
+             <script type="text/javascript">
+                 document.getElementById("required").value="${xmlExportItem.required}";
+             </script>
+		</td>
+    </tr>
+	<tr>
+		<td width="15%" align="left">数据类型</td>
+		<td align="left">
+		    <select id="dataType" name="dataType">
+			    <option value="Integer">整数型</option>
+			    <option value="Long">长整数型</option>
+				<option value="Double">数值型</option>
+				<option value="Date">日期型</option>
+				<option value="String">字符型</option>
+             </select>
+             <script type="text/javascript">
+                 document.getElementById("dataType").value="${xmlExportItem.dataType}";
+             </script>
+		</td>
+    </tr>
+	<tr>
+		<td width="15%" align="left">默认值</td>
+		<td align="left">
+            <input id="defaultValue" name="defaultValue" type="text" 
+			       class="easyui-validatebox x-text" style="width:425px;" 
+				   value="${xmlExportItem.defaultValue}"/>
+			<div style="margin-top:5px;">
+		     （提示：当该字段的查询结果为空null时的取值。）
+	        </div>
+		</td>
+	</tr>
+	<tr>
 		<td width="15%" align="left">类型</td>
 		<td align="left">
 		    <select id="tagFlag" name="tagFlag">

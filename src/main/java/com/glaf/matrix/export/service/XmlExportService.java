@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSONObject;
 import com.glaf.matrix.export.domain.XmlExport;
 import com.glaf.matrix.export.query.XmlExportQuery;
 
@@ -43,6 +44,14 @@ public interface XmlExportService {
 	 */
 	@Transactional
 	void deleteByIds(List<String> ids);
+
+	/**
+	 * 导出某个节点及子孙节点的定义
+	 * 
+	 * @param expId
+	 * @return
+	 */
+	JSONObject exportJson(String expId);
 
 	/**
 	 * 获取全部子孙节点
@@ -82,6 +91,15 @@ public interface XmlExportService {
 	 * @return
 	 */
 	List<XmlExport> getXmlExportsByQueryCriteria(int start, int pageSize, XmlExportQuery query);
+
+	/**
+	 * 批量保存
+	 * 
+	 * @param expId
+	 * @param jsonObject
+	 */
+	@Transactional
+	void importAll(String expId, JSONObject jsonObject);
 
 	/**
 	 * 根据查询参数获取记录列表

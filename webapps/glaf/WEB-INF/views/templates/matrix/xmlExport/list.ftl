@@ -70,7 +70,6 @@
 			});
 	});
 
-
 	function formatterActive(val, row){
         var str = "";
 		if(val == "Y"){
@@ -81,12 +80,10 @@
 	    return str;
 	}
 
-
 	function formatterKeys(val, row){
 		var str = "<a href='javascript:editRow(\""+row.id+"\");'>修改</a>&nbsp;<a href='javascript:subList(\""+row.id+"\");'>导出项</a>";
 	    return str;
 	}
-
 	 
     function subList(expId){
 	    var link = '${request.contextPath}/matrix/xmlExportItem?expId='+expId;
@@ -104,7 +101,6 @@
             iframe: {src: link}
 		}); 
 	}
-
  
 	function editRow(id){
 	    var link="${request.contextPath}/matrix/xmlExport/edit?id="+id;
@@ -171,28 +167,21 @@
 	}
 
 	function editSelected(){
-	    var rows = jQuery('#mydatagrid').datagrid('getSelections');
-	    if(rows == null || rows.length !=1){
-		  alert("请选择其中一条记录。");
-		  return;
-	    }
-	    var selected = jQuery('#mydatagrid').datagrid('getSelected');
-	    if (selected ){
-		  var link = '${request.contextPath}/matrix/xmlExport/edit?id='+selected.id;
-		  jQuery.layer({
-			type: 2,
-			maxmin: true,
-			shadeClose: true,
-			title: "修改记录",
-			closeBtn: [0, true],
-			shade: [0.8, '#000'],
-			border: [10, 0.3, '#000'],
-			offset: ['20px',''],
-			fadeIn: 100,
-			area: ['1080px', (jQuery(window).height() - 50) +'px'],
-            iframe: {src: link}
-		  });
-	    }
+	    var nodeId = jQuery("#nodeId").val();
+        var link = '${contextPath}/matrix/xmlExport/edit?nodeId='+nodeId;
+		jQuery.layer({
+				type: 2,
+				maxmin: true,
+				shadeClose: true,
+				title: "修改记录",
+				closeBtn: [0, true],
+				shade: [0.8, '#000'],
+				border: [10, 0.3, '#000'],
+				offset: ['20px',''],
+				fadeIn: 100,
+				area: ['980px', (jQuery(window).height() - 50) +'px'],
+				iframe: {src: link}
+			  });
 	}
 
 	function viewSelected(){
@@ -251,17 +240,10 @@
 		}
 	}
 
-	function exportXml0(){
-	    var rows = jQuery('#mydatagrid').datagrid('getSelections');
-	    if(rows == null || rows.length !=1){
-		    alert("请选择其中一条记录。");
-		    return;
-	    }
-	    var selected = jQuery('#mydatagrid').datagrid('getSelected');
-	    if (selected){
-		    var link = '${request.contextPath}/matrix/xmlExport/showExport?expId='+selected.id;
-		    //window.open(link);
-			jQuery.layer({
+	function exportData(){
+		var nodeId = jQuery("#nodeId").val();
+        var link = '${contextPath}/matrix/xmlExport/showExport?nodeId='+nodeId;
+		jQuery.layer({
 				type: 2,
 				maxmin: true,
 				shadeClose: true,
@@ -274,11 +256,10 @@
 				area: ['680px', (jQuery(window).height() - 50) +'px'],
 				iframe: {src: link}
 			  });
-	    }
 	}
 
 	function exportXml(expId){
-		var link = '${request.contextPath}/matrix/xmlExport/showExport?expId='+expId;
+		var link = '${contextPath}/matrix/xmlExport/showExport?expId='+expId;
 		//window.open(link);
 		jQuery.layer({
 				type: 2,
@@ -293,6 +274,31 @@
 				area: ['680px', (jQuery(window).height() - 50) +'px'],
 				iframe: {src: link}
 			  });
+	}
+
+	function showImportDef(){
+		var nodeId = jQuery("#nodeId").val();
+		var link = '${contextPath}/matrix/xmlExport/showImportDef?nodeId='+nodeId;
+		//window.open(link);
+		jQuery.layer({
+				type: 2,
+				maxmin: true,
+				shadeClose: true,
+				title: "导入定义",
+				closeBtn: [0, true],
+				shade: [0.8, '#000'],
+				border: [10, 0.3, '#000'],
+				offset: ['20px',''],
+				fadeIn: 100,
+				area: ['980px', (jQuery(window).height() - 50) +'px'],
+				iframe: {src: link}
+			  });
+	}
+
+	function exportDef(){
+		var nodeId = jQuery("#nodeId").val();
+        var link = '${contextPath}/matrix/xmlExport/exportDef?nodeId='+nodeId;
+		window.open(link);
 	}
 
 	function reloadGrid(){
@@ -334,23 +340,6 @@
 		});
 	}
 
-	function searchData(){
-        var params = jQuery("#searchForm").formSerialize();
-        jQuery.ajax({
-                    type: "POST",
-                    url: '${request.contextPath}/matrix/xmlExport/json',
-                    dataType: 'json',
-                    data: params,
-                    error: function(data){
-                              alert('服务器处理错误！');
-                    },
-                    success: function(data){
-                              jQuery('#mydatagrid').datagrid('loadData', data);
-                    }
-                  });
-
-	    jQuery('#dlg').dialog('close');
-	}
 		 
 </script>
 </head>
@@ -374,8 +363,12 @@
 		   onclick="javascript:addNew();">新增</a>  
 		<a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-edit'"
 		   onclick="javascript:editSelected();">修改</a>
-		<a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-package'"
-		   onclick="javascript:exportXml0();">导出XML</a>
+		<a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-exp'"
+		   onclick="javascript:exportData();">导出数据</a>
+		<a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-exp'"
+		   onclick="javascript:exportDef();">导出定义</a>
+		<a href="#" class="easyui-linkbutton" data-options="plain:true, iconCls:'icon-imp'"
+		   onclick="javascript:showImportDef();">导入定义</a>
    </div> 
   </div> 
   <div data-options="region:'center',border:true">

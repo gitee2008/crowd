@@ -46,6 +46,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.alibaba.fastjson.JSON;
@@ -137,15 +138,16 @@ public class XmlExportController {
 	@RequestMapping("/edit")
 	public ModelAndView edit(HttpServletRequest request, ModelMap modelMap) {
 		RequestUtils.setRequestParameterToAttribute(request);
-
 		long nodeId = RequestUtils.getLong(request, "nodeId");
 		long nodeParentId = RequestUtils.getLong(request, "nodeParentId");
-
 		XmlExport xmlExport = null;
+
 		if (StringUtils.isNotEmpty(RequestUtils.getString(request, "id"))) {
 			xmlExport = xmlExportService.getXmlExport(RequestUtils.getString(request, "id"));
-		} else if (nodeId > 0) {
-			xmlExport = xmlExportService.getXmlExportByNodeId(nodeId);
+		} else {
+			if (nodeId > 0) {
+				xmlExport = xmlExportService.getXmlExportByNodeId(nodeId);
+			}
 		}
 
 		if (xmlExport != null) {
@@ -209,6 +211,39 @@ public class XmlExportController {
 		}
 
 		return new ModelAndView("/matrix/xmlExport/edit", modelMap);
+	}
+
+	@ResponseBody
+	@RequestMapping("/exportDef")
+	public void exportDef(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("text/html; charset=UTF-8");
+		Map<String, Object> params = RequestUtils.getParameterMap(request);
+		SysParams.putInternalParams(params);
+		LoginContext loginContext = RequestUtils.getLoginContext(request);
+		params.put("login_user", loginContext.getUser());
+		params.put("login_userid", loginContext.getActorId());
+		params.put("login_tenantid", loginContext.getTenantId());
+		String expId = RequestUtils.getString(request, "expId");
+		long nodeId = RequestUtils.getLong(request, "nodeId");
+		try {
+			XmlExport xmlExport = null;
+			if (nodeId > 0) {
+				xmlExport = xmlExportService.getXmlExportByNodeId(nodeId);
+			} else {
+				xmlExport = xmlExportService.getXmlExport(expId);
+			}
+			if (xmlExport != null && StringUtils.equals(xmlExport.getActive(), "Y")) {
+				JSONObject jsonObject = xmlExportService.exportJson(xmlExport.getId());
+				ResponseUtils.download(request, response, jsonObject.toJSONString().getBytes("UTF-8"),
+						xmlExport.getTitle() + DateUtils.getNowYearMonthDayHHmmss() + ".json");
+			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			logger.error(ex);
+		}
 	}
 
 	@ResponseBody
@@ -392,6 +427,92 @@ public class XmlExportController {
 		}
 	}
 
+	@ResponseBody
+	@RequestMapping("/importDef")
+	public void importDef(HttpServletRequest request, HttpServletResponse response, MultipartFile mFile)
+			throws IOException {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("text/html; charset=UTF-8");
+		Map<String, Object> params = RequestUtils.getParameterMap(request);
+		SysParams.putInternalParams(params);
+		LoginContext loginContext = RequestUtils.getLoginContext(request);
+		params.put("login_user", loginContext.getUser());
+		params.put("login_userid", loginContext.getActorId());
+		params.put("login_tenantid", loginContext.getTenantId());
+		long nodeId = RequestUtils.getLong(request, "nodeId");
+		String expId = RequestUtils.getString(request, "expId");
+		PrintWriter writer = null;
+		try {
+			writer = response.getWriter();
+			XmlExport xmlExport = null;
+			if (nodeId > 0) {
+				xmlExport = xmlExportService.getXmlExportByNodeId(nodeId);
+			} else {
+				xmlExport = xmlExportService.getXmlExport(expId);
+			}
+			if (mFile != null && xmlExport != null && StringUtils.equals(xmlExport.getActive(), "Y")) {
+				JSONObject jsonObject = JSON.parseObject(new String(mFile.getBytes(), "UTF-8"));
+				xmlExportService.importAll(xmlExport.getId(), jsonObject);
+				writer.println("<h3><span style='color:#339933;'>导入成功！</span><h3>");
+				writer.flush();
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			logger.error(ex);
+			if (writer != null) {
+				writer.println("<h3><span style='color:#ff0066;'>导入失败！</span><h3><br>");
+				writer.println(ex.getCause().getMessage());
+				writer.flush();
+			}
+		} finally {
+			IOUtils.closeQuietly(writer);
+		}
+	}
+
+	@ResponseBody
+	@RequestMapping("/importDef2")
+	public void importDef2(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
+		response.setContentType("text/html; charset=UTF-8");
+		Map<String, Object> params = RequestUtils.getParameterMap(request);
+		SysParams.putInternalParams(params);
+		LoginContext loginContext = RequestUtils.getLoginContext(request);
+		params.put("login_user", loginContext.getUser());
+		params.put("login_userid", loginContext.getActorId());
+		params.put("login_tenantid", loginContext.getTenantId());
+		long nodeId = RequestUtils.getLong(request, "nodeId");
+		String expId = RequestUtils.getString(request, "expId");
+		String json = RequestUtils.getString(request, "json");
+		PrintWriter writer = null;
+		try {
+			writer = response.getWriter();
+			XmlExport xmlExport = null;
+			if (nodeId > 0) {
+				xmlExport = xmlExportService.getXmlExportByNodeId(nodeId);
+			} else {
+				xmlExport = xmlExportService.getXmlExport(expId);
+			}
+			if (StringUtils.isNotEmpty(json) && xmlExport != null && StringUtils.equals(xmlExport.getActive(), "Y")) {
+				JSONObject jsonObject = JSON.parseObject(json);
+				xmlExportService.importAll(xmlExport.getId(), jsonObject);
+				writer.println("<h3>导入成功！<h3>");
+				writer.flush();
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			logger.error(ex);
+			if (writer != null) {
+				writer.println("<h3>导入失败！<h3><br>");
+				writer.println(ex.getCause().getMessage());
+				writer.flush();
+			}
+		} finally {
+			IOUtils.closeQuietly(writer);
+		}
+	}
+
 	@RequestMapping("/json")
 	@ResponseBody
 	public byte[] json(HttpServletRequest request, ModelMap modelMap) throws IOException {
@@ -524,6 +645,9 @@ public class XmlExportController {
 			xmlExport.setSortNo(RequestUtils.getInt(request, "sortNo"));
 			xmlExport.setCreateBy(actorId);
 			xmlExport.setUpdateBy(actorId);
+			if (StringUtils.isEmpty(xmlExport.getActive())) {
+				xmlExport.setActive("Y");
+			}
 
 			this.xmlExportService.save(xmlExport);
 
@@ -574,8 +698,17 @@ public class XmlExportController {
 	public ModelAndView showExport(HttpServletRequest request, ModelMap modelMap) {
 		RequestUtils.setRequestParameterToAttribute(request);
 
+		long nodeId = RequestUtils.getLong(request, "nodeId");
 		long nodeParentId = RequestUtils.getLong(request, "nodeParentId");
-		XmlExport xmlExport = xmlExportService.getXmlExport(RequestUtils.getString(request, "expId"));
+		XmlExport xmlExport = null;
+		if (StringUtils.isNotEmpty(RequestUtils.getString(request, "id"))) {
+			xmlExport = xmlExportService.getXmlExport(RequestUtils.getString(request, "id"));
+		} else {
+			if (nodeId > 0) {
+				xmlExport = xmlExportService.getXmlExportByNodeId(nodeId);
+			}
+		}
+
 		if (xmlExport != null) {
 			request.setAttribute("xmlExport", xmlExport);
 			XmlExport parent = xmlExportService.getXmlExportByNodeId(xmlExport.getNodeParentId());
@@ -626,6 +759,8 @@ public class XmlExportController {
 			request.setAttribute("templates", templateMap.values());
 		}
 
+		request.setAttribute("ts", System.currentTimeMillis());
+
 		String view = request.getParameter("view");
 		if (StringUtils.isNotEmpty(view)) {
 			return new ModelAndView(view, modelMap);
@@ -637,6 +772,42 @@ public class XmlExportController {
 		}
 
 		return new ModelAndView("/matrix/xmlExport/showExport", modelMap);
+	}
+
+	@RequestMapping("/showImportDef")
+	public ModelAndView showImportDef(HttpServletRequest request, ModelMap modelMap) {
+		RequestUtils.setRequestParameterToAttribute(request);
+		long nodeId = RequestUtils.getLong(request, "nodeId");
+		XmlExport xmlExport = null;
+		if (StringUtils.isNotEmpty(RequestUtils.getString(request, "id"))) {
+			xmlExport = xmlExportService.getXmlExport(RequestUtils.getString(request, "id"));
+		} else {
+			if (nodeId > 0) {
+				xmlExport = xmlExportService.getXmlExportByNodeId(nodeId);
+			}
+		}
+
+		if (xmlExport != null) {
+			request.setAttribute("xmlExport", xmlExport);
+			XmlExport parent = xmlExportService.getXmlExportByNodeId(xmlExport.getNodeParentId());
+			if (parent != null) {
+				request.setAttribute("parent", parent);
+			}
+		}
+
+		request.setAttribute("ts", System.currentTimeMillis());
+
+		String view = request.getParameter("view");
+		if (StringUtils.isNotEmpty(view)) {
+			return new ModelAndView(view, modelMap);
+		}
+
+		String x_view = ViewProperties.getString("xmlExport.showImportDef");
+		if (StringUtils.isNotEmpty(x_view)) {
+			return new ModelAndView(x_view, modelMap);
+		}
+
+		return new ModelAndView("/matrix/xmlExport/showImportDef", modelMap);
 	}
 
 	@ResponseBody
@@ -656,7 +827,7 @@ public class XmlExportController {
 					TreeModel tree = new BaseTree();
 					tree.setId(model.getNodeId());
 					tree.setParentId(model.getNodeParentId());
-					tree.setName(model.getTitle());
+					tree.setName(model.getTitle() + "[" + model.getXmlTag() + "]");
 					tree.setSortNo(model.getSortNo());
 					tree.setLevel(model.getLevel());
 					treeModels.add(tree);

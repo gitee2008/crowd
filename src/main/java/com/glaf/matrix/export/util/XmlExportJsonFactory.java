@@ -18,12 +18,15 @@
 
 package com.glaf.matrix.export.util;
 
+import java.util.List;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.glaf.core.util.DateUtils;
 import com.glaf.matrix.export.domain.XmlExport;
+import com.glaf.matrix.export.domain.XmlExportItem;
 
 /**
  * 
@@ -82,17 +85,11 @@ public class XmlExportJsonFactory {
 		if (jsonObject.containsKey("sortNo")) {
 			model.setSortNo(jsonObject.getInteger("sortNo"));
 		}
-		if (jsonObject.containsKey("createBy")) {
-			model.setCreateBy(jsonObject.getString("createBy"));
-		}
-		if (jsonObject.containsKey("createTime")) {
-			model.setCreateTime(jsonObject.getDate("createTime"));
-		}
-		if (jsonObject.containsKey("updateBy")) {
-			model.setUpdateBy(jsonObject.getString("updateBy"));
-		}
-		if (jsonObject.containsKey("updateTime")) {
-			model.setUpdateTime(jsonObject.getDate("updateTime"));
+
+		if (jsonObject.containsKey("items")) {
+			JSONArray array = jsonObject.getJSONArray("items");
+			List<XmlExportItem> items = XmlExportItemJsonFactory.arrayToList(array);
+			model.setItems(items);
 		}
 
 		return model;
@@ -159,6 +156,12 @@ public class XmlExportJsonFactory {
 			jsonObject.put("updateTime_date", DateUtils.getDate(model.getUpdateTime()));
 			jsonObject.put("updateTime_datetime", DateUtils.getDateTime(model.getUpdateTime()));
 		}
+
+		if (model.getItems() != null && !model.getItems().isEmpty()) {
+			JSONArray array = XmlExportItemJsonFactory.listToArray(model.getItems());
+			jsonObject.put("items", array);
+		}
+
 		return jsonObject;
 	}
 
