@@ -209,7 +209,7 @@ public class JacksonTreeHelper {
 
 		for (int i = 0, len = treeModels.size(); i < len; i++) {
 			TreeComponent treeModel = (TreeComponent) treeModels.get(i);
-			if (treeModel != null && treeModel.getId() == treeModel.getParentId()) {
+			if (treeModel != null && StringUtils.equals(treeModel.getId(), treeModel.getParentId())) {
 				treeModel.setParentId("-1");
 			}
 			if (treeModel != null && treeModel.getId() != null) {
