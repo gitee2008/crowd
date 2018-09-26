@@ -54,7 +54,7 @@
 				idField: 'id',
 				columns:[[
 				        {title:'序号', field:'startIndex', width:80, sortable:false},
-						{title:'标题', field:'title', width:380},
+						{title:'标题', field:'title', width:280},
 						{title:'XMLTag', field:'xmlTag', width:150},
 						{title:'创建人', field:'createBy', width:90},
 						{title:'创建时间', field:'createTime', width:90},
@@ -346,7 +346,7 @@
 <body style="margin:1px;">  
 <input type="hidden" id="nodeId" name="nodeId" value="${nodeId}" >
 <div class="easyui-layout" data-options="fit:true">  
-   <div data-options="region:'west',split:true" style="width:280px;">
+   <div data-options="region:'west',split:true" style="width:385px;">
 	  <div class="easyui-layout" data-options="fit:true">  
            
 			 <div data-options="region:'center',border:false">
