@@ -35,7 +35,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
- 
 import com.glaf.core.context.ContextFactory;
 import com.glaf.core.domain.Database;
 import com.glaf.core.el.ExpressionTools;
@@ -84,26 +83,20 @@ public class XmlExportDataBean {
 				sql = sqlExecutor.getSql();
 				logger.debug("sql:" + sql);
 				// logger.debug("params:" + parameter);
-
 				srcPsmt = srcConn.prepareStatement(sql);
-
 				if (sqlExecutor.getParameter() != null) {
 					// logger.debug("params:" + parameter);
 					logger.debug("parameter:" + sqlExecutor.getParameter());
-
 					List<Object> values = (List<Object>) sqlExecutor.getParameter();
 					JdbcUtils.fillStatement(srcPsmt, values);
 				}
 				srcRs = srcPsmt.executeQuery();
-
 				Map<String, XmlExportItem> itemMap = xmlExport.getItemMap();
 				while (srcRs.next()) {
 					datalist.add(this.toMap(srcRs, itemMap));
 				}
-
 				JdbcUtils.close(srcRs);
 				JdbcUtils.close(srcPsmt);
-
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -122,8 +115,6 @@ public class XmlExportDataBean {
 			srcConn = DBConnectionFactory.getConnection(srcDatabase.getName());
 			return this.getListData(xmlExport, srcConn);
 		} catch (Exception ex) {
-			ex.printStackTrace();
-			logger.error("execute sql query error", ex);
 			throw new RuntimeException(ex);
 		} finally {
 			JdbcUtils.close(srcConn);
@@ -137,8 +128,6 @@ public class XmlExportDataBean {
 			srcConn = DBConnectionFactory.getConnection(srcDatabase.getName());
 			return this.getListData(xmlExport, srcConn);
 		} catch (Exception ex) {
-			ex.printStackTrace();
-			logger.error("execute sql query error", ex);
 			throw new RuntimeException(ex);
 		} finally {
 			JdbcUtils.close(srcConn);
@@ -168,16 +157,12 @@ public class XmlExportDataBean {
 					JdbcUtils.fillStatement(srcPsmt, values);
 				}
 				srcRs = srcPsmt.executeQuery();
-
 				dataMap.putAll(params);
-
 				if (srcRs.next()) {
 					dataMap.putAll(this.toMap(srcRs, xmlExport.getItemMap()));
 				}
-
 				JdbcUtils.close(srcRs);
 				JdbcUtils.close(srcPsmt);
-
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -196,8 +181,6 @@ public class XmlExportDataBean {
 			srcConn = DBConnectionFactory.getConnection(srcDatabase.getName());
 			return this.getMapData(xmlExport, srcConn);
 		} catch (Exception ex) {
-			ex.printStackTrace();
-			logger.error("execute sql query error", ex);
 			throw new RuntimeException(ex);
 		} finally {
 			JdbcUtils.close(srcConn);
@@ -211,8 +194,6 @@ public class XmlExportDataBean {
 			srcConn = DBConnectionFactory.getConnection(srcDatabase.getName());
 			return this.getMapData(xmlExport, srcConn);
 		} catch (Exception ex) {
-			ex.printStackTrace();
-			logger.error("execute sql query error", ex);
 			throw new RuntimeException(ex);
 		} finally {
 			JdbcUtils.close(srcConn);

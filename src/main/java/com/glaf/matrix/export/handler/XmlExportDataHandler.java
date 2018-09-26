@@ -147,7 +147,6 @@ public class XmlExportDataHandler implements XmlDataHandler {
 
 			String sql = current.getSql();
 			if (StringUtils.isNotEmpty(sql) && DBUtils.isLegalQuerySql(sql)) {
-
 				XmlExportDataBean bean = new XmlExportDataBean();
 				Map<String, Object> dataMap = null;
 				List<Map<String, Object>> resultList = null;
@@ -185,11 +184,6 @@ public class XmlExportDataHandler implements XmlDataHandler {
 					}
 				} else {
 					/**
-					 * 处理多条记录
-					 */
-					Element elem = null;
-
-					/**
 					 * 处理树形结构的叶子节点
 					 */
 					if (StringUtils.equals(current.getTreeFlag(), "Y")
@@ -220,6 +214,7 @@ public class XmlExportDataHandler implements XmlDataHandler {
 									trees);
 						}
 					} else {
+						Element elem = null;
 						for (Map<String, Object> rowMap : resultList) {
 							/**
 							 * 在当前节点的父节点上添加下级节点
