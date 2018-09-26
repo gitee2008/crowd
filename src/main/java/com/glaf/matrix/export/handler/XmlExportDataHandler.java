@@ -18,12 +18,6 @@
 
 package com.glaf.matrix.export.handler;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -40,18 +34,13 @@ import org.dom4j.Element;
 import com.glaf.core.context.ContextFactory;
 import com.glaf.core.domain.Database;
 import com.glaf.core.el.ExpressionTools;
-import com.glaf.core.entity.SqlExecutor;
-import com.glaf.core.jdbc.DBConnectionFactory;
 import com.glaf.core.service.IDatabaseService;
 import com.glaf.core.tree.component.TreeComponent;
 import com.glaf.core.tree.helper.XmlTreeHelper;
 import com.glaf.core.util.DBUtils;
-import com.glaf.core.util.DateUtils;
-import com.glaf.core.util.JdbcUtils;
-import com.glaf.core.util.LowerLinkedMap;
 import com.glaf.core.util.ParamUtils;
-import com.glaf.core.util.QueryUtils;
 
+import com.glaf.matrix.export.bean.XmlExportDataBean;
 import com.glaf.matrix.export.domain.XmlExport;
 import com.glaf.matrix.export.domain.XmlExportItem;
 import com.glaf.matrix.export.service.XmlExportItemService;
@@ -74,14 +63,10 @@ public class XmlExportDataHandler implements XmlDataHandler {
 	/**
 	 * 增加XML节点
 	 * 
-	 * @param xmlExport
-	 *            导出定义
-	 * @param root
-	 *            根节点
-	 * @param databaseId
-	 *            数据库编号
+	 * @param xmlExport  导出定义
+	 * @param root       根节点
+	 * @param databaseId 数据库编号
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public void addChild(XmlExport xmlExport, org.dom4j.Element root, long databaseId) {
 		List<XmlExport> list = getXmlExportService().getAllChildren(xmlExport.getNodeId());
@@ -95,11 +80,8 @@ public class XmlExportDataHandler implements XmlDataHandler {
 			}
 		}
 
-		Map<String, Object> parameter = new HashMap<String, Object>();
-
 		List<XmlExportItem> items = getXmlExportItemService().getXmlExportItemsByExpId(xmlExport.getId());
 		xmlExport.setItems(items);
-
 		Database srcDatabase = getDatabaseService().getDatabaseById(databaseId);
 
 		if (xmlExport.getNodeParentId() == 0) {// 顶层节点，只能有一个根节点
@@ -107,67 +89,31 @@ public class XmlExportDataHandler implements XmlDataHandler {
 			if (StringUtils.equals(xmlExport.getResultFlag(), "S")) {
 				if (xmlExport.getItems() != null && !xmlExport.getItems().isEmpty()) {
 					String value = null;
-					Connection srcConn = null;
-					PreparedStatement srcPsmt = null;
-					ResultSet srcRs = null;
 					try {
-						String sql = xmlExport.getSql();
-						if (StringUtils.isNotEmpty(sql) && DBUtils.isLegalQuerySql(sql)) {
-							Map<String, Object> params = xmlExport.getParameter();
-							parameter.putAll(params);
-							SqlExecutor sqlExecutor = QueryUtils.replaceSQL(sql, parameter);
-							sql = sqlExecutor.getSql();
-							logger.debug("sql:" + sql);
-							// logger.debug("params:" + parameter);
-							srcConn = DBConnectionFactory.getConnection(srcDatabase.getName());
-							srcPsmt = srcConn.prepareStatement(sql);
-
-							if (sqlExecutor.getParameter() != null) {
-								// logger.debug("params:" + parameter);
-								logger.debug("parameter:" + sqlExecutor.getParameter());
-								List<Object> values = (List<Object>) sqlExecutor.getParameter();
-								JdbcUtils.fillStatement(srcPsmt, values);
-							}
-							srcRs = srcPsmt.executeQuery();
-							Map<String, Object> dataMap = new HashMap<String, Object>();
-							dataMap.putAll(params);
-
-							if (StringUtils.equals(xmlExport.getResultFlag(), "S")) {
-								if (srcRs.next()) {
-									dataMap.putAll(this.toMap(srcRs, xmlExport.getItemMap()));
-								}
-							}
-
-							JdbcUtils.close(srcRs);
-							JdbcUtils.close(srcPsmt);
-							JdbcUtils.close(srcConn);
-
-							for (XmlExportItem item : xmlExport.getItems()) {
-								/**
-								 * 处理属性
-								 */
-								if (StringUtils.equals(item.getTagFlag(), "A")) {
-									if (StringUtils.isNotEmpty(item.getExpression())) {
-										value = ExpressionTools.evaluate(item.getExpression(), dataMap);
-									} else {
-										value = ParamUtils.getString(dataMap, item.getName().toLowerCase());
-									}
-									if (StringUtils.isNotEmpty(value)) {
-										root.addAttribute(item.getName(), value);
-									}
+						Map<String, Object> dataMap = null;
+						if (StringUtils.equals(xmlExport.getResultFlag(), "S")) {
+							XmlExportDataBean bean = new XmlExportDataBean();
+							dataMap = bean.getMapData(xmlExport, databaseId);
+						}
+						for (XmlExportItem item : xmlExport.getItems()) {
+							/**
+							 * 处理属性
+							 */
+							if (StringUtils.equals(item.getTagFlag(), "A")) {
+								if (StringUtils.isNotEmpty(item.getExpression())) {
+									value = ExpressionTools.evaluate(item.getExpression(), dataMap);
 								} else {
-									root.addElement(item.getName(), value);
+									value = ParamUtils.getString(dataMap, item.getName().toLowerCase());
 								}
+								if (StringUtils.isNotEmpty(value)) {
+									root.addAttribute(item.getName(), value);
+								}
+							} else {
+								root.addElement(item.getName(), value);
 							}
 						}
 					} catch (Exception ex) {
-						ex.printStackTrace();
-						logger.error("execute sql query error", ex);
 						throw new RuntimeException(ex);
-					} finally {
-						JdbcUtils.close(srcRs);
-						JdbcUtils.close(srcPsmt);
-						JdbcUtils.close(srcConn);
 					}
 				}
 			}
@@ -190,56 +136,28 @@ public class XmlExportDataHandler implements XmlDataHandler {
 	 * @param xmlExport
 	 * @param databaseId
 	 */
-	@SuppressWarnings("unchecked")
 	public void addChild(XmlExport current, Database srcDatabase) {
 		Map<String, Object> parameter = new HashMap<String, Object>();
-		Connection srcConn = null;
-		PreparedStatement srcPsmt = null;
-		ResultSet srcRs = null;
 		String value = null;
 		try {
 			if (current.getItems() == null || current.getItems().isEmpty()) {
 				List<XmlExportItem> items = getXmlExportItemService().getXmlExportItemsByExpId(current.getId());
 				current.setItems(items);
 			}
+
 			String sql = current.getSql();
 			if (StringUtils.isNotEmpty(sql) && DBUtils.isLegalQuerySql(sql)) {
-				Map<String, Object> params = current.getParameter();
-				parameter.putAll(params);
-				SqlExecutor sqlExecutor = QueryUtils.replaceSQL(sql, parameter);
-				sql = sqlExecutor.getSql();
-				logger.debug("sql:" + sql);
-				// logger.debug("params:" + parameter);
-				srcConn = DBConnectionFactory.getConnection(srcDatabase.getName());
-				srcPsmt = srcConn.prepareStatement(sql);
 
-				if (sqlExecutor.getParameter() != null) {
-					// logger.debug("params:" + parameter);
-					logger.debug("parameter:" + sqlExecutor.getParameter());
-					List<Object> values = (List<Object>) sqlExecutor.getParameter();
-					JdbcUtils.fillStatement(srcPsmt, values);
-				}
-				srcRs = srcPsmt.executeQuery();
-				Map<String, Object> dataMap = new HashMap<String, Object>();
-				dataMap.putAll(params);
-				List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
+				XmlExportDataBean bean = new XmlExportDataBean();
+				Map<String, Object> dataMap = null;
+				List<Map<String, Object>> resultList = null;
 
 				if (StringUtils.equals(current.getResultFlag(), "S")) {
-					if (srcRs.next()) {
-						dataMap.putAll(this.toMap(srcRs, current.getItemMap()));
-					}
+					dataMap = bean.getMapData(current, srcDatabase);
 				} else {
-					Map<String, XmlExportItem> itemMap = current.getItemMap();
-					while (srcRs.next()) {
-						resultList.add(this.toMap(srcRs, itemMap));
-					}
+					resultList = bean.getListData(current, srcDatabase);
 				}
 
-				JdbcUtils.close(srcRs);
-				JdbcUtils.close(srcPsmt);
-				JdbcUtils.close(srcConn);
-
-				logger.debug("result size:" + resultList.size());
 				current.setDataList(resultList);
 
 				/**
@@ -429,13 +347,7 @@ public class XmlExportDataHandler implements XmlDataHandler {
 				}
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
-			logger.error("execute sql query error", ex);
 			throw new RuntimeException(ex);
-		} finally {
-			JdbcUtils.close(srcRs);
-			JdbcUtils.close(srcPsmt);
-			JdbcUtils.close(srcConn);
 		}
 	}
 
@@ -470,64 +382,6 @@ public class XmlExportDataHandler implements XmlDataHandler {
 
 	public void setXmlExportService(XmlExportService xmlExportService) {
 		this.xmlExportService = xmlExportService;
-	}
-
-	public Map<String, Object> toMap(ResultSet rs, Map<String, XmlExportItem> itemMap) throws SQLException {
-		Map<String, Object> resultMap = new LowerLinkedMap();
-		ResultSetMetaData rsmd = rs.getMetaData();
-		DecimalFormat formater1 = new DecimalFormat("###");
-		DecimalFormat formater2 = new DecimalFormat("###.##");
-		int count = rsmd.getColumnCount();
-		for (int i = 1; i <= count; i++) {
-			String columnName = rsmd.getColumnLabel(i);
-			if (StringUtils.isEmpty(columnName)) {
-				columnName = rsmd.getColumnName(i);
-			}
-			columnName = columnName.toLowerCase();
-			Object object = rs.getObject(i);
-			if (object != null) {
-				if (object instanceof java.util.Date) {
-					java.util.Date date = (java.util.Date) object;
-					resultMap.put(columnName, DateUtils.getDate(date));
-				} else if (object instanceof Integer) {
-					int val = (int) object;
-					resultMap.put(columnName, formater1.format(val));
-				} else if (object instanceof Long) {
-					long val = (long) object;
-					resultMap.put(columnName, formater1.format(val));
-				} else if (object instanceof Double) {
-					double val = (double) object;
-					resultMap.put(columnName, formater2.format(val));
-				} else if (object instanceof java.math.BigInteger) {
-					java.math.BigInteger val = (java.math.BigInteger) object;
-					resultMap.put(columnName, formater1.format(val.longValue()));
-				} else if (object instanceof java.math.BigDecimal) {
-					java.math.BigDecimal val = (java.math.BigDecimal) object;
-					resultMap.put(columnName, formater2.format(val.doubleValue()));
-				} else {
-					resultMap.put(columnName, object);
-				}
-			} else {
-				XmlExportItem item = itemMap.get(columnName);
-				if (item != null && StringUtils.isNotEmpty(item.getDefaultValue())) {
-					resultMap.put(columnName, item.getDefaultValue());
-				}
-			}
-		}
-
-		Set<Entry<String, XmlExportItem>> entrySet = itemMap.entrySet();
-		for (Entry<String, XmlExportItem> entry : entrySet) {
-			String key = entry.getKey();
-			XmlExportItem item = entry.getValue();
-			if (resultMap.get(key) == null && StringUtils.isNotEmpty(item.getExpression())) {
-				String value = ExpressionTools.evaluate(item.getExpression(), resultMap);
-				if (value != null) {
-					resultMap.put(key, value);
-				}
-			}
-		}
-
-		return resultMap;
 	}
 
 }
