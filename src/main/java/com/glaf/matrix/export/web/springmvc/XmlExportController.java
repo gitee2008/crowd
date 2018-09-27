@@ -641,6 +641,7 @@ public class XmlExportController {
 			xmlExport.setXmlTag(request.getParameter("xmlTag"));
 			xmlExport.setTemplateId(request.getParameter("templateId"));
 			xmlExport.setExternalAttrsFlag(request.getParameter("externalAttrsFlag"));
+			xmlExport.setAllowRoles(request.getParameter("allowRoles"));
 			xmlExport.setInterval(RequestUtils.getInt(request, "interval"));
 			xmlExport.setSortNo(RequestUtils.getInt(request, "sortNo"));
 			xmlExport.setCreateBy(actorId);

@@ -126,6 +126,12 @@ public class XmlExport implements Serializable, JSONable {
 	protected String externalAttrsFlag;
 
 	/**
+	 * 允许角色
+	 */
+	@Column(name = "ALLOWROLES_", length = 4000)
+	protected String allowRoles;
+
+	/**
 	 * 时间间隔
 	 */
 	@Column(name = "INTERVAL_")
@@ -211,6 +217,13 @@ public class XmlExport implements Serializable, JSONable {
 		items.add(item);
 	}
 
+	public void addChild(XmlExport child) {
+		if (children == null) {
+			children = new ArrayList<XmlExport>();
+		}
+		children.add(child);
+	}
+
 	public void addElement(String name, String title) {
 		if (items == null) {
 			items = new ArrayList<XmlExportItem>();
@@ -220,13 +233,6 @@ public class XmlExport implements Serializable, JSONable {
 		item.setName(name);
 		item.setTitle(title);
 		items.add(item);
-	}
-
-	public void addChild(XmlExport child) {
-		if (children == null) {
-			children = new ArrayList<XmlExport>();
-		}
-		children.add(child);
 	}
 
 	public void addItem(XmlExportItem item) {
@@ -255,6 +261,10 @@ public class XmlExport implements Serializable, JSONable {
 
 	public String getActive() {
 		return active;
+	}
+
+	public String getAllowRoles() {
+		return allowRoles;
 	}
 
 	public String getBlank() {
@@ -412,6 +422,10 @@ public class XmlExport implements Serializable, JSONable {
 
 	public void setActive(String active) {
 		this.active = active;
+	}
+
+	public void setAllowRoles(String allowRoles) {
+		this.allowRoles = allowRoles;
 	}
 
 	public void setBlank(String blank) {

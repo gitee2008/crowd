@@ -26,6 +26,8 @@
 			jdbcType="VARCHAR" />
 		<result property="externalAttrsFlag"
 			column="EXTERNALATTRSFLAG_" jdbcType="VARCHAR" />
+		<result property="allowRoles" column="ALLOWROLES_"
+			jdbcType="VARCHAR" />
 		<result property="interval" column="INTERVAL_"
 			jdbcType="INTEGER" />
 		<result property="sortNo" column="SORTNO_" jdbcType="INTEGER" />
@@ -84,6 +86,9 @@
 			</if>
 			<if test="externalAttrsFlag != null">
 				,EXTERNALATTRSFLAG_
+			</if>
+			<if test="allowRoles != null">
+				,ALLOWROLES_
 			</if>
 			<if test="interval != null">
 				,INTERVAL_
@@ -149,6 +154,9 @@
 			</if>
 			<if test="externalAttrsFlag != null">
 				,#{externalAttrsFlag, jdbcType=VARCHAR}
+			</if>
+			<if test="allowRoles != null">
+				,#{allowRoles, jdbcType=VARCHAR}
 			</if>
 			<if test="interval != null">
 				,#{interval, jdbcType=INTEGER}
@@ -219,6 +227,9 @@
 			<if test="externalAttrsFlag != null">
 				EXTERNALATTRSFLAG_ = #{externalAttrsFlag,
 				jdbcType=VARCHAR},
+			</if>
+			<if test="allowRoles != null">
+				ALLOWROLES_ = #{allowRoles, jdbcType=VARCHAR},
 			</if>
 			<if test="interval != null">
 				INTERVAL_ = #{interval, jdbcType=INTEGER},

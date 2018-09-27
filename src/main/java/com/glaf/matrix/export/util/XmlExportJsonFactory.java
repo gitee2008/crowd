@@ -79,6 +79,9 @@ public class XmlExportJsonFactory {
 		if (jsonObject.containsKey("externalAttrsFlag")) {
 			model.setExternalAttrsFlag(jsonObject.getString("externalAttrsFlag"));
 		}
+		if (jsonObject.containsKey("allowRoles")) {
+			model.setAllowRoles(jsonObject.getString("allowRoles"));
+		}
 		if (jsonObject.containsKey("interval")) {
 			model.setInterval(jsonObject.getInteger("interval"));
 		}
@@ -138,6 +141,9 @@ public class XmlExportJsonFactory {
 		}
 		if (model.getExternalAttrsFlag() != null) {
 			jsonObject.put("externalAttrsFlag", model.getExternalAttrsFlag());
+		}
+		if (model.getAllowRoles() != null) {
+			jsonObject.put("allowRoles", model.getAllowRoles());
 		}
 		jsonObject.put("interval", model.getInterval());
 		if (model.getCreateBy() != null) {
@@ -211,6 +217,9 @@ public class XmlExportJsonFactory {
 		}
 		if (model.getExternalAttrsFlag() != null) {
 			jsonObject.put("externalAttrsFlag", model.getExternalAttrsFlag());
+		}
+		if (model.getAllowRoles() != null) {
+			jsonObject.put("allowRoles", model.getAllowRoles());
 		}
 		jsonObject.put("interval", model.getInterval());
 		if (model.getCreateBy() != null) {

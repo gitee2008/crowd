@@ -66,12 +66,6 @@ public class DataExportJsonFactory {
 		if (jsonObject.containsKey("templateId")) {
 			model.setTemplateId(jsonObject.getString("templateId"));
 		}
-		if (jsonObject.containsKey("externalColumnsFlag")) {
-			model.setExternalColumnsFlag(jsonObject.getString("externalColumnsFlag"));
-		}
-		if (jsonObject.containsKey("interval")) {
-			model.setInterval(jsonObject.getInteger("interval"));
-		}
 		if (jsonObject.containsKey("sortNo")) {
 			model.setSortNo(jsonObject.getInteger("sortNo"));
 		}
@@ -125,10 +119,6 @@ public class DataExportJsonFactory {
 		if (model.getTemplateId() != null) {
 			jsonObject.put("templateId", model.getTemplateId());
 		}
-		if (model.getExternalColumnsFlag() != null) {
-			jsonObject.put("externalColumnsFlag", model.getExternalColumnsFlag());
-		}
-		jsonObject.put("interval", model.getInterval());
 		if (model.getCreateBy() != null) {
 			jsonObject.put("createBy", model.getCreateBy());
 		}
@@ -181,10 +171,6 @@ public class DataExportJsonFactory {
 		if (model.getTemplateId() != null) {
 			jsonObject.put("templateId", model.getTemplateId());
 		}
-		if (model.getExternalColumnsFlag() != null) {
-			jsonObject.put("externalColumnsFlag", model.getExternalColumnsFlag());
-		}
-		jsonObject.put("interval", model.getInterval());
 		if (model.getCreateBy() != null) {
 			jsonObject.put("createBy", model.getCreateBy());
 		}
