@@ -33,6 +33,7 @@ import com.glaf.core.dao.EntityDAO;
 import com.glaf.core.id.IdGenerator;
 import com.glaf.core.util.UUID32;
 import com.glaf.matrix.export.domain.XmlExportItem;
+import com.glaf.matrix.export.factory.XmlExportFactory;
 import com.glaf.matrix.export.mapper.XmlExportItemMapper;
 import com.glaf.matrix.export.query.XmlExportItemQuery;
 
@@ -63,12 +64,14 @@ public class XmlExportItemServiceImpl implements XmlExportItemService {
 	public void deleteById(String id) {
 		if (id != null) {
 			xmlExportItemMapper.deleteXmlExportItemById(id);
+			XmlExportFactory.clearAll();
 		}
 	}
 
 	@Transactional
 	public void deleteByIds(List<String> ids) {
 		if (ids != null && !ids.isEmpty()) {
+			XmlExportFactory.clearAll();
 			for (String id : ids) {
 				xmlExportItemMapper.deleteXmlExportItemById(id);
 			}
@@ -123,6 +126,8 @@ public class XmlExportItemServiceImpl implements XmlExportItemService {
 		} else {
 			xmlExportItemMapper.updateXmlExportItem(xmlExportItem);
 		}
+
+		XmlExportFactory.clearAll();
 	}
 
 	@javax.annotation.Resource

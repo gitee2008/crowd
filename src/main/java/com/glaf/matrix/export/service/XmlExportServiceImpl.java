@@ -38,6 +38,7 @@ import com.glaf.core.security.Authentication;
 import com.glaf.core.util.UUID32;
 import com.glaf.matrix.export.domain.XmlExport;
 import com.glaf.matrix.export.domain.XmlExportItem;
+import com.glaf.matrix.export.factory.XmlExportFactory;
 import com.glaf.matrix.export.mapper.XmlExportMapper;
 import com.glaf.matrix.export.mapper.XmlExportItemMapper;
 import com.glaf.matrix.export.query.XmlExportQuery;
@@ -73,12 +74,14 @@ public class XmlExportServiceImpl implements XmlExportService {
 	public void deleteById(String id) {
 		if (id != null) {
 			xmlExportMapper.deleteXmlExportById(id);
+			XmlExportFactory.clearAll();
 		}
 	}
 
 	@Transactional
 	public void deleteByIds(List<String> ids) {
 		if (ids != null && !ids.isEmpty()) {
+			XmlExportFactory.clearAll();
 			for (String id : ids) {
 				xmlExportMapper.deleteXmlExportById(id);
 			}
@@ -299,6 +302,7 @@ public class XmlExportServiceImpl implements XmlExportService {
 		} else {
 			xmlExportMapper.updateXmlExport(xmlExport);
 		}
+		XmlExportFactory.clearAll();
 	}
 
 	@Transactional
@@ -320,6 +324,8 @@ public class XmlExportServiceImpl implements XmlExportService {
 					xmlExportItemMapper.insertXmlExportItem(item);
 				}
 			}
+
+			XmlExportFactory.clearAll();
 
 			return model.getId();
 		}

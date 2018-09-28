@@ -43,18 +43,13 @@ import com.glaf.core.util.ParamUtils;
 import com.glaf.matrix.export.bean.XmlExportDataBean;
 import com.glaf.matrix.export.domain.XmlExport;
 import com.glaf.matrix.export.domain.XmlExportItem;
-import com.glaf.matrix.export.service.XmlExportItemService;
-import com.glaf.matrix.export.service.XmlExportService;
+import com.glaf.matrix.export.factory.XmlExportFactory;
 
 public class XmlExportDataHandler implements XmlDataHandler {
 
 	protected static final Log logger = LogFactory.getLog(XmlExportDataHandler.class);
 
 	protected IDatabaseService databaseService;
-
-	protected XmlExportService xmlExportService;
-
-	protected XmlExportItemService xmlExportItemService;
 
 	public XmlExportDataHandler() {
 
@@ -69,10 +64,10 @@ public class XmlExportDataHandler implements XmlDataHandler {
 	 */
 	@Override
 	public void addChild(XmlExport xmlExport, org.dom4j.Element root, long databaseId) {
-		List<XmlExport> list = getXmlExportService().getAllChildren(xmlExport.getNodeId());
+		List<XmlExport> list = XmlExportFactory.getAllChildren(xmlExport.getNodeId());
 		if (list != null && !list.isEmpty()) {
 			for (XmlExport export : list) {
-				List<XmlExport> children = getXmlExportService().getChildrenWithItems(export.getNodeId());
+				List<XmlExport> children = XmlExportFactory.getChildrenWithItems(export.getNodeId());
 				export.setChildren(children);
 				if (export.getNodeParentId() == xmlExport.getNodeId()) {
 					xmlExport.addChild(export);
@@ -80,7 +75,7 @@ public class XmlExportDataHandler implements XmlDataHandler {
 			}
 		}
 
-		List<XmlExportItem> items = getXmlExportItemService().getXmlExportItemsByExpId(xmlExport.getId());
+		List<XmlExportItem> items = XmlExportFactory.getXmlExportItemsByExpId(xmlExport.getId());
 		xmlExport.setItems(items);
 		Database srcDatabase = getDatabaseService().getDatabaseById(databaseId);
 
@@ -119,7 +114,7 @@ public class XmlExportDataHandler implements XmlDataHandler {
 			}
 		}
 
-		List<XmlExport> children = getXmlExportService().getChildrenWithItems(xmlExport.getNodeId());
+		List<XmlExport> children = XmlExportFactory.getChildrenWithItems(xmlExport.getNodeId());
 		if (children != null && !children.isEmpty()) {
 			xmlExport.setElement(root);
 			logger.debug("---------------------------gen child xml----------------------------");
@@ -141,7 +136,7 @@ public class XmlExportDataHandler implements XmlDataHandler {
 		String value = null;
 		try {
 			if (current.getItems() == null || current.getItems().isEmpty()) {
-				List<XmlExportItem> items = getXmlExportItemService().getXmlExportItemsByExpId(current.getId());
+				List<XmlExportItem> items = XmlExportFactory.getXmlExportItemsByExpId(current.getId());
 				current.setItems(items);
 			}
 
@@ -252,7 +247,7 @@ public class XmlExportDataHandler implements XmlDataHandler {
 							List<XmlExport> children = current.getChildren();
 							if (children == null || children.isEmpty()) {
 								if (!StringUtils.equals(current.getLeafFlag(), "Y")) {
-									children = getXmlExportService().getChildrenWithItems(current.getNodeId());
+									children = XmlExportFactory.getChildrenWithItems(current.getNodeId());
 								}
 							}
 							// logger.debug("->children:" + children);
@@ -318,7 +313,7 @@ public class XmlExportDataHandler implements XmlDataHandler {
 				List<XmlExport> children = current.getChildren();
 				if (children == null || children.isEmpty()) {
 					if (!StringUtils.equals(current.getLeafFlag(), "Y")) {
-						children = getXmlExportService().getChildrenWithItems(current.getNodeId());
+						children = XmlExportFactory.getChildrenWithItems(current.getNodeId());
 					}
 				}
 				// logger.debug("->children:" + children);
@@ -353,30 +348,8 @@ public class XmlExportDataHandler implements XmlDataHandler {
 		return databaseService;
 	}
 
-	public XmlExportItemService getXmlExportItemService() {
-		if (xmlExportItemService == null) {
-			xmlExportItemService = ContextFactory.getBean("com.glaf.matrix.export.service.xmlExportItemService");
-		}
-		return xmlExportItemService;
-	}
-
-	public XmlExportService getXmlExportService() {
-		if (xmlExportService == null) {
-			xmlExportService = ContextFactory.getBean("com.glaf.matrix.export.service.xmlExportService");
-		}
-		return xmlExportService;
-	}
-
 	public void setDatabaseService(IDatabaseService databaseService) {
 		this.databaseService = databaseService;
-	}
-
-	public void setXmlExportItemService(XmlExportItemService xmlExportItemService) {
-		this.xmlExportItemService = xmlExportItemService;
-	}
-
-	public void setXmlExportService(XmlExportService xmlExportService) {
-		this.xmlExportService = xmlExportService;
 	}
 
 }

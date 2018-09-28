@@ -46,20 +46,15 @@ import com.glaf.core.util.DateUtils;
 import com.glaf.core.util.JdbcUtils;
 import com.glaf.core.util.LowerLinkedMap;
 import com.glaf.core.util.QueryUtils;
+
 import com.glaf.matrix.export.domain.XmlExport;
 import com.glaf.matrix.export.domain.XmlExportItem;
-import com.glaf.matrix.export.service.XmlExportItemService;
-import com.glaf.matrix.export.service.XmlExportService;
 
 public class XmlExportDataBean {
 
 	protected static final Log logger = LogFactory.getLog(XmlExportDataBean.class);
 
 	protected IDatabaseService databaseService;
-
-	protected XmlExportService xmlExportService;
-
-	protected XmlExportItemService xmlExportItemService;
 
 	public IDatabaseService getDatabaseService() {
 		if (databaseService == null) {
@@ -200,30 +195,8 @@ public class XmlExportDataBean {
 		}
 	}
 
-	public XmlExportItemService getXmlExportItemService() {
-		if (xmlExportItemService == null) {
-			xmlExportItemService = ContextFactory.getBean("com.glaf.matrix.export.service.xmlExportItemService");
-		}
-		return xmlExportItemService;
-	}
-
-	public XmlExportService getXmlExportService() {
-		if (xmlExportService == null) {
-			xmlExportService = ContextFactory.getBean("com.glaf.matrix.export.service.xmlExportService");
-		}
-		return xmlExportService;
-	}
-
 	public void setDatabaseService(IDatabaseService databaseService) {
 		this.databaseService = databaseService;
-	}
-
-	public void setXmlExportItemService(XmlExportItemService xmlExportItemService) {
-		this.xmlExportItemService = xmlExportItemService;
-	}
-
-	public void setXmlExportService(XmlExportService xmlExportService) {
-		this.xmlExportService = xmlExportService;
 	}
 
 	public Map<String, Object> toMap(ResultSet rs, Map<String, XmlExportItem> itemMap) throws SQLException {
