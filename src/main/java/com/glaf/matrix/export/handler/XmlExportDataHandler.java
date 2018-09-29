@@ -134,6 +134,8 @@ public class XmlExportDataHandler implements XmlDataHandler {
 	public void addChild(XmlExport current, Database srcDatabase) {
 		Map<String, Object> parameter = new HashMap<String, Object>();
 		String value = null;
+		Map<String, Object> dataMap = null;
+		List<Map<String, Object>> resultList = null;
 		try {
 			if (current.getItems() == null || current.getItems().isEmpty()) {
 				List<XmlExportItem> items = XmlExportFactory.getXmlExportItemsByExpId(current.getId());
@@ -141,47 +143,43 @@ public class XmlExportDataHandler implements XmlDataHandler {
 			}
 
 			String sql = current.getSql();
-			if (StringUtils.isNotEmpty(sql) && DBUtils.isLegalQuerySql(sql)) {
+			if (current.getItems() != null && !current.getItems().isEmpty() && StringUtils.isNotEmpty(sql)
+					&& DBUtils.isLegalQuerySql(sql)) {
 				XmlExportDataBean bean = new XmlExportDataBean();
-				Map<String, Object> dataMap = null;
-				List<Map<String, Object>> resultList = null;
 
 				if (StringUtils.equals(current.getResultFlag(), "S")) {
 					dataMap = bean.getMapData(current, srcDatabase);
 				} else {
 					resultList = bean.getListData(current, srcDatabase);
+					current.setDataList(resultList);
 				}
-
-				current.setDataList(resultList);
 
 				/**
 				 * 处理单一记录
 				 */
 				if (StringUtils.equals(current.getResultFlag(), "S")) {
-					if (current.getItems() != null && !current.getItems().isEmpty()) {
-						for (XmlExportItem item : current.getItems()) {
-							/**
-							 * 处理属性
-							 */
-							if (StringUtils.equals(item.getTagFlag(), "A")) {
-								if (StringUtils.isNotEmpty(item.getExpression())) {
-									value = ExpressionTools.evaluate(item.getExpression(), dataMap);
-								} else {
-									value = ParamUtils.getString(dataMap, item.getName().toLowerCase());
-								}
-								if (StringUtils.isNotEmpty(value)) {
-									current.getElement().addAttribute(item.getName(), value);
-								}
+					for (XmlExportItem item : current.getItems()) {
+						/**
+						 * 处理属性
+						 */
+						if (StringUtils.equals(item.getTagFlag(), "A")) {
+							if (StringUtils.isNotEmpty(item.getExpression())) {
+								value = ExpressionTools.evaluate(item.getExpression(), dataMap);
 							} else {
-								current.getElement().addElement(item.getName(), value);
+								value = ParamUtils.getString(dataMap, item.getName().toLowerCase());
 							}
+							if (StringUtils.isNotEmpty(value)) {
+								current.getElement().addAttribute(item.getName(), value);
+							}
+						} else {
+							current.getElement().addElement(item.getName(), value);
 						}
 					}
 				} else {
 					/**
 					 * 处理树形结构的叶子节点
 					 */
-					if (StringUtils.equals(current.getTreeFlag(), "Y")
+					if (resultList != null && !resultList.isEmpty() && StringUtils.equals(current.getTreeFlag(), "Y")
 							&& StringUtils.equals(current.getLeafFlag(), "Y")) {
 						List<TreeComponent> trees = new ArrayList<TreeComponent>();
 						for (Map<String, Object> rowMap : resultList) {
@@ -196,111 +194,113 @@ public class XmlExportDataHandler implements XmlDataHandler {
 							trees.add(tree);
 						}
 						// this.processTreeNode(current, trees);
-						if (current.getItems() != null && !current.getItems().isEmpty()) {
-							/**
-							 * 有序HashMap
-							 */
-							Map<String, String> elemMap = new LinkedHashMap<String, String>();
-							for (XmlExportItem item : current.getItems()) {
-								elemMap.put(item.getName(), item.getTagFlag());
-							}
-							XmlTreeHelper xmlTreeHelper = new XmlTreeHelper();
-							xmlTreeHelper.appendChild(current.getParent().getElement(), current.getXmlTag(), elemMap,
-									trees);
+
+						/**
+						 * 有序HashMap
+						 */
+						Map<String, String> elemMap = new LinkedHashMap<String, String>();
+						for (XmlExportItem item : current.getItems()) {
+							elemMap.put(item.getName(), item.getTagFlag());
 						}
+						XmlTreeHelper xmlTreeHelper = new XmlTreeHelper();
+						xmlTreeHelper.appendChild(current.getParent().getElement(), current.getXmlTag(), elemMap,
+								trees);
 					} else {
-						Element elem = null;
-						for (Map<String, Object> rowMap : resultList) {
-							/**
-							 * 在当前节点的父节点上添加下级节点
-							 */
-							elem = current.getParent().getElement().addElement(current.getXmlTag());
-							// logger.debug("----<" + current.getXmlTag() + ">" + current.getTitle() +
-							// "----");
-							// logger.debug("elem:" + elem);
-							// logger.debug("current.getItems():" + current.getItems());
-							if (elem != null && current.getItems() != null && !current.getItems().isEmpty()) {
-								for (XmlExportItem item : current.getItems()) {
-									/**
-									 * 处理属性
-									 */
-									if (StringUtils.equals(item.getTagFlag(), "A")) {
-										if (StringUtils.isNotEmpty(item.getExpression())) {
-											value = ExpressionTools.evaluate(item.getExpression(), rowMap);
+						if (resultList != null && !resultList.isEmpty()) {
+							Element elem = null;
+							for (Map<String, Object> rowMap : resultList) {
+								/**
+								 * 在当前节点的父节点上添加下级节点
+								 */
+								elem = current.getParent().getElement().addElement(current.getXmlTag());
+								// logger.debug("----<" + current.getXmlTag() + ">" + current.getTitle() +
+								// "----");
+								// logger.debug("elem:" + elem);
+								// logger.debug("current.getItems():" + current.getItems());
+								if (elem != null) {
+									for (XmlExportItem item : current.getItems()) {
+										/**
+										 * 处理属性
+										 */
+										if (StringUtils.equals(item.getTagFlag(), "A")) {
+											if (StringUtils.isNotEmpty(item.getExpression())) {
+												value = ExpressionTools.evaluate(item.getExpression(), rowMap);
+											} else {
+												value = ParamUtils.getString(rowMap,
+														item.getName().trim().toLowerCase());
+											}
+											if (StringUtils.isNotEmpty(value)) {
+												elem.addAttribute(item.getName(), value);
+											}
 										} else {
-											value = ParamUtils.getString(rowMap, item.getName().trim().toLowerCase());
+											elem.addElement(item.getName(), value);
 										}
-										if (StringUtils.isNotEmpty(value)) {
-											elem.addAttribute(item.getName(), value);
+									}
+								}
+
+								// logger.debug("elem:" + elem);
+
+								/**
+								 * 处理每条记录的子孙节点
+								 */
+								List<XmlExport> children = current.getChildren();
+								if (children == null || children.isEmpty()) {
+									if (!StringUtils.equals(current.getLeafFlag(), "Y")) {
+										children = XmlExportFactory.getChildrenWithItems(current.getNodeId());
+									}
+								}
+								// logger.debug("->children:" + children);
+								if (children != null && !children.isEmpty()) {
+									current.setElement(elem);
+
+									Set<Entry<String, Object>> entrySet0 = rowMap.entrySet();
+									for (Entry<String, Object> entry : entrySet0) {
+										String key = entry.getKey();
+										Object val = entry.getValue();
+										parameter.put(key, val);
+									}
+
+									if (StringUtils.isNotEmpty(current.getName())) {
+										Set<Entry<String, Object>> entrySet = current.getParameter().entrySet();
+										for (Entry<String, Object> entry : entrySet) {
+											String key = entry.getKey();
+											Object val = entry.getValue();
+											parameter.put(current.getName() + "_" + key, val);
 										}
-									} else {
-										elem.addElement(item.getName(), value);
 									}
-								}
-							}
 
-							// logger.debug("elem:" + elem);
-
-							/**
-							 * 处理每条记录的子孙节点
-							 */
-							List<XmlExport> children = current.getChildren();
-							if (children == null || children.isEmpty()) {
-								if (!StringUtils.equals(current.getLeafFlag(), "Y")) {
-									children = XmlExportFactory.getChildrenWithItems(current.getNodeId());
-								}
-							}
-							// logger.debug("->children:" + children);
-							if (children != null && !children.isEmpty()) {
-								current.setElement(elem);
-
-								Set<Entry<String, Object>> entrySet0 = rowMap.entrySet();
-								for (Entry<String, Object> entry : entrySet0) {
-									String key = entry.getKey();
-									Object val = entry.getValue();
-									parameter.put(key, val);
-								}
-
-								if (StringUtils.isNotEmpty(current.getName())) {
-									Set<Entry<String, Object>> entrySet = current.getParameter().entrySet();
-									for (Entry<String, Object> entry : entrySet) {
-										String key = entry.getKey();
-										Object val = entry.getValue();
-										parameter.put(current.getName() + "_" + key, val);
+									if (StringUtils.isNotEmpty(current.getMapping())) {
+										Set<Entry<String, Object>> entrySet = current.getParameter().entrySet();
+										for (Entry<String, Object> entry : entrySet) {
+											String key = entry.getKey();
+											Object val = entry.getValue();
+											parameter.put(current.getMapping() + "_" + key, val);
+										}
 									}
-								}
 
-								if (StringUtils.isNotEmpty(current.getMapping())) {
-									Set<Entry<String, Object>> entrySet = current.getParameter().entrySet();
-									for (Entry<String, Object> entry : entrySet) {
-										String key = entry.getKey();
-										Object val = entry.getValue();
-										parameter.put(current.getMapping() + "_" + key, val);
+									if (StringUtils.isNotEmpty(current.getName())) {
+										Set<Entry<String, Object>> entrySet = rowMap.entrySet();
+										for (Entry<String, Object> entry : entrySet) {
+											String key = entry.getKey();
+											Object val = entry.getValue();
+											parameter.put(current.getName() + "_" + key, val);
+										}
 									}
-								}
 
-								if (StringUtils.isNotEmpty(current.getName())) {
-									Set<Entry<String, Object>> entrySet = rowMap.entrySet();
-									for (Entry<String, Object> entry : entrySet) {
-										String key = entry.getKey();
-										Object val = entry.getValue();
-										parameter.put(current.getName() + "_" + key, val);
+									if (StringUtils.isNotEmpty(current.getMapping())) {
+										Set<Entry<String, Object>> entrySet = rowMap.entrySet();
+										for (Entry<String, Object> entry : entrySet) {
+											String key = entry.getKey();
+											Object val = entry.getValue();
+											parameter.put(current.getMapping() + "_" + key, val);
+										}
 									}
-								}
 
-								if (StringUtils.isNotEmpty(current.getMapping())) {
-									Set<Entry<String, Object>> entrySet = rowMap.entrySet();
-									for (Entry<String, Object> entry : entrySet) {
-										String key = entry.getKey();
-										Object val = entry.getValue();
-										parameter.put(current.getMapping() + "_" + key, val);
+									for (XmlExport child : children) {
+										child.setParent(current);
+										child.setParameter(parameter);
+										this.addChild(child, srcDatabase);
 									}
-								}
-
-								for (XmlExport child : children) {
-									child.setParent(current);
-									child.setParameter(parameter);
-									this.addChild(child, srcDatabase);
 								}
 							}
 						}
