@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,6 +72,7 @@ import com.glaf.core.util.ParamUtils;
 import com.glaf.core.util.RequestUtils;
 import com.glaf.core.util.ResponseUtils;
 import com.glaf.core.util.StaxonUtils;
+import com.glaf.core.util.StringTools;
 import com.glaf.core.util.Tools;
 
 import com.glaf.matrix.export.domain.XmlExport;
@@ -260,16 +262,33 @@ public class XmlExportController {
 		try {
 			XmlExport xmlExport = xmlExportService.getXmlExport(expId);
 			if (xmlExport != null && StringUtils.equals(xmlExport.getActive(), "Y")) {
-				xmlExport.setParameter(params);
-				XmlDataHandler xmlDataHandler = new XmlExportDataHandler();
-				org.dom4j.Document document = DocumentHelper.createDocument();
-				org.dom4j.Element root = document.addElement(xmlExport.getXmlTag());
-				xmlExport.setElement(root);
-				xmlDataHandler.addChild(xmlExport, root, databaseId);
-				byte[] data = Dom4jUtils.getBytesFromPrettyDocument(document, "UTF-8");
-				data = StaxonUtils.xml2json(new String(data, "UTF-8")).getBytes();
-				ResponseUtils.download(request, response, data,
-						xmlExport.getTitle() + DateUtils.getNowYearMonthDayHHmmss() + ".json");
+				boolean hasPerm = true;
+				if (StringUtils.isNotEmpty(xmlExport.getAllowRoles())) {
+					hasPerm = false;
+					List<String> roles = StringTools.split(xmlExport.getAllowRoles());
+					if (loginContext.isSystemAdministrator()) {
+						hasPerm = true;
+					}
+					Collection<String> permissions = loginContext.getPermissions();
+					for (String perm : permissions) {
+						if (roles.contains(perm)) {
+							hasPerm = true;
+							break;
+						}
+					}
+				}
+				if (hasPerm) {
+					xmlExport.setParameter(params);
+					XmlDataHandler xmlDataHandler = new XmlExportDataHandler();
+					org.dom4j.Document document = DocumentHelper.createDocument();
+					org.dom4j.Element root = document.addElement(xmlExport.getXmlTag());
+					xmlExport.setElement(root);
+					xmlDataHandler.addChild(xmlExport, root, databaseId);
+					byte[] data = Dom4jUtils.getBytesFromPrettyDocument(document, "UTF-8");
+					data = StaxonUtils.xml2json(new String(data, "UTF-8")).getBytes();
+					ResponseUtils.download(request, response, data,
+							xmlExport.getTitle() + DateUtils.getNowYearMonthDayHHmmss() + ".json");
+				}
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -348,45 +367,63 @@ public class XmlExportController {
 		try {
 			XmlExport xmlExport = xmlExportService.getXmlExport(expId);
 			if (xmlExport != null && StringUtils.equals(xmlExport.getActive(), "Y")) {
-				if (StringUtils.isEmpty(templateId)) {
-					templateId = xmlExport.getTemplateId();
-				}
-				if (StringUtils.isNotEmpty(templateId)) {
-					Template tpl = templateService.getTemplate(templateId);
-					if (tpl != null && tpl.getData() != null) {
 
-						xmlExport.setParameter(params);
-						DataHandler dataHandler = new ExportDataHandler();
-						dataHandler.addChild(xmlExport, params, databaseId);
-
-						bais = new ByteArrayInputStream(tpl.getData());
-						is = new BufferedInputStream(bais);
-						baos = new ByteArrayOutputStream();
-						bos = new BufferedOutputStream(baos);
-
-						Context context2 = PoiTransformer.createInitialContext();
-
-						Set<Entry<String, Object>> entrySet = params.entrySet();
-						for (Entry<String, Object> entry : entrySet) {
-							String key = entry.getKey();
-							Object value = entry.getValue();
-							context2.putVar(key, value);
+				boolean hasPerm = true;
+				if (StringUtils.isNotEmpty(xmlExport.getAllowRoles())) {
+					hasPerm = false;
+					List<String> roles = StringTools.split(xmlExport.getAllowRoles());
+					if (loginContext.isSystemAdministrator()) {
+						hasPerm = true;
+					}
+					Collection<String> permissions = loginContext.getPermissions();
+					for (String perm : permissions) {
+						if (roles.contains(perm)) {
+							hasPerm = true;
+							break;
 						}
+					}
+				}
+				if (hasPerm) {
+					if (StringUtils.isEmpty(templateId)) {
+						templateId = xmlExport.getTemplateId();
+					}
+					if (StringUtils.isNotEmpty(templateId)) {
+						Template tpl = templateService.getTemplate(templateId);
+						if (tpl != null && tpl.getData() != null) {
 
-						org.jxls.util.JxlsHelper.getInstance().processTemplate(is, bos, context2);
-						IOUtils.closeQuietly(is);
-						IOUtils.closeQuietly(bais);
+							xmlExport.setParameter(params);
+							DataHandler dataHandler = new ExportDataHandler();
+							dataHandler.addChild(xmlExport, params, databaseId);
 
-						bos.flush();
-						baos.flush();
-						byte[] data = baos.toByteArray();
+							bais = new ByteArrayInputStream(tpl.getData());
+							is = new BufferedInputStream(bais);
+							baos = new ByteArrayOutputStream();
+							bos = new BufferedOutputStream(baos);
 
-						if (StringUtils.endsWithIgnoreCase(tpl.getDataFile(), ".xlsx")) {
-							ResponseUtils.download(request, response, data,
-									xmlExport.getTitle() + DateUtils.getNowYearMonthDayHHmmss() + ".xlsx");
-						} else {
-							ResponseUtils.download(request, response, data,
-									xmlExport.getTitle() + DateUtils.getNowYearMonthDayHHmmss() + ".xls");
+							Context context2 = PoiTransformer.createInitialContext();
+
+							Set<Entry<String, Object>> entrySet = params.entrySet();
+							for (Entry<String, Object> entry : entrySet) {
+								String key = entry.getKey();
+								Object value = entry.getValue();
+								context2.putVar(key, value);
+							}
+
+							org.jxls.util.JxlsHelper.getInstance().processTemplate(is, bos, context2);
+							IOUtils.closeQuietly(is);
+							IOUtils.closeQuietly(bais);
+
+							bos.flush();
+							baos.flush();
+							byte[] data = baos.toByteArray();
+
+							if (StringUtils.endsWithIgnoreCase(tpl.getDataFile(), ".xlsx")) {
+								ResponseUtils.download(request, response, data,
+										xmlExport.getTitle() + DateUtils.getNowYearMonthDayHHmmss() + ".xlsx");
+							} else {
+								ResponseUtils.download(request, response, data,
+										xmlExport.getTitle() + DateUtils.getNowYearMonthDayHHmmss() + ".xls");
+							}
 						}
 					}
 				}
@@ -411,15 +448,32 @@ public class XmlExportController {
 		try {
 			XmlExport xmlExport = xmlExportService.getXmlExport(expId);
 			if (xmlExport != null && StringUtils.equals(xmlExport.getActive(), "Y")) {
-				xmlExport.setParameter(params);
-				XmlDataHandler xmlDataHandler = new XmlExportDataHandler();
-				org.dom4j.Document document = DocumentHelper.createDocument();
-				org.dom4j.Element root = document.addElement(xmlExport.getXmlTag());
-				xmlExport.setElement(root);
-				xmlDataHandler.addChild(xmlExport, root, databaseId);
-				byte[] data = Dom4jUtils.getBytesFromPrettyDocument(document, "UTF-8");
-				ResponseUtils.download(request, response, data,
-						xmlExport.getTitle() + DateUtils.getNowYearMonthDayHHmmss() + ".xml");
+				boolean hasPerm = true;
+				if (StringUtils.isNotEmpty(xmlExport.getAllowRoles())) {
+					hasPerm = false;
+					List<String> roles = StringTools.split(xmlExport.getAllowRoles());
+					if (loginContext.isSystemAdministrator()) {
+						hasPerm = true;
+					}
+					Collection<String> permissions = loginContext.getPermissions();
+					for (String perm : permissions) {
+						if (roles.contains(perm)) {
+							hasPerm = true;
+							break;
+						}
+					}
+				}
+				if (hasPerm) {
+					xmlExport.setParameter(params);
+					XmlDataHandler xmlDataHandler = new XmlExportDataHandler();
+					org.dom4j.Document document = DocumentHelper.createDocument();
+					org.dom4j.Element root = document.addElement(xmlExport.getXmlTag());
+					xmlExport.setElement(root);
+					xmlDataHandler.addChild(xmlExport, root, databaseId);
+					byte[] data = Dom4jUtils.getBytesFromPrettyDocument(document, "UTF-8");
+					ResponseUtils.download(request, response, data,
+							xmlExport.getTitle() + DateUtils.getNowYearMonthDayHHmmss() + ".xml");
+				}
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -640,8 +694,8 @@ public class XmlExportController {
 			xmlExport.setActive(request.getParameter("active"));
 			xmlExport.setXmlTag(request.getParameter("xmlTag"));
 			xmlExport.setTemplateId(request.getParameter("templateId"));
-			xmlExport.setExternalAttrsFlag(request.getParameter("externalAttrsFlag"));
 			xmlExport.setAllowRoles(request.getParameter("allowRoles"));
+			xmlExport.setExternalAttrsFlag(request.getParameter("externalAttrsFlag"));
 			xmlExport.setInterval(RequestUtils.getInt(request, "interval"));
 			xmlExport.setSortNo(RequestUtils.getInt(request, "sortNo"));
 			xmlExport.setCreateBy(actorId);
