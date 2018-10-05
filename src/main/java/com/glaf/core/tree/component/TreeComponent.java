@@ -40,8 +40,7 @@ public class TreeComponent extends TreeBase implements Serializable, Component {
 
 	protected Map<String, Object> dataMap;
 	private boolean last;
-	protected List<TreeComponent> components = Collections
-			.synchronizedList(new java.util.concurrent.CopyOnWriteArrayList<TreeComponent>());
+	protected List<TreeComponent> components = Collections.synchronizedList(new java.util.ArrayList<TreeComponent>());
 	protected TreeComponent parent;
 	protected TreeModel treeModel;
 	protected Object treeObject;
@@ -58,8 +57,7 @@ public class TreeComponent extends TreeBase implements Serializable, Component {
 	/**
 	 * This method compares all attributes, except for parent and children
 	 * 
-	 * @param o
-	 *            the object to compare to
+	 * @param o the object to compare to
 	 */
 	@Override
 	public boolean equals(Object obj) {
@@ -79,6 +77,9 @@ public class TreeComponent extends TreeBase implements Serializable, Component {
 	}
 
 	public List<TreeComponent> getComponents() {
+		if (components != null) {
+			java.util.Collections.sort(components);
+		}
 		return components;
 	}
 
@@ -168,8 +169,7 @@ public class TreeComponent extends TreeBase implements Serializable, Component {
 	/**
 	 * Sets the last.
 	 * 
-	 * @param last
-	 *            The last to set
+	 * @param last The last to set
 	 */
 	public void setLast(boolean last) {
 		this.last = last;
