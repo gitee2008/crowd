@@ -36,7 +36,7 @@
 				idField: 'id',
 				columns:[[
 				    {title:'序号', field:'startIndex', width:80, sortable:false},
-					{title:'分类', field:'category', width:120, sortable:true},
+					{title:'分类', field:'categoryName', width:120, sortable:true},
 					{title:'发起人', field:'itemName', width:120, sortable:true},
 					{title:'地址', field:'itemLocation', width:120, sortable:true},
 					{title:'标题', field:'itemTitle', width:180, sortable:true},
