@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.glaf.search.mapper.SearchFieldMapper">
+
+	<resultMap id="searchFieldResultMap"
+		type="com.glaf.search.domain.SearchField">
+		<id property="id" column="ID_" jdbcType="VARCHAR" />
+		<result property="serverId" column="SERVERID_"
+			jdbcType="VARCHAR" />
+		<result property="code" column="CODE_" jdbcType="VARCHAR" />
+		<result property="mappingCode" column="MAPPINGCODE_"
+			jdbcType="VARCHAR" />
+		<result property="type" column="TYPE_" jdbcType="VARCHAR" />
+		<result property="format" column="FORMAT_" jdbcType="VARCHAR" />
+		<result property="indexAnalyzer" column="INDEXANALYZER_"
+			jdbcType="VARCHAR" />
+		<result property="fieldAnalyzer" column="FIELDANALYZER_"
+			jdbcType="VARCHAR" />
+		<result property="termVector" column="TERMVECTOR_"
+			jdbcType="VARCHAR" />
+		<result property="analyzerFlag" column="ANALYZERFLAG_"
+			jdbcType="VARCHAR" />
+		<result property="searchReturnFlag" column="SEARCHRETURNFLAG_"
+			jdbcType="VARCHAR" />
+		<result property="locked" column="LOCKED_" jdbcType="INTEGER" />
+		<result property="createBy" column="CREATEBY_"
+			jdbcType="VARCHAR" />
+		<result property="createTime" column="CREATETIME_"
+			jdbcType="TIMESTAMP" />
+		<result property="updateBy" column="UPDATEBY_"
+			jdbcType="VARCHAR" />
+		<result property="updateTime" column="UPDATETIME_"
+			jdbcType="TIMESTAMP" />
+	</resultMap>
+
+
+	<insert id="insertSearchField"
+		parameterType="com.glaf.search.domain.SearchField">
+		insert into SYS_SEARCH_FIELD
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			ID_
+			<if test="serverId != null">
+				,SERVERID_
+			</if>
+			<if test="code != null">
+				,CODE_
+			</if>
+			<if test="mappingCode != null">
+				,MAPPINGCODE_
+			</if>
+			<if test="type != null">
+				,TYPE_
+			</if>
+			<if test="format != null">
+				,FORMAT_
+			</if>
+			<if test="indexAnalyzer != null">
+				,INDEXANALYZER_
+			</if>
+			<if test="fieldAnalyzer != null">
+				,FIELDANALYZER_
+			</if>
+			<if test="termVector != null">
+				,TERMVECTOR_
+			</if>
+			<if test="analyzerFlag != null">
+				,ANALYZERFLAG_
+			</if>
+			<if test="searchReturnFlag != null">
+				,SEARCHRETURNFLAG_
+			</if>
+			<if test="locked != null">
+				,LOCKED_
+			</if>
+			<if test="createBy != null">
+				,CREATEBY_
+			</if>
+			<if test="createTime != null">
+				,CREATETIME_
+			</if>
+			<if test="updateBy != null">
+				,UPDATEBY_
+			</if>
+			<if test="updateTime != null">
+				,UPDATETIME_
+			</if>
+		</trim>
+
+		<trim prefix=" values (" suffix=")" suffixOverrides=",">
+			#{id, jdbcType=VARCHAR}
+
+			<if test="serverId != null">
+				,#{serverId, jdbcType=VARCHAR}
+			</if>
+			<if test="code != null">
+				,#{code, jdbcType=VARCHAR}
+			</if>
+			<if test="mappingCode != null">
+				,#{mappingCode, jdbcType=VARCHAR}
+			</if>
+			<if test="type != null">
+				,#{type, jdbcType=VARCHAR}
+			</if>
+			<if test="format != null">
+				,#{format, jdbcType=VARCHAR}
+			</if>
+			<if test="indexAnalyzer != null">
+				,#{indexAnalyzer, jdbcType=VARCHAR}
+			</if>
+			<if test="fieldAnalyzer != null">
+				,#{fieldAnalyzer, jdbcType=VARCHAR}
+			</if>
+			<if test="termVector != null">
+				,#{termVector, jdbcType=VARCHAR}
+			</if>
+			<if test="analyzerFlag != null">
+				,#{analyzerFlag, jdbcType=VARCHAR}
+			</if>
+			<if test="searchReturnFlag != null">
+				,#{searchReturnFlag, jdbcType=VARCHAR}
+			</if>
+			<if test="locked != null">
+				,#{locked, jdbcType=INTEGER}
+			</if>
+			<if test="createBy != null">
+				,#{createBy, jdbcType=VARCHAR}
+			</if>
+			<if test="createTime != null">
+				,#{createTime, jdbcType=TIMESTAMP}
+			</if>
+			<if test="updateBy != null">
+				,#{updateBy, jdbcType=VARCHAR}
+			</if>
+			<if test="updateTime != null">
+				,#{updateTime, jdbcType=TIMESTAMP}
+			</if>
+		</trim>
+	</insert>
+
+
+	<insert id="bulkInsertSearchField"
+		parameterType="java.util.List">
+		insert into SYS_SEARCH_FIELD (
+		ID_
+		,SERVERID_
+		,CODE_
+		,MAPPINGCODE_
+		,TYPE_
+		,FORMAT_
+		,INDEXANALYZER_
+		,FIELDANALYZER_
+		,TERMVECTOR_
+		,ANALYZERFLAG_
+		,SEARCHRETURNFLAG_
+		,LOCKED_
+		,CREATEBY_
+		,CREATETIME_
+		,UPDATEBY_
+		,UPDATETIME_
+		) values
+		<foreach collection="list" item="searchField" index="index"
+			separator=",">
+			(
+			#{searchField.id, jdbcType=VARCHAR}
+			,#{searchField.serverId, jdbcType=VARCHAR}
+			,#{searchField.code,
+			jdbcType=VARCHAR}
+			,#{searchField.mappingCode, jdbcType=VARCHAR}
+			,#{searchField.type, jdbcType=VARCHAR}
+			,#{searchField.format,
+			jdbcType=VARCHAR}
+			,#{searchField.indexAnalyzer, jdbcType=VARCHAR}
+			,#{searchField.fieldAnalyzer, jdbcType=VARCHAR}
+			,#{searchField.termVector, jdbcType=VARCHAR}
+			,#{searchField.analyzerFlag, jdbcType=VARCHAR}
+			,#{searchField.searchReturnFlag, jdbcType=VARCHAR}
+			,#{searchField.locked, jdbcType=INTEGER}
+			,#{searchField.createBy,
+			jdbcType=VARCHAR}
+			,#{searchField.createTime, jdbcType=TIMESTAMP}
+			,#{searchField.updateBy, jdbcType=VARCHAR}
+			,#{searchField.updateTime,
+			jdbcType=TIMESTAMP}
+			)
+		</foreach>
+	</insert>
+
+
+	<insert id="bulkInsertSearchField_oracle"
+		parameterType="java.util.List">
+		INSERT ALL
+		<foreach collection="list" item="searchField" index="index">
+			insert
+			into SYS_SEARCH_FIELD (
+			ID_
+			,SERVERID_
+			,CODE_
+			,MAPPINGCODE_
+			,TYPE_
+			,FORMAT_
+			,INDEXANALYZER_
+			,FIELDANALYZER_
+			,TERMVECTOR_
+			,ANALYZERFLAG_
+			,SEARCHRETURNFLAG_
+			,LOCKED_
+			,CREATEBY_
+			,CREATETIME_
+			,UPDATEBY_
+			,UPDATETIME_
+			) values (
+			#{searchField.id, jdbcType=VARCHAR}
+			,#{searchField.serverId, jdbcType=VARCHAR}
+			,#{searchField.code,
+			jdbcType=VARCHAR}
+			,#{searchField.mappingCode, jdbcType=VARCHAR}
+			,#{searchField.type, jdbcType=VARCHAR}
+			,#{searchField.format,
+			jdbcType=VARCHAR}
+			,#{searchField.indexAnalyzer, jdbcType=VARCHAR}
+			,#{searchField.fieldAnalyzer, jdbcType=VARCHAR}
+			,#{searchField.termVector, jdbcType=VARCHAR}
+			,#{searchField.analyzerFlag, jdbcType=VARCHAR}
+			,#{searchField.searchReturnFlag, jdbcType=VARCHAR}
+			,#{searchField.locked, jdbcType=INTEGER}
+			,#{searchField.createBy,
+			jdbcType=VARCHAR}
+			,#{searchField.createTime, jdbcType=TIMESTAMP}
+			,#{searchField.updateBy, jdbcType=VARCHAR}
+			,#{searchField.updateTime,
+			jdbcType=TIMESTAMP}
+			)
+		</foreach>
+		SELECT * FROM dual
+	</insert>
+
+
+	<update id="updateSearchField"
+		parameterType="com.glaf.search.domain.SearchField">
+		update SYS_SEARCH_FIELD
+		set
+		<trim prefix="" suffix="" suffixOverrides=",">
+			<if test="code != null">
+				CODE_ = #{code, jdbcType=VARCHAR},
+			</if>
+			<if test="mappingCode != null">
+				MAPPINGCODE_ = #{mappingCode, jdbcType=VARCHAR},
+			</if>
+			<if test="type != null">
+				TYPE_ = #{type, jdbcType=VARCHAR},
+			</if>
+			<if test="format != null">
+				FORMAT_ = #{format, jdbcType=VARCHAR},
+			</if>
+			<if test="indexAnalyzer != null">
+				INDEXANALYZER_ = #{indexAnalyzer, jdbcType=VARCHAR},
+			</if>
+			<if test="fieldAnalyzer != null">
+				FIELDANALYZER_ = #{fieldAnalyzer, jdbcType=VARCHAR},
+			</if>
+			<if test="termVector != null">
+				TERMVECTOR_ = #{termVector, jdbcType=VARCHAR},
+			</if>
+			<if test="analyzerFlag != null">
+				ANALYZERFLAG_ = #{analyzerFlag, jdbcType=VARCHAR},
+			</if>
+			<if test="searchReturnFlag != null">
+				SEARCHRETURNFLAG_ = #{searchReturnFlag,
+				jdbcType=VARCHAR},
+			</if>
+			<if test="locked != null">
+				LOCKED_ = #{locked, jdbcType=INTEGER},
+			</if>
+			<if test="updateBy != null">
+				UPDATEBY_ = #{updateBy, jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				UPDATETIME_ = #{updateTime, jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+		where
+		ID_ = #{id, jdbcType=VARCHAR}
+
+	</update>
+
+
+	<delete id="deleteSearchFieldById" parameterType="string">
+		delete from
+		SYS_SEARCH_FIELD
+		where ID_ = #{id}
+	</delete>
+
+
+	<select id="getSearchFieldById" parameterType="string"
+		resultMap="searchFieldResultMap">
+		select * from SYS_SEARCH_FIELD where ID_ = #{id}
+	</select>
+
+
+	<select id="getSearchFields"
+		parameterType="com.glaf.search.query.SearchFieldQuery"
+		resultMap="searchFieldResultMap">
+		select distinct E.*
+		<include refid="selectSearchFieldsSql" />
+		<choose>
+			<when test="orderBy != null">
+				order by ${orderBy}
+			</when>
+			<otherwise>
+				order by E.CREATETIME_ desc
+			</otherwise>
+		</choose>
+	</select>
+
+
+	<select id="getSearchFieldCount"
+		parameterType="com.glaf.search.query.SearchFieldQuery"
+		resultType="int">
+		select count(*)
+		<include refid="selectSearchFieldsSql" />
+	</select>
+
+
+	<sql id="selectSearchFieldsSql">
+
+		from SYS_SEARCH_FIELD E
+
+		<where>
+			1 = 1
+
+			<if test="serverId != null and serverId != '' ">
+				and E.SERVERID_ = #{serverId}
+			</if>
+
+			<if test="code != null and code != '' ">
+				and E.CODE_ = #{code}
+			</if>
+
+			<if test="codeLike != null and codeLike != '' ">
+				and E.CODE_ like #{codeLike}
+			</if>
+
+			<if test="mappingCode != null and mappingCode != '' ">
+				and E.MAPPINGCODE_ = #{mappingCode}
+			</if>
+
+			<if test="mappingCodeLike != null and mappingCodeLike != '' ">
+				and E.MAPPINGCODE_ like #{mappingCodeLike}
+			</if>
+
+			<if test="type != null and type != '' ">
+				and E.TYPE_ = #{type}
+			</if>
+
+			<if test="typeLike != null and typeLike != '' ">
+				and E.TYPE_ like #{typeLike}
+			</if>
+
+			<if test="format != null and format != '' ">
+				and E.FORMAT_ = #{format}
+			</if>
+
+			<if test="formatLike != null and formatLike != '' ">
+				and E.FORMAT_ like #{formatLike}
+			</if>
+
+			<if test="indexAnalyzer != null and indexAnalyzer != '' ">
+				and E.INDEXANALYZER_ = #{indexAnalyzer}
+			</if>
+
+			<if test="indexAnalyzerLike != null and indexAnalyzerLike != '' ">
+				and E.INDEXANALYZER_ like #{indexAnalyzerLike}
+			</if>
+
+			<if test="fieldAnalyzer != null and fieldAnalyzer != '' ">
+				and E.FIELDANALYZER_ = #{fieldAnalyzer}
+			</if>
+
+			<if test="fieldAnalyzerLike != null and fieldAnalyzerLike != '' ">
+				and E.FIELDANALYZER_ like #{fieldAnalyzerLike}
+			</if>
+
+			<if test="termVector != null and termVector != '' ">
+				and E.TERMVECTOR_ = #{termVector}
+			</if>
+
+			<if test="termVectorLike != null and termVectorLike != '' ">
+				and E.TERMVECTOR_ like #{termVectorLike}
+			</if>
+
+			<if test="analyzerFlag != null and analyzerFlag != '' ">
+				and E.ANALYZERFLAG_ = #{analyzerFlag}
+			</if>
+
+			<if test="searchReturnFlag != null and searchReturnFlag != '' ">
+				and E.SEARCHRETURNFLAG_ = #{searchReturnFlag}
+			</if>
+		</where>
+	</sql>
+
+</mapper>

@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.glaf.search.mapper.SearchServerMapper">
+
+	<resultMap id="searchServerResultMap"
+		type="com.glaf.search.domain.SearchServer">
+		<id property="id" column="ID_" jdbcType="VARCHAR" />
+		<result property="serverURL" column="SERVERURL_"
+			jdbcType="VARCHAR" />
+		<result property="indexName" column="INDEXNAME_"
+			jdbcType="VARCHAR" />
+		<result property="type" column="TYPE_" jdbcType="VARCHAR" />
+		<result property="tokenizer" column="TOKENIZER_"
+			jdbcType="VARCHAR" />
+		<result property="tokenFilter" column="TOKENFILTER_"
+			jdbcType="VARCHAR" />
+		<result property="characterFilter" column="CHARACTERFILTER_"
+			jdbcType="VARCHAR" />
+		<result property="analyzerName" column="ANALYZERNAME_"
+			jdbcType="VARCHAR" />
+		<result property="analyzerType" column="ANALYZERTYPE_"
+			jdbcType="VARCHAR" />
+		<result property="filter" column="FILTER_" jdbcType="VARCHAR" />
+		<result property="locked" column="LOCKED_" jdbcType="INTEGER" />
+		<result property="createBy" column="CREATEBY_"
+			jdbcType="VARCHAR" />
+		<result property="createTime" column="CREATETIME_"
+			jdbcType="TIMESTAMP" />
+		<result property="updateBy" column="UPDATEBY_"
+			jdbcType="VARCHAR" />
+		<result property="updateTime" column="UPDATETIME_"
+			jdbcType="TIMESTAMP" />
+	</resultMap>
+
+
+	<insert id="insertSearchServer"
+		parameterType="com.glaf.search.domain.SearchServer">
+		insert into SYS_SEARCH_SERVER
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			ID_
+			<if test="serverURL != null">
+				,SERVERURL_
+			</if>
+			<if test="indexName != null">
+				,INDEXNAME_
+			</if>
+			<if test="type != null">
+				,TYPE_
+			</if>
+			<if test="tokenizer != null">
+				,TOKENIZER_
+			</if>
+			<if test="tokenFilter != null">
+				,TOKENFILTER_
+			</if>
+			<if test="characterFilter != null">
+				,CHARACTERFILTER_
+			</if>
+			<if test="analyzerName != null">
+				,ANALYZERNAME_
+			</if>
+			<if test="analyzerType != null">
+				,ANALYZERTYPE_
+			</if>
+			<if test="filter != null">
+				,FILTER_
+			</if>
+			<if test="locked != null">
+				,LOCKED_
+			</if>
+			<if test="createBy != null">
+				,CREATEBY_
+			</if>
+			<if test="createTime != null">
+				,CREATETIME_
+			</if>
+			<if test="updateBy != null">
+				,UPDATEBY_
+			</if>
+			<if test="updateTime != null">
+				,UPDATETIME_
+			</if>
+		</trim>
+
+		<trim prefix=" values (" suffix=")" suffixOverrides=",">
+			#{id, jdbcType=VARCHAR}
+
+			<if test="serverURL != null">
+				,#{serverURL, jdbcType=VARCHAR}
+			</if>
+			<if test="indexName != null">
+				,#{indexName, jdbcType=VARCHAR}
+			</if>
+			<if test="type != null">
+				,#{type, jdbcType=VARCHAR}
+			</if>
+			<if test="tokenizer != null">
+				,#{tokenizer, jdbcType=VARCHAR}
+			</if>
+			<if test="tokenFilter != null">
+				,#{tokenFilter, jdbcType=VARCHAR}
+			</if>
+			<if test="characterFilter != null">
+				,#{characterFilter, jdbcType=VARCHAR}
+			</if>
+			<if test="analyzerName != null">
+				,#{analyzerName, jdbcType=VARCHAR}
+			</if>
+			<if test="analyzerType != null">
+				,#{analyzerType, jdbcType=VARCHAR}
+			</if>
+			<if test="filter != null">
+				,#{filter, jdbcType=VARCHAR}
+			</if>
+			<if test="locked != null">
+				,#{locked, jdbcType=INTEGER}
+			</if>
+			<if test="createBy != null">
+				,#{createBy, jdbcType=VARCHAR}
+			</if>
+			<if test="createTime != null">
+				,#{createTime, jdbcType=TIMESTAMP}
+			</if>
+			<if test="updateBy != null">
+				,#{updateBy, jdbcType=VARCHAR}
+			</if>
+			<if test="updateTime != null">
+				,#{updateTime, jdbcType=TIMESTAMP}
+			</if>
+		</trim>
+	</insert>
+
+
+	<insert id="bulkInsertSearchServer"
+		parameterType="java.util.List">
+		insert into SYS_SEARCH_SERVER (
+		ID_
+		,SERVERURL_
+		,INDEXNAME_
+		,TYPE_
+		,TOKENIZER_
+		,TOKENFILTER_
+		,CHARACTERFILTER_
+		,ANALYZERNAME_
+		,ANALYZERTYPE_
+		,FILTER_
+		,LOCKED_
+		,CREATEBY_
+		,CREATETIME_
+		,UPDATEBY_
+		,UPDATETIME_
+		) values
+		<foreach collection="list" item="searchServer" index="index"
+			separator=",">
+			(
+			#{searchServer.id, jdbcType=VARCHAR}
+			,#{searchServer.serverURL, jdbcType=VARCHAR}
+			,#{searchServer.indexName, jdbcType=VARCHAR}
+			,#{searchServer.type,
+			jdbcType=VARCHAR}
+			,#{searchServer.tokenizer, jdbcType=VARCHAR}
+			,#{searchServer.tokenFilter, jdbcType=VARCHAR}
+			,#{searchServer.characterFilter, jdbcType=VARCHAR}
+			,#{searchServer.analyzerName, jdbcType=VARCHAR}
+			,#{searchServer.analyzerType, jdbcType=VARCHAR}
+			,#{searchServer.filter, jdbcType=VARCHAR}
+			,#{searchServer.locked,
+			jdbcType=INTEGER}
+			,#{searchServer.createBy, jdbcType=VARCHAR}
+			,#{searchServer.createTime, jdbcType=TIMESTAMP}
+			,#{searchServer.updateBy, jdbcType=VARCHAR}
+			,#{searchServer.updateTime, jdbcType=TIMESTAMP}
+			)
+		</foreach>
+	</insert>
+
+
+	<insert id="bulkInsertSearchServer_oracle"
+		parameterType="java.util.List">
+		INSERT ALL
+		<foreach collection="list" item="searchServer" index="index">
+			insert
+			into SYS_SEARCH_SERVER (
+			ID_
+			,SERVERURL_
+			,INDEXNAME_
+			,TYPE_
+			,TOKENIZER_
+			,TOKENFILTER_
+			,CHARACTERFILTER_
+			,ANALYZERNAME_
+			,ANALYZERTYPE_
+			,FILTER_
+			,LOCKED_
+			,CREATEBY_
+			,CREATETIME_
+			,UPDATEBY_
+			,UPDATETIME_
+			) values (
+			#{searchServer.id, jdbcType=VARCHAR}
+			,#{searchServer.serverURL,
+			jdbcType=VARCHAR}
+			,#{searchServer.indexName, jdbcType=VARCHAR}
+			,#{searchServer.type, jdbcType=VARCHAR}
+			,#{searchServer.tokenizer,
+			jdbcType=VARCHAR}
+			,#{searchServer.tokenFilter, jdbcType=VARCHAR}
+			,#{searchServer.characterFilter, jdbcType=VARCHAR}
+			,#{searchServer.analyzerName, jdbcType=VARCHAR}
+			,#{searchServer.analyzerType, jdbcType=VARCHAR}
+			,#{searchServer.filter, jdbcType=VARCHAR}
+			,#{searchServer.locked,
+			jdbcType=INTEGER}
+			,#{searchServer.createBy, jdbcType=VARCHAR}
+			,#{searchServer.createTime, jdbcType=TIMESTAMP}
+			,#{searchServer.updateBy, jdbcType=VARCHAR}
+			,#{searchServer.updateTime, jdbcType=TIMESTAMP}
+			)
+		</foreach>
+		SELECT * FROM dual
+	</insert>
+
+
+	<update id="updateSearchServer"
+		parameterType="com.glaf.search.domain.SearchServer">
+		update SYS_SEARCH_SERVER
+		set
+		<trim prefix="" suffix="" suffixOverrides=",">
+			<if test="serverURL != null">
+				SERVERURL_ = #{serverURL, jdbcType=VARCHAR},
+			</if>
+			<if test="indexName != null">
+				INDEXNAME_ = #{indexName, jdbcType=VARCHAR},
+			</if>
+			<if test="type != null">
+				TYPE_ = #{type, jdbcType=VARCHAR},
+			</if>
+			<if test="tokenizer != null">
+				TOKENIZER_ = #{tokenizer, jdbcType=VARCHAR},
+			</if>
+			<if test="tokenFilter != null">
+				TOKENFILTER_ = #{tokenFilter, jdbcType=VARCHAR},
+			</if>
+			<if test="characterFilter != null">
+				CHARACTERFILTER_ = #{characterFilter, jdbcType=VARCHAR},
+			</if>
+			<if test="analyzerName != null">
+				ANALYZERNAME_ = #{analyzerName, jdbcType=VARCHAR},
+			</if>
+			<if test="analyzerType != null">
+				ANALYZERTYPE_ = #{analyzerType, jdbcType=VARCHAR},
+			</if>
+			<if test="filter != null">
+				FILTER_ = #{filter, jdbcType=VARCHAR},
+			</if>
+			<if test="locked != null">
+				LOCKED_ = #{locked, jdbcType=INTEGER},
+			</if>
+			<if test="updateBy != null">
+				UPDATEBY_ = #{updateBy, jdbcType=VARCHAR},
+			</if>
+			<if test="updateTime != null">
+				UPDATETIME_ = #{updateTime, jdbcType=TIMESTAMP},
+			</if>
+		</trim>
+		where
+		ID_ = #{id, jdbcType=VARCHAR}
+
+	</update>
+
+
+	<delete id="deleteSearchServerById" parameterType="string">
+		delete from
+		SYS_SEARCH_SERVER
+		where ID_ = #{id}
+	</delete>
+
+
+	<select id="getSearchServerById" parameterType="string"
+		resultMap="searchServerResultMap">
+		select * from SYS_SEARCH_SERVER where ID_ = #{id}
+	</select>
+
+
+	<select id="getSearchServers"
+		parameterType="com.glaf.search.query.SearchServerQuery"
+		resultMap="searchServerResultMap">
+		select distinct E.*
+		<include refid="selectSearchServersSql" />
+		<choose>
+			<when test="orderBy != null">
+				order by ${orderBy}
+			</when>
+			<otherwise>
+				order by E.CREATETIME_ desc
+			</otherwise>
+		</choose>
+	</select>
+
+
+	<select id="getSearchServerCount"
+		parameterType="com.glaf.search.query.SearchServerQuery"
+		resultType="int">
+		select count(*)
+		<include refid="selectSearchServersSql" />
+	</select>
+
+
+	<sql id="selectSearchServersSql">
+
+		from SYS_SEARCH_SERVER E
+
+		<where>
+			1 = 1
+
+			<if test="serverURL != null and serverURL != '' ">
+				and E.SERVERURL_ = #{serverURL}
+			</if>
+
+			<if test="serverURLLike != null and serverURLLike != '' ">
+				and E.SERVERURL_ like #{serverURLLike}
+			</if>
+
+			<if test="indexName != null and indexName != '' ">
+				and E.INDEXNAME_ = #{indexName}
+			</if>
+
+			<if test="indexNameLike != null and indexNameLike != '' ">
+				and E.INDEXNAME_ like #{indexNameLike}
+			</if>
+
+			<if test="type != null and type != '' ">
+				and E.TYPE_ = #{type}
+			</if>
+
+			<if test="typeLike != null and typeLike != '' ">
+				and E.TYPE_ like #{typeLike}
+			</if>
+
+			<if test="tokenizer != null and tokenizer != '' ">
+				and E.TOKENIZER_ = #{tokenizer}
+			</if>
+
+			<if test="tokenizerLike != null and tokenizerLike != '' ">
+				and E.TOKENIZER_ like #{tokenizerLike}
+			</if>
+
+			<if test="tokenFilter != null and tokenFilter != '' ">
+				and E.TOKENFILTER_ = #{tokenFilter}
+			</if>
+
+			<if test="tokenFilterLike != null and tokenFilterLike != '' ">
+				and E.TOKENFILTER_ like #{tokenFilterLike}
+			</if>
+
+			<if test="characterFilter != null and characterFilter != '' ">
+				and E.CHARACTERFILTER_ = #{characterFilter}
+			</if>
+
+			<if
+				test="characterFilterLike != null and characterFilterLike != '' ">
+				and E.CHARACTERFILTER_ like #{characterFilterLike}
+			</if>
+
+			<if test="analyzerName != null and analyzerName != '' ">
+				and E.ANALYZERNAME_ = #{analyzerName}
+			</if>
+
+			<if test="analyzerNameLike != null and analyzerNameLike != '' ">
+				and E.ANALYZERNAME_ like #{analyzerNameLike}
+			</if>
+
+			<if test="analyzerType != null and analyzerType != '' ">
+				and E.ANALYZERTYPE_ = #{analyzerType}
+			</if>
+
+			<if test="analyzerTypeLike != null and analyzerTypeLike != '' ">
+				and E.ANALYZERTYPE_ like #{analyzerTypeLike}
+			</if>
+
+			<if test="filter != null and filter != '' ">
+				and E.FILTER_ = #{filter}
+			</if>
+
+			<if test="filterLike != null and filterLike != '' ">
+				and E.FILTER_ like #{filterLike}
+			</if>
+		</where>
+	</sql>
+
+</mapper>
