@@ -57,8 +57,8 @@ import com.glaf.search.util.SearchServerJsonFactory;
  *
  */
 
-@Controller("/search/searchServer")
-@RequestMapping("/search/searchServer")
+@Controller("/sys/searchServer")
+@RequestMapping("/sys/searchServer")
 public class SearchServerController {
 	protected static final Log logger = LogFactory.getLog(SearchServerController.class);
 
@@ -83,7 +83,7 @@ public class SearchServerController {
 					if (searchServer != null
 							&& (StringUtils.equals(searchServer.getCreateBy(), loginContext.getActorId())
 									|| loginContext.isSystemAdministrator())) {
-
+						searchServerService.deleteById(x);
 					}
 				}
 			}
@@ -92,7 +92,7 @@ public class SearchServerController {
 			SearchServer searchServer = searchServerService.getSearchServer(String.valueOf(id));
 			if (searchServer != null && (StringUtils.equals(searchServer.getCreateBy(), loginContext.getActorId())
 					|| loginContext.isSystemAdministrator())) {
-
+				searchServerService.deleteById(id);
 				return ResponseUtils.responseResult(true);
 			}
 		}
@@ -118,7 +118,7 @@ public class SearchServerController {
 			return new ModelAndView(x_view, modelMap);
 		}
 
-		return new ModelAndView("/search/searchServer/edit", modelMap);
+		return new ModelAndView("/sys/searchServer/edit", modelMap);
 	}
 
 	@RequestMapping("/json")
@@ -210,7 +210,7 @@ public class SearchServerController {
 			return new ModelAndView(view, modelMap);
 		}
 
-		return new ModelAndView("/search/searchServer/list", modelMap);
+		return new ModelAndView("/sys/searchServer/list", modelMap);
 	}
 
 	@RequestMapping("/query")
@@ -224,7 +224,7 @@ public class SearchServerController {
 		if (StringUtils.isNotEmpty(x_view)) {
 			return new ModelAndView(x_view, modelMap);
 		}
-		return new ModelAndView("/search/searchServer/query", modelMap);
+		return new ModelAndView("/sys/searchServer/query", modelMap);
 	}
 
 	@ResponseBody
@@ -271,10 +271,6 @@ public class SearchServerController {
 			searchServer.setAnalyzerType(request.getParameter("analyzerType"));
 			searchServer.setFilter(request.getParameter("filter"));
 			searchServer.setLocked(RequestUtils.getInt(request, "locked"));
-			searchServer.setCreateBy(request.getParameter("createBy"));
-			searchServer.setCreateTime(RequestUtils.getDate(request, "createTime"));
-			searchServer.setUpdateBy(request.getParameter("updateBy"));
-			searchServer.setUpdateTime(RequestUtils.getDate(request, "updateTime"));
 			searchServer.setCreateBy(actorId);
 			searchServer.setUpdateBy(actorId);
 

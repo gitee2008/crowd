@@ -108,7 +108,7 @@ public class SearchField implements Serializable, JSONable {
 	 * 是否锁定
 	 */
 	@Column(name = "LOCKED_")
-	protected Integer locked;
+	protected int locked;
 
 	/**
 	 * 创建人
@@ -140,148 +140,6 @@ public class SearchField implements Serializable, JSONable {
 
 	}
 
-	public String getId() {
-		return this.id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public String getServerId() {
-		return this.serverId;
-	}
-
-	public String getCode() {
-		return this.code;
-	}
-
-	public String getMappingCode() {
-		return this.mappingCode;
-	}
-
-	public String getType() {
-		return this.type;
-	}
-
-	public String getFormat() {
-		return this.format;
-	}
-
-	public String getIndexAnalyzer() {
-		return this.indexAnalyzer;
-	}
-
-	public String getFieldAnalyzer() {
-		return this.fieldAnalyzer;
-	}
-
-	public String getTermVector() {
-		return this.termVector;
-	}
-
-	public String getAnalyzerFlag() {
-		return this.analyzerFlag;
-	}
-
-	public String getSearchReturnFlag() {
-		return this.searchReturnFlag;
-	}
-
-	public Integer getLocked() {
-		return this.locked;
-	}
-
-	public String getCreateBy() {
-		return this.createBy;
-	}
-
-	public Date getCreateTime() {
-		return this.createTime;
-	}
-
-	public String getCreateTimeString() {
-		if (this.createTime != null) {
-			return DateUtils.getDateTime(this.createTime);
-		}
-		return "";
-	}
-
-	public String getUpdateBy() {
-		return this.updateBy;
-	}
-
-	public Date getUpdateTime() {
-		return this.updateTime;
-	}
-
-	public String getUpdateTimeString() {
-		if (this.updateTime != null) {
-			return DateUtils.getDateTime(this.updateTime);
-		}
-		return "";
-	}
-
-	public void setServerId(String serverId) {
-		this.serverId = serverId;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public void setMappingCode(String mappingCode) {
-		this.mappingCode = mappingCode;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
-	public void setFormat(String format) {
-		this.format = format;
-	}
-
-	public void setIndexAnalyzer(String indexAnalyzer) {
-		this.indexAnalyzer = indexAnalyzer;
-	}
-
-	public void setFieldAnalyzer(String fieldAnalyzer) {
-		this.fieldAnalyzer = fieldAnalyzer;
-	}
-
-	public void setTermVector(String termVector) {
-		this.termVector = termVector;
-	}
-
-	public void setAnalyzerFlag(String analyzerFlag) {
-		this.analyzerFlag = analyzerFlag;
-	}
-
-	public void setSearchReturnFlag(String searchReturnFlag) {
-		this.searchReturnFlag = searchReturnFlag;
-	}
-
-	public void setLocked(Integer locked) {
-		this.locked = locked;
-	}
-
-	public void setCreateBy(String createBy) {
-		this.createBy = createBy;
-	}
-
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
-
-	public void setUpdateBy(String updateBy) {
-		this.updateBy = updateBy;
-	}
-
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -299,6 +157,84 @@ public class SearchField implements Serializable, JSONable {
 		return true;
 	}
 
+	public String getAnalyzerFlag() {
+		return this.analyzerFlag;
+	}
+
+	public String getCode() {
+		return this.code;
+	}
+
+	public String getCreateBy() {
+		return this.createBy;
+	}
+
+	public Date getCreateTime() {
+		return this.createTime;
+	}
+
+	public String getCreateTimeString() {
+		if (this.createTime != null) {
+			return DateUtils.getDateTime(this.createTime);
+		}
+		return "";
+	}
+
+	public String getFieldAnalyzer() {
+		return this.fieldAnalyzer;
+	}
+
+	public String getFormat() {
+		return this.format;
+	}
+
+	public String getId() {
+		return this.id;
+	}
+
+	public String getIndexAnalyzer() {
+		return this.indexAnalyzer;
+	}
+
+	public int getLocked() {
+		return this.locked;
+	}
+
+	public String getMappingCode() {
+		return this.mappingCode;
+	}
+
+	public String getSearchReturnFlag() {
+		return this.searchReturnFlag;
+	}
+
+	public String getServerId() {
+		return this.serverId;
+	}
+
+	public String getTermVector() {
+		return this.termVector;
+	}
+
+	public String getType() {
+		return this.type;
+	}
+
+	public String getUpdateBy() {
+		return this.updateBy;
+	}
+
+	public Date getUpdateTime() {
+		return this.updateTime;
+	}
+
+	public String getUpdateTimeString() {
+		if (this.updateTime != null) {
+			return DateUtils.getDateTime(this.updateTime);
+		}
+		return "";
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -309,6 +245,70 @@ public class SearchField implements Serializable, JSONable {
 
 	public SearchField jsonToObject(JSONObject jsonObject) {
 		return SearchFieldJsonFactory.jsonToObject(jsonObject);
+	}
+
+	public void setAnalyzerFlag(String analyzerFlag) {
+		this.analyzerFlag = analyzerFlag;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public void setCreateBy(String createBy) {
+		this.createBy = createBy;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+	public void setFieldAnalyzer(String fieldAnalyzer) {
+		this.fieldAnalyzer = fieldAnalyzer;
+	}
+
+	public void setFormat(String format) {
+		this.format = format;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public void setIndexAnalyzer(String indexAnalyzer) {
+		this.indexAnalyzer = indexAnalyzer;
+	}
+
+	public void setLocked(int locked) {
+		this.locked = locked;
+	}
+
+	public void setMappingCode(String mappingCode) {
+		this.mappingCode = mappingCode;
+	}
+
+	public void setSearchReturnFlag(String searchReturnFlag) {
+		this.searchReturnFlag = searchReturnFlag;
+	}
+
+	public void setServerId(String serverId) {
+		this.serverId = serverId;
+	}
+
+	public void setTermVector(String termVector) {
+		this.termVector = termVector;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public void setUpdateBy(String updateBy) {
+		this.updateBy = updateBy;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
 	}
 
 	public JSONObject toJsonObject() {

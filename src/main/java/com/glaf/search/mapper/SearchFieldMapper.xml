@@ -291,6 +291,13 @@
 		SYS_SEARCH_FIELD
 		where ID_ = #{id}
 	</delete>
+	
+	
+	<delete id="deleteSearchFieldByServerId" parameterType="string">
+		delete from
+		SYS_SEARCH_FIELD
+		where SERVERID_ = #{serverId}
+	</delete>
 
 
 	<select id="getSearchFieldById" parameterType="string"

@@ -19,6 +19,7 @@
 package com.glaf.search.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +37,7 @@ import com.glaf.core.jdbc.DBConnectionFactory;
 import com.glaf.core.util.DBUtils;
 import com.glaf.core.util.UUID32;
 import com.glaf.search.domain.SearchServer;
+import com.glaf.search.mapper.SearchFieldMapper;
 import com.glaf.search.mapper.SearchServerMapper;
 import com.glaf.search.query.SearchServerQuery;
 
@@ -52,6 +54,8 @@ public class SearchServerServiceImpl implements SearchServerService {
 
 	protected SqlSessionTemplate sqlSessionTemplate;
 
+	protected SearchFieldMapper searchFieldMapper;
+
 	protected SearchServerMapper searchServerMapper;
 
 	public SearchServerServiceImpl() {
@@ -63,6 +67,7 @@ public class SearchServerServiceImpl implements SearchServerService {
 		for (SearchServer searchServer : list) {
 			if (StringUtils.isEmpty(searchServer.getId())) {
 				searchServer.setId(idGenerator.getNextId("SYS_SEARCH_SERVER"));
+				searchServer.setCreateTime(new Date());
 			}
 		}
 
@@ -94,6 +99,7 @@ public class SearchServerServiceImpl implements SearchServerService {
 	@Transactional
 	public void deleteById(String id) {
 		if (id != null) {
+			searchFieldMapper.deleteSearchFieldByServerId(id);
 			searchServerMapper.deleteSearchServerById(id);
 		}
 	}
@@ -102,6 +108,7 @@ public class SearchServerServiceImpl implements SearchServerService {
 	public void deleteByIds(List<String> ids) {
 		if (ids != null && !ids.isEmpty()) {
 			for (String id : ids) {
+				searchFieldMapper.deleteSearchFieldByServerId(id);
 				searchServerMapper.deleteSearchServerById(id);
 			}
 		}
@@ -148,10 +155,11 @@ public class SearchServerServiceImpl implements SearchServerService {
 	public void save(SearchServer searchServer) {
 		if (StringUtils.isEmpty(searchServer.getId())) {
 			searchServer.setId(UUID32.getUUID());
-			// searchServer.setCreateTime(new Date());
-			// searchServer.setDeleteFlag(0);
+			searchServer.setCreateTime(new Date());
+			searchServer.setLocked(0);
 			searchServerMapper.insertSearchServer(searchServer);
 		} else {
+			searchServer.setUpdateTime(new Date());
 			searchServerMapper.updateSearchServer(searchServer);
 		}
 	}
@@ -164,6 +172,11 @@ public class SearchServerServiceImpl implements SearchServerService {
 	@javax.annotation.Resource
 	public void setIdGenerator(IdGenerator idGenerator) {
 		this.idGenerator = idGenerator;
+	}
+
+	@javax.annotation.Resource(name = "com.glaf.search.mapper.SearchFieldMapper")
+	public void setSearchFieldMapper(SearchFieldMapper searchFieldMapper) {
+		this.searchFieldMapper = searchFieldMapper;
 	}
 
 	@javax.annotation.Resource(name = "com.glaf.search.mapper.SearchServerMapper")

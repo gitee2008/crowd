@@ -102,7 +102,7 @@ public class SearchServer implements Serializable, JSONable {
 	 * 是否锁定
 	 */
 	@Column(name = "LOCKED_")
-	protected Integer locked;
+	protected int locked;
 
 	/**
 	 * 创建人
@@ -135,6 +135,13 @@ public class SearchServer implements Serializable, JSONable {
 
 	public SearchServer() {
 
+	}
+
+	public void addField(SearchField searchField) {
+		if (searchFields == null) {
+			searchFields = new ArrayList<SearchField>();
+		}
+		searchFields.add(searchField);
 	}
 
 	@Override
@@ -193,7 +200,7 @@ public class SearchServer implements Serializable, JSONable {
 		return this.indexName;
 	}
 
-	public Integer getLocked() {
+	public int getLocked() {
 		return this.locked;
 	}
 
@@ -276,7 +283,7 @@ public class SearchServer implements Serializable, JSONable {
 		this.indexName = indexName;
 	}
 
-	public void setLocked(Integer locked) {
+	public void setLocked(int locked) {
 		this.locked = locked;
 	}
 

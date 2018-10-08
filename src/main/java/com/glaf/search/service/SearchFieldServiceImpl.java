@@ -19,6 +19,7 @@
 package com.glaf.search.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -63,6 +64,7 @@ public class SearchFieldServiceImpl implements SearchFieldService {
 		for (SearchField searchField : list) {
 			if (StringUtils.isEmpty(searchField.getId())) {
 				searchField.setId(idGenerator.getNextId("SYS_SEARCH_FIELD"));
+				searchField.setCreateTime(new Date());
 			}
 		}
 
@@ -148,10 +150,11 @@ public class SearchFieldServiceImpl implements SearchFieldService {
 	public void save(SearchField searchField) {
 		if (StringUtils.isEmpty(searchField.getId())) {
 			searchField.setId(UUID32.getUUID());
-			// searchField.setCreateTime(new Date());
-			// searchField.setDeleteFlag(0);
+			searchField.setCreateTime(new Date());
+			searchField.setLocked(0);
 			searchFieldMapper.insertSearchField(searchField);
 		} else {
+			searchField.setUpdateTime(new Date());
 			searchFieldMapper.updateSearchField(searchField);
 		}
 	}

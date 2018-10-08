@@ -57,8 +57,8 @@ import com.glaf.search.util.SearchFieldJsonFactory;
  *
  */
 
-@Controller("/search/searchField")
-@RequestMapping("/search/searchField")
+@Controller("/sys/searchField")
+@RequestMapping("/sys/searchField")
 public class SearchFieldController {
 	protected static final Log logger = LogFactory.getLog(SearchFieldController.class);
 
@@ -82,7 +82,7 @@ public class SearchFieldController {
 					SearchField searchField = searchFieldService.getSearchField(String.valueOf(x));
 					if (searchField != null && (StringUtils.equals(searchField.getCreateBy(), loginContext.getActorId())
 							|| loginContext.isSystemAdministrator())) {
-
+						searchFieldService.deleteById(x);
 					}
 				}
 			}
@@ -91,7 +91,7 @@ public class SearchFieldController {
 			SearchField searchField = searchFieldService.getSearchField(String.valueOf(id));
 			if (searchField != null && (StringUtils.equals(searchField.getCreateBy(), loginContext.getActorId())
 					|| loginContext.isSystemAdministrator())) {
-
+				searchFieldService.deleteById(id);
 				return ResponseUtils.responseResult(true);
 			}
 		}
@@ -117,7 +117,7 @@ public class SearchFieldController {
 			return new ModelAndView(x_view, modelMap);
 		}
 
-		return new ModelAndView("/search/searchField/edit", modelMap);
+		return new ModelAndView("/sys/searchField/edit", modelMap);
 	}
 
 	@RequestMapping("/json")
@@ -209,7 +209,7 @@ public class SearchFieldController {
 			return new ModelAndView(view, modelMap);
 		}
 
-		return new ModelAndView("/search/searchField/list", modelMap);
+		return new ModelAndView("/sys/searchField/list", modelMap);
 	}
 
 	@RequestMapping("/query")
@@ -223,7 +223,7 @@ public class SearchFieldController {
 		if (StringUtils.isNotEmpty(x_view)) {
 			return new ModelAndView(x_view, modelMap);
 		}
-		return new ModelAndView("/search/searchField/query", modelMap);
+		return new ModelAndView("/sys/searchField/query", modelMap);
 	}
 
 	@ResponseBody
@@ -271,10 +271,6 @@ public class SearchFieldController {
 			searchField.setAnalyzerFlag(request.getParameter("analyzerFlag"));
 			searchField.setSearchReturnFlag(request.getParameter("searchReturnFlag"));
 			searchField.setLocked(RequestUtils.getInt(request, "locked"));
-			searchField.setCreateBy(request.getParameter("createBy"));
-			searchField.setCreateTime(RequestUtils.getDate(request, "createTime"));
-			searchField.setUpdateBy(request.getParameter("updateBy"));
-			searchField.setUpdateTime(RequestUtils.getDate(request, "updateTime"));
 			searchField.setCreateBy(actorId);
 			searchField.setUpdateBy(actorId);
 

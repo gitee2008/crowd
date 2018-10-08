@@ -38,7 +38,7 @@ public interface SearchFieldMapper {
 
 	void bulkInsertSearchField_oracle(List<SearchField> list);
 
-	void deleteSearchFields(SearchFieldQuery query);
+	void deleteSearchFieldByServerId(String serverId);
 
 	void deleteSearchFieldById(String id);
 
