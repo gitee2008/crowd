@@ -422,6 +422,49 @@ public class ElasticSearchUtils {
 	}
 
 	/**
+	 * 获取总记录数
+	 * 
+	 * @param serverURL 服务地址
+	 * @param indexName 索引名称
+	 * @param type      索引类型
+	 * @param queryJson 查询条件
+	 * @return
+	 */
+	public static long getTotal(String serverURL, String indexName, String type, String queryJson) {
+		JSONObject result = null;
+		HttpClient httpClient = new HttpClient();
+		String url = serverURL + "/" + indexName + "/" + type + "/_search";
+		PostMethod postMethod = new PostMethod(url);
+		RequestEntity requestEntity = null;
+		long total = 0;
+		try {
+			JSONObject queryJsonObject = JSONObject.parseObject(queryJson);
+			queryJsonObject.put("from", 0);
+			queryJsonObject.put("size", 0);
+			queryJson = queryJsonObject.toJSONString();
+			requestEntity = new StringRequestEntity(queryJson, "application/json", "UTF-8");
+			postMethod.setRequestEntity(requestEntity);
+
+			int statusCode = httpClient.executeMethod(postMethod);
+			if (statusCode != HttpStatus.SC_OK) {
+				logger.error("method failed: " + postMethod.getStatusLine());
+			} else {
+				String responseBody = postMethod.getResponseBodyAsString();
+				result = JSONObject.parseObject(responseBody);
+				JSONObject hits = result.getJSONObject("hits");
+				if (hits != null) {
+					total = hits.getLong("total");
+				}
+			}
+		} catch (IOException ex) {
+			logger.error("method error: " + ex.getMessage());
+		} finally {
+			postMethod.releaseConnection();
+		}
+		return total;
+	}
+
+	/**
 	 * 重建索引
 	 * 
 	 * @param serverURL    服务地址
@@ -490,49 +533,6 @@ public class ElasticSearchUtils {
 			postMethod.releaseConnection();
 		}
 		return result;
-	}
-
-	/**
-	 * 获取总记录数
-	 * 
-	 * @param serverURL 服务地址
-	 * @param indexName 索引名称
-	 * @param type      索引类型
-	 * @param queryJson 查询条件
-	 * @return
-	 */
-	public static long searcherRecords(String serverURL, String indexName, String type, String queryJson) {
-		JSONObject result = null;
-		HttpClient httpClient = new HttpClient();
-		String url = serverURL + "/" + indexName + "/" + type + "/_search";
-		PostMethod postMethod = new PostMethod(url);
-		RequestEntity requestEntity = null;
-		long total = 0;
-		try {
-			JSONObject queryJsonObject = JSONObject.parseObject(queryJson);
-			queryJsonObject.put("from", 0);
-			queryJsonObject.put("size", 0);
-			queryJson = queryJsonObject.toJSONString();
-			requestEntity = new StringRequestEntity(queryJson, "application/json", "UTF-8");
-			postMethod.setRequestEntity(requestEntity);
-
-			int statusCode = httpClient.executeMethod(postMethod);
-			if (statusCode != HttpStatus.SC_OK) {
-				logger.error("method failed: " + postMethod.getStatusLine());
-			} else {
-				String responseBody = postMethod.getResponseBodyAsString();
-				result = JSONObject.parseObject(responseBody);
-				JSONObject hits = result.getJSONObject("hits");
-				if (hits != null) {
-					total = hits.getLong("total");
-				}
-			}
-		} catch (IOException ex) {
-			logger.error("method error: " + ex.getMessage());
-		} finally {
-			postMethod.releaseConnection();
-		}
-		return total;
 	}
 
 	/**
