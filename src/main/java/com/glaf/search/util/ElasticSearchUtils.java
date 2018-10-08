@@ -34,6 +34,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.alibaba.fastjson.JSONObject;
+import com.glaf.core.util.UUID32;
 import com.glaf.search.domain.SearchField;
 import com.glaf.search.domain.SearchServer;
 
@@ -59,7 +60,7 @@ public class ElasticSearchUtils {
 			putMethod.setRequestEntity(requestEntity);
 			int statusCode = httpClient.executeMethod(putMethod);
 			if (statusCode != HttpStatus.SC_OK) {
-				logger.error("method failed: " + putMethod.getStatusLine());
+				logger.error("create document failed: " + putMethod.getStatusLine());
 			} else {
 				String responseBody = putMethod.getResponseBodyAsString();
 				JSONObject responseJson = JSONObject.parseObject(responseBody);
@@ -517,6 +518,11 @@ public class ElasticSearchUtils {
 		PostMethod postMethod = new PostMethod(url);
 		RequestEntity requestEntity = null;
 		try {
+			JSONObject queryJsonObject = JSONObject.parseObject(queryJson);
+			queryJsonObject.put("from", 0);
+			queryJsonObject.put("size", 5000);
+			queryJson = queryJsonObject.toJSONString();
+			logger.debug("query params:" + queryJson);
 			requestEntity = new StringRequestEntity(queryJson, "application/json", "UTF-8");
 			postMethod.setRequestEntity(requestEntity);
 
@@ -559,12 +565,13 @@ public class ElasticSearchUtils {
 			queryJsonObject.put("from", from);
 			queryJsonObject.put("size", pageSize);
 			queryJson = queryJsonObject.toJSONString();
+			logger.debug("query params:" + queryJson);
 			requestEntity = new StringRequestEntity(queryJson, "application/json", "UTF-8");
 			postMethod.setRequestEntity(requestEntity);
 
 			int statusCode = httpClient.executeMethod(postMethod);
 			if (statusCode != HttpStatus.SC_OK) {
-				logger.error("method failed: " + postMethod.getStatusLine());
+				logger.error("search paging failed: " + postMethod.getStatusLine());
 			} else {
 				String responseBody = postMethod.getResponseBodyAsString();
 				result = JSONObject.parseObject(responseBody);
@@ -655,17 +662,21 @@ public class ElasticSearchUtils {
 		String server = "http://127.0.0.1:9200";
 		String indexName = "index";
 		String typeName = "test";
-		String id = "4";
+		String id = UUID32.getUUID();
 		String jsonData = "{\"content\":\"中美贸易战，中国不惧美国\"}";
 		ElasticSearchUtils.createDocument(server, indexName, typeName, id, jsonData);
 		String queryJson = "{\"query\":\"中国\"}";
-		JSONObject object = ElasticSearchUtils.searchPaging(server, indexName, typeName, queryJson, 1, 10);
-		System.out.println(object.toJSONString());
+		JSONObject json = ElasticSearchUtils.searchPaging(server, indexName, typeName, queryJson, 1, 10);
+		if (json != null) {
+			System.out.println(json.toJSONString());
+		}
 		List<String> fields = new ArrayList<String>();
 		fields.add("content");
 		String queryStr = ElasticSearchUtils.getMultiMatchQueryAllJsonString("中美", "most_fields", fields, fields,
 				"red-highlight");
-		object = ElasticSearchUtils.searchPaging(server, indexName, typeName, queryStr, 1, 1);
-		System.out.println(object.toJSONString());
+		json = ElasticSearchUtils.searchPaging(server, indexName, typeName, queryStr, 1, 10);
+		if (json != null) {
+			System.out.println(json.toJSONString());
+		}
 	}
 }
