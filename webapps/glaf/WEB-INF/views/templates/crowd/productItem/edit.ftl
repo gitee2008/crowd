@@ -68,7 +68,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td width="15%" align="left">小图片地址</td>
+		<td width="15%" align="left">小图片</td>
 		<td align="left">
               <input id="smallUrl" name="smallUrl" type="file" 
 			         class="easyui-validatebox x-text" style="width:350px;"/>
@@ -78,7 +78,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td width="15%" align="left">图片地址</td>
+		<td width="15%" align="left">大图片</td>
 		<td align="left">
               <input id="itemUrl" name="itemUrl" type="file" 
 			         class="easyui-validatebox x-text" style="width:350px;"/>
