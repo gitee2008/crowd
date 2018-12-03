@@ -671,7 +671,7 @@
 		<dependency>
 			<groupId>com.github.pagehelper</groupId>
 			<artifactId>pagehelper</artifactId>
-			<version>5.1.7</version>
+			<version>5.1.8</version>
 		</dependency>
 		<!-- jdbc驱动 -->
 		<dependency>
@@ -966,7 +966,7 @@
 		<dependency>
 			<groupId>net.oschina.j2cache</groupId>
 			<artifactId>j2cache-core</artifactId>
-			<version>2.5.5-release</version>
+			<version>2.7.6-release</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jxls</groupId>
