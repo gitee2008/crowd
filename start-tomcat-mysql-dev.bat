@@ -2,4 +2,4 @@ rem start deleteTemp-dev.bat
 set JAVA_HOME=C:\jdk1.8.0
 cd tomcat
 cd bin
-startup_mysql_dev
+startup_mysql_dev.bat
